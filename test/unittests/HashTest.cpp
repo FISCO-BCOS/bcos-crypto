@@ -17,9 +17,7 @@
  * @file HashTest.h
  * @date 2021.03.04
  */
-
-//#include <libutilities/JsonDataConvertUtility.h>
-#include <bcos-framework/interfaces/libcrypto/CryptoSuite.h>
+#include <bcos-framework/interfaces/crypto/CryptoSuite.h>
 #include <hash/Keccak256.h>
 #include <hash/SM3.h>
 #include <test/bcos-test/libutils/TestPromptFixture.h>
@@ -40,10 +38,13 @@ BOOST_AUTO_TEST_CASE(testKeccak256)
     std::string ts = keccak256->emptyHash().hex();
     BOOST_CHECK_EQUAL(
         ts, std::string("c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"));
+    std::cout << "#### checkx passed" << std::endl;
+
     std::string hashData = "abcde";
     ts = keccak256->hash(hashData).hex();
     BOOST_CHECK_EQUAL(
         ts, std::string("6377c7e66081cb65e473c1b95db5195a27d04a7108b468890224bedbe1a8a6eb"));
+    std::cout << "#### check1 passed" << std::endl;
 
     h256 emptyKeccak256(
         *fromHexString("c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"));
@@ -53,6 +54,7 @@ BOOST_AUTO_TEST_CASE(testKeccak256)
         h256("c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"));
     BOOST_REQUIRE_EQUAL(cryptoSuite->hash("hello"),
         h256("1c8aff950685c2ed4bc3174f3472287b56d9517b9c948127319a09a7a36deac8"));
+    std::cout << "#### check2 passed" << std::endl;
 }
 BOOST_AUTO_TEST_CASE(testSM3)
 {
@@ -61,19 +63,26 @@ BOOST_AUTO_TEST_CASE(testSM3)
     std::string ts = sm3->emptyHash().hex();
     BOOST_CHECK_EQUAL(
         ts, std::string("1ab21d8355cfa17f8e61194831e81a8f22bec8c728fefb747ed035eb5082aa2b"));
+    std::cout << "#### check4 passed" << std::endl;
+
     std::string hashData = "abcde";
     ts = sm3->hash(hashData).hex();
     BOOST_CHECK_EQUAL(
         ts, std::string("afe4ccac5ab7d52bcae36373676215368baf52d3905e1fecbe369cc120e97628"));
+    std::cout << "#### check5 passed" << std::endl;
 
     h256 emptyKeccak256(
         *fromHexString("1ab21d8355cfa17f8e61194831e81a8f22bec8c728fefb747ed035eb5082aa2b"));
     BOOST_REQUIRE_EQUAL(emptyKeccak256, sm3->emptyHash());
+    std::cout << "#### check6 passed" << std::endl;
 
     BOOST_REQUIRE_EQUAL(cryptoSuite->hash(""),
         h256("1ab21d8355cfa17f8e61194831e81a8f22bec8c728fefb747ed035eb5082aa2b"));
+    std::cout << "#### check7 passed" << std::endl;
+
     BOOST_REQUIRE_EQUAL(cryptoSuite->hash("hello"),
         h256("becbbfaae6548b8bf0cfcad5a27183cd1be6093b1cceccc303d9c61d0a645268"));
+    std::cout << "#### check8 passed" << std::endl;
 }
 BOOST_AUTO_TEST_SUITE_END()
 }  // namespace test

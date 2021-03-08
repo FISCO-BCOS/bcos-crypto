@@ -30,7 +30,7 @@ jobs:
         run: rustup default nightly
       - name: check commit
         if: ${{ runner.os == 'Linux' && github.base_ref != 'master' && github.event_name == 'pull_request' }}
-        run: bash bcos-cmake-scripts/shell/check-commit.sh 3000 "https://api.github.com/repos/FISCO-BCOS/bcos-crypto`"
+        run: bash bcos-cmake-scripts/shell/check-commit.sh 3000 "https://api.github.com/repos/FISCO-BCOS/bcos-crypto"
       - uses: actions/cache@v2
         id: cache
         with:
@@ -61,7 +61,7 @@ jobs:
       - name: compile
         run: make -j2
       - name: run test
-        run: make test
+        run: CTEST_OUTPUT_ON_FAILURE=TRUE make test
   build_with_gcc:
     name: build_with_gcc
     runs-on: ${{ matrix.os }}
@@ -100,7 +100,7 @@ jobs:
       - name: compile
         run: make -j2
       - name: run test
-        run: make test
+        run: CTEST_OUTPUT_ON_FAILURE=TRUE make test
   ubuntu16_04_build_with_gcc:
     name: ubuntu16_04_build_with_gcc
     runs-on: ${{ matrix.os }}
@@ -139,7 +139,7 @@ jobs:
       - name: compile
         run: make -j2
       - name: run test
-        run: make test
+        run: CTEST_OUTPUT_ON_FAILURE=TRUE make test
       - name: generate coverage
         run: make coverage
       - name: upload code coverage to Codecov
@@ -186,4 +186,4 @@ jobs:
           mkdir -p build && cd build
           cmake3 .. -DTESTS=ON
           make -j2
-          make test
+          CTEST_OUTPUT_ON_FAILURE=TRUE make test
