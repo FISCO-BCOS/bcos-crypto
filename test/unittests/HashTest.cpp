@@ -17,9 +17,7 @@
  * @file HashTest.h
  * @date 2021.03.04
  */
-
-//#include <libutilities/JsonDataConvertUtility.h>
-#include <bcos-framework/interfaces/libcrypto/CryptoSuite.h>
+#include <bcos-framework/interfaces/crypto/CryptoSuite.h>
 #include <hash/Keccak256.h>
 #include <hash/SM3.h>
 #include <test/bcos-test/libutils/TestPromptFixture.h>
@@ -40,6 +38,7 @@ BOOST_AUTO_TEST_CASE(testKeccak256)
     std::string ts = keccak256->emptyHash().hex();
     BOOST_CHECK_EQUAL(
         ts, std::string("c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"));
+
     std::string hashData = "abcde";
     ts = keccak256->hash(hashData).hex();
     BOOST_CHECK_EQUAL(
@@ -61,6 +60,7 @@ BOOST_AUTO_TEST_CASE(testSM3)
     std::string ts = sm3->emptyHash().hex();
     BOOST_CHECK_EQUAL(
         ts, std::string("1ab21d8355cfa17f8e61194831e81a8f22bec8c728fefb747ed035eb5082aa2b"));
+
     std::string hashData = "abcde";
     ts = sm3->hash(hashData).hex();
     BOOST_CHECK_EQUAL(
@@ -72,6 +72,7 @@ BOOST_AUTO_TEST_CASE(testSM3)
 
     BOOST_REQUIRE_EQUAL(cryptoSuite->hash(""),
         h256("1ab21d8355cfa17f8e61194831e81a8f22bec8c728fefb747ed035eb5082aa2b"));
+
     BOOST_REQUIRE_EQUAL(cryptoSuite->hash("hello"),
         h256("becbbfaae6548b8bf0cfcad5a27183cd1be6093b1cceccc303d9c61d0a645268"));
 }

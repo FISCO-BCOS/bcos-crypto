@@ -27,8 +27,8 @@ list(APPEND CMAKE_MODULE_PATH ${BCOS_CRYPTO_CMAKE_DIR})
 #init hunter
 include(HunterGate)
 HunterGate(
-    URL "https://github.com/FISCO-BCOS/hunter/archive/cbc6b446ed9e4bff82027fa7af30c6f030b9dc38.tar.gz"
-    SHA1 "e2b62ea14869e386b33e9b9a0c01a0d2f83b9761"
+    URL "https://github.com/FISCO-BCOS/hunter/archive/de72c627250f14e7fb11b22bbf4cfa65d5f50d19.tar.gz"
+    SHA1 "107d1d430c8da07154a94d2856a6eb19c540a36e"
 )
 project(bcos-crypto VERSION "3.0.0")
 set(VERSION_SUFFIX "")
@@ -38,13 +38,15 @@ include(Options)
 configure_project()
 include(CompilerSettings)
 
+include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/..)
 # install dependencies
 include(InstallBcosFrameworkDependencies)
 hunter_add_package(wedpr-crypto)
 find_package(wedpr-crypto CONFIG REQUIRED)
 
 # add source directory
-aux_source_directory(./hash SRC_LIST)
+include(Sources)
 
 set(BCOS_CRYPTO_TARGET bcos-crypto)
 add_library(${BCOS_CRYPTO_TARGET} ${SRC_LIST} ${HEADERS})
@@ -67,11 +69,7 @@ install(
     INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )
 # install the include files for hash
-install(
-    DIRECTORY "hash/"
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/bcos-crypto/hash"
-    FILES_MATCHING PATTERN "*.h"
-)
+include(InstallInclude)
 
 # for doxygen
 include(BuildDocs)

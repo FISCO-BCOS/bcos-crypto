@@ -19,32 +19,29 @@
  * @author yujiechen
  */
 #pragma once
-#include <bcos-framework/interfaces/libcrypto/Hash.h>
+#include <WeDPRCrypto.h>
+#include <bcos-framework/interfaces/crypto/Hash.h>
 
 namespace bcos
 {
 namespace crypto
 {
+h256 inline sm3Hash(bytesConstRef _data)
+{
+    h256 hashData;
+    HashResult hashResult{(char*)hashData.data(), h256::size};
+    wedpr_sm3_hash_binary(&hashResult, (const char*)_data.data(), _data.size());
+    // Note: Due to the return value optimize of the C++ compiler, there will be no additional copy
+    // overhead
+    return hashData;
+}
 class SM3 : public Hash
 {
 public:
     using Ptr = std::shared_ptr<SM3>;
     SM3() {}
     virtual ~SM3() {}
-    h256 hash(bytesConstRef _data) override
-    {
-        char* hexData = (char*)(toHexString(_data)->c_str());
-        // TODO: wedpr crypto supports direct hash calculation on binary
-        char* result = wedpr_sm3_hash(hexData);
-        auto hashResult = h256(result, h256::StringDataType::FromHex);
-        if (result)
-        {
-            delete result;
-        }
-        return hashResult;
-    }
-
-private:
+    h256 hash(bytesConstRef _data) override { return sm3Hash(_data); }
 };
 }  // namespace crypto
 }  // namespace bcos
