@@ -21,16 +21,16 @@
 
 using namespace bcos;
 using namespace bcos::crypto;
+h256 bcos::crypto::keccak256Hash(bytesConstRef _data)
+{
+    h256 hashData;
+    HashResult hashResult{(char*)hashData.data(), h256::size};
+    wedpr_keccak256_hash_binary(&hashResult, (const char*)_data.data(), _data.size());
+    // Note: Due to the return value optimize of the C++ compiler, there will be no additional copy
+    // overhead
+    return hashData;
+}
 h256 Keccak256::hash(bytesConstRef _data)
 {
-    char* hexData = (char*)(toHexString(_data)->c_str());
-    char* result = wedpr_keccak256_hash(hexData);
-    // TODO: wedpr crypto supports direct hash calculation on binary
-    auto hashResult = h256(result, h256::StringDataType::FromHex);
-    // release the allocated memory
-    if (result)
-    {
-        delete result;
-    }
-    return hashResult;
+    return keccak256Hash(_data);
 }
