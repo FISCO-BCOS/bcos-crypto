@@ -44,11 +44,11 @@ std::shared_ptr<bytes> bcos::crypto::secp256k1Sign(KeyPair const& _keyPair, cons
 }
 
 bool bcos::crypto::secp256k1Verify(
-    Public const& _pubKey, const h256& _hash, std::shared_ptr<bytes> _signatureData)
+    Public const& _pubKey, const h256& _hash, bytesConstRef _signatureData)
 {
     auto verifyResult = wedpr_secp256k1_verify_binary((const char*)_pubKey.data(), Public::size,
-        (const char*)_hash.data(), h256::size, (const char*)_signatureData->data(),
-        _signatureData->size());
+        (const char*)_hash.data(), h256::size, (const char*)_signatureData.data(),
+        _signatureData.size());
     if (verifyResult == 0)
     {
         return true;
@@ -70,23 +70,23 @@ std::shared_ptr<KeyPair> bcos::crypto::secp256k1GenerateKeyPair()
     return keyPair;
 }
 
-Public bcos::crypto::secp256k1Recover(const h256& _hash, std::shared_ptr<bytes> _signatureData)
+Public bcos::crypto::secp256k1Recover(const h256& _hash, bytesConstRef _signatureData)
 {
     Public pubKey;
     PublicKey publicKeyResult{(char*)pubKey.data(), Public::size};
     auto retCode =
         wedpr_secp256k1_recover_binary_public_key(&publicKeyResult, (const char*)_hash.data(),
-            h256::size, (const char*)_signatureData->data(), _signatureData->size());
+            h256::size, (const char*)_signatureData.data(), _signatureData.size());
     if (retCode != 0)
     {
         BOOST_THROW_EXCEPTION(InvalidSignature() << errinfo_comment(
                                   "invalid signature: secp256k1Recover failed, msgHash : " +
-                                  _hash.hex() + ", signData:" + *toHexString(*_signatureData)));
+                                  _hash.hex() + ", signData:" + *toHexString(_signatureData)));
     }
     return pubKey;
 }
 
-std::pair<bool, bytes> bcos::crypto::secp256k1Recover(std::shared_ptr<bytes> _in)
+std::pair<bool, bytes> bcos::crypto::secp256k1Recover(bytesConstRef _input)
 {
     struct
     {
@@ -95,7 +95,7 @@ std::pair<bool, bytes> bcos::crypto::secp256k1Recover(std::shared_ptr<bytes> _in
         h256 r;
         h256 s;
     } in;
-    memcpy(&in, _in->data(), std::min(_in->size(), sizeof(*_in)));
+    memcpy(&in, _input.data(), std::min(_input.size(), sizeof(_input)));
     u256 v = (u256)in.v;
     if (v >= 27 && v <= 28)
     {
@@ -105,7 +105,8 @@ std::pair<bool, bytes> bcos::crypto::secp256k1Recover(std::shared_ptr<bytes> _in
         {
             auto encodedBytes = std::make_shared<bytes>();
             signatureData->encode(encodedBytes);
-            auto publicKey = secp256k1Recover(in.hash, encodedBytes);
+            auto publicKey = secp256k1Recover(
+                in.hash, bytesConstRef(encodedBytes->data(), encodedBytes->size()));
             auto address = secp256k1ToAddress(publicKey);
             return {true, address.asBytes()};
         }
@@ -116,4 +117,9 @@ std::pair<bool, bytes> bcos::crypto::secp256k1Recover(std::shared_ptr<bytes> _in
         }
     }
     return {false, {}};
+}
+
+Address Secp256k1Crypto::calculateAddress(Public const& _pubKey)
+{
+    return secp256k1ToAddress(_pubKey);
 }

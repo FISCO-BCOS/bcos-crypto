@@ -27,16 +27,16 @@ namespace bcos
 namespace crypto
 {
 std::shared_ptr<bytes> sm2Sign(KeyPair const& _keyPair, const h256& _hash);
-bool sm2Verify(Public const& _pubKey, const h256& _hash, std::shared_ptr<bytes> _signatureData);
+bool sm2Verify(Public const& _pubKey, const h256& _hash, bytesConstRef _signatureData);
 std::shared_ptr<KeyPair> sm2GenerateKeyPair();
-Public sm2Recover(const h256& _hash, std::shared_ptr<bytes> _signData);
-std::pair<bool, bytes> sm2Recover(std::shared_ptr<bytes> _in);
+Public sm2Recover(const h256& _hash, bytesConstRef _signData);
+std::pair<bool, bytes> sm2Recover(bytesConstRef _in);
 
 class SM2SignatureData : public SignatureData
 {
 public:
     using Ptr = std::shared_ptr<SM2SignatureData>;
-    explicit SM2SignatureData(bytes const& _data)
+    explicit SM2SignatureData(bytesConstRef _data)
     {
         m_signatureLen = c_sm2SignatureLen;
         decode(_data);
@@ -57,7 +57,7 @@ public:
         memcpy(_signatureData->data() + 64, m_pub.data(), Public::size);
     }
 
-    void decode(bytes const& _signatureData) override
+    void decode(bytesConstRef _signatureData) override
     {
         decodeCommonFields(_signatureData);
         m_pub = Public(_signatureData.data() + 64, Public::ConstructorType::FromPointer);
@@ -82,17 +82,17 @@ public:
         return sm2Sign(_keyPair, _hash);
     }
 
-    bool verify(
-        Public const& _pubKey, const h256& _hash, std::shared_ptr<bytes> _signatureData) override
+    bool verify(Public const& _pubKey, const h256& _hash, bytesConstRef _signatureData) override
     {
         return sm2Verify(_pubKey, _hash, _signatureData);
     }
 
-    Public recover(const h256& _hash, std::shared_ptr<bytes> _signatureData) override
+    Public recover(const h256& _hash, bytesConstRef _signatureData) override
     {
         return sm2Recover(_hash, _signatureData);
     }
     std::shared_ptr<KeyPair> generateKeyPair() override { return sm2GenerateKeyPair(); }
+    Address calculateAddress(Public const& _pubKey) override;
 };
 }  // namespace crypto
 }  // namespace bcos

@@ -60,10 +60,9 @@ std::shared_ptr<KeyPair> bcos::crypto::sm2GenerateKeyPair()
     return keyPair;
 }
 
-bool bcos::crypto::sm2Verify(
-    Public const& _pubKey, const h256& _hash, std::shared_ptr<bytes> _signatureData)
+bool bcos::crypto::sm2Verify(Public const& _pubKey, const h256& _hash, bytesConstRef _signatureData)
 {
-    auto signatureWithoutPub = bytesRef(_signatureData->data(), 64);
+    auto signatureWithoutPub = bytesConstRef(_signatureData.data(), 64);
     auto verifyResult = wedpr_sm2_verify_binary((const char*)_pubKey.data(), Public::size,
         (const char*)_hash.data(), h256::size, (const char*)signatureWithoutPub.data(),
         signatureWithoutPub.size());
@@ -74,19 +73,19 @@ bool bcos::crypto::sm2Verify(
     return false;
 }
 
-Public bcos::crypto::sm2Recover(const h256& _hash, std::shared_ptr<bytes> _signData)
+Public bcos::crypto::sm2Recover(const h256& _hash, bytesConstRef _signData)
 {
-    auto signatureStruct = std::make_shared<SM2SignatureData>(*_signData);
+    auto signatureStruct = std::make_shared<SM2SignatureData>(_signData);
     if (sm2Verify(signatureStruct->pub(), _hash, _signData))
     {
         return signatureStruct->pub();
     }
     BOOST_THROW_EXCEPTION(InvalidSignature() << errinfo_comment(
                               "invalid signature: sm2 recover public key failed, msgHash : " +
-                              _hash.hex() + ", signature:" + *toHexString(*_signData)));
+                              _hash.hex() + ", signature:" + *toHexString(_signData)));
 }
 
-std::pair<bool, bytes> bcos::crypto::sm2Recover(std::shared_ptr<bytes> _in)
+std::pair<bool, bytes> bcos::crypto::sm2Recover(bytesConstRef _input)
 {
     struct
     {
@@ -95,14 +94,15 @@ std::pair<bool, bytes> bcos::crypto::sm2Recover(std::shared_ptr<bytes> _in)
         h256 r;
         h256 s;
     } in;
-    memcpy(&in, _in->data(), std::min(_in->size(), sizeof(*_in)));
+    memcpy(&in, _input.data(), std::min(_input.size(), sizeof(_input)));
     // verify the signature
     auto signatureData = std::make_shared<SM2SignatureData>(in.r, in.s, in.pub);
     try
     {
         std::shared_ptr<bytes> encodedData = std::make_shared<bytes>();
         signatureData->encode(encodedData);
-        if (sm2Verify(signatureData->pub(), in.hash, encodedData))
+        if (sm2Verify(signatureData->pub(), in.hash,
+                bytesConstRef(encodedData->data(), encodedData->size())))
         {
             auto address = sm2ToAddress(signatureData->pub());
             return {true, address.asBytes()};
@@ -114,4 +114,9 @@ std::pair<bool, bytes> bcos::crypto::sm2Recover(std::shared_ptr<bytes> _in)
                      << LOG_KV("error", boost::diagnostic_information(e));
     }
     return {false, {}};
+}
+
+Address SM2Crypto::calculateAddress(Public const& _pubKey)
+{
+    return sm2ToAddress(_pubKey);
 }

@@ -19,7 +19,7 @@
  * @author yujiechen
  */
 #include "Secp256k1KeyPair.h"
-#include "hash/Keccak256.h"
+#include <bcos-crypto/hash/Keccak256.h>
 #include <bcos-crypto/signature/Exceptions.h>
 
 bcos::crypto::Public bcos::crypto::secp256k1PriToPub(bcos::crypto::Secret const& _secret)

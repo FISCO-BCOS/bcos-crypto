@@ -27,8 +27,8 @@ list(APPEND CMAKE_MODULE_PATH ${BCOS_CRYPTO_CMAKE_DIR})
 #init hunter
 include(HunterGate)
 HunterGate(
-    URL "https://github.com/FISCO-BCOS/hunter/archive/de72c627250f14e7fb11b22bbf4cfa65d5f50d19.tar.gz"
-    SHA1 "107d1d430c8da07154a94d2856a6eb19c540a36e"
+    URL "https://github.com/FISCO-BCOS/hunter/archive/ba6423d54a2a910445eeb901c4faae49907040b7.tar.gz"
+    SHA1 "ea41ec8b70ef7d92aca6724224afe1095834c2a7"
 )
 project(bcos-crypto VERSION "3.0.0")
 set(VERSION_SUFFIX "")
@@ -37,9 +37,10 @@ set(VERSION_SUFFIX "")
 include(Options)
 configure_project()
 include(CompilerSettings)
+include(CopyInclude)
 
-include_directories(${PROJECT_SOURCE_DIR})
-include_directories(${PROJECT_SOURCE_DIR}/..)
+include_directories(${CMAKE_INSTALL_INCLUDEDIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 # install dependencies
 include(InstallBcosFrameworkDependencies)
 hunter_add_package(wedpr-crypto)
