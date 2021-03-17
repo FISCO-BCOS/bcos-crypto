@@ -1,10 +1,11 @@
+set(DESTINATION_INCLUDE_DIR "${CMAKE_INSTALL_INCLUDEDIR}/bcos-crypto")
 install(
-    DIRECTORY "hash/"
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/bcos-crypto/hash"
+    DIRECTORY "hash"
+    DESTINATION "${DESTINATION_INCLUDE_DIR}"
     FILES_MATCHING PATTERN "*.h"
 )
 install(
-    DIRECTORY "signature/secp256k1"
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/bcos-crypto/signature/secp256k1"
+    DIRECTORY "signature"
+    DESTINATION "${DESTINATION_INCLUDE_DIR}"
     FILES_MATCHING PATTERN "*.h"
 )
