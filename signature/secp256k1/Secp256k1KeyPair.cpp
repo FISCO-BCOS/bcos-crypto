@@ -35,8 +35,3 @@ bcos::crypto::Public bcos::crypto::secp256k1PriToPub(bcos::crypto::Secret const&
     }
     return pubKey;
 }
-
-bcos::Address bcos::crypto::secp256k1ToAddress(bcos::crypto::Public const& _pubKey)
-{
-    return right160(keccak256Hash(_pubKey.ref()));
-}

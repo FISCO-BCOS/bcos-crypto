@@ -22,16 +22,19 @@
 #include "Secp256k1Crypto.h"
 #include "Secp256k1KeyPair.h"
 #include <bcos-crypto/signature/Exceptions.h>
+#include <bcos-crypto/signature/codec/SignatureDataWithV.h>
 #include <wedpr-crypto/WeDPRCrypto.h>
 
 using namespace bcos;
 using namespace bcos::crypto;
+
 std::shared_ptr<bytes> bcos::crypto::secp256k1Sign(KeyPair const& _keyPair, const HashType& _hash)
 {
-    FixedBytes<65> signatureDataArray;
+    FixedBytes<SECP256K1_SIGNATURE_LEN> signatureDataArray;
     CInputBuffer privateKey{(const char*)_keyPair.secretKey().data(), Secret::size};
     CInputBuffer msgHash{(const char*)_hash.data(), HashType::size};
-    COutputBuffer secp256k1SignatureResult{(char*)signatureDataArray.data(), 65};
+    COutputBuffer secp256k1SignatureResult{
+        (char*)signatureDataArray.data(), SECP256K1_SIGNATURE_LEN};
     auto retCode = wedpr_secp256k1_sign(&privateKey, &msgHash, &secp256k1SignatureResult);
     if (retCode != 0)
     {
@@ -87,7 +90,7 @@ Public bcos::crypto::secp256k1Recover(const HashType& _hash, bytesConstRef _sign
     return pubKey;
 }
 
-std::pair<bool, bytes> bcos::crypto::secp256k1Recover(bytesConstRef _input)
+std::pair<bool, bytes> bcos::crypto::secp256k1Recover(Hash::Ptr _hashImpl, bytesConstRef _input)
 {
     struct
     {
@@ -100,15 +103,15 @@ std::pair<bool, bytes> bcos::crypto::secp256k1Recover(bytesConstRef _input)
     u256 v = (u256)in.v;
     if (v >= 27 && v <= 28)
     {
-        auto signatureData =
-            std::make_shared<Secp256k1SignatureData>(in.r, in.s, (byte)((int)v - 27));
+        auto signatureData = std::make_shared<SignatureDataWithV>(
+            in.r, in.s, (byte)((int)v - 27), SECP256K1_SIGNATURE_LEN);
         try
         {
             auto encodedBytes = std::make_shared<bytes>();
             signatureData->encode(encodedBytes);
             auto publicKey = secp256k1Recover(
                 in.hash, bytesConstRef(encodedBytes->data(), encodedBytes->size()));
-            auto address = secp256k1ToAddress(publicKey);
+            auto address = getAddress(_hashImpl, publicKey);
             return {true, address.asBytes()};
         }
         catch (const std::exception& e)
@@ -118,9 +121,4 @@ std::pair<bool, bytes> bcos::crypto::secp256k1Recover(bytesConstRef _input)
         }
     }
     return {false, {}};
-}
-
-Address Secp256k1Crypto::calculateAddress(Public const& _pubKey)
-{
-    return secp256k1ToAddress(_pubKey);
 }
