@@ -19,6 +19,7 @@
  */
 #include <bcos-crypto/hash/Keccak256.h>
 #include <bcos-crypto/hash/SM3.h>
+#include <bcos-crypto/hash/Sha3.h>
 #include <bcos-framework/interfaces/crypto/CryptoSuite.h>
 #include <bcos-test/libutils/TestPromptFixture.h>
 #include <boost/test/unit_test.hpp>
@@ -66,15 +67,38 @@ BOOST_AUTO_TEST_CASE(testSM3)
     BOOST_CHECK_EQUAL(
         ts, std::string("afe4ccac5ab7d52bcae36373676215368baf52d3905e1fecbe369cc120e97628"));
 
-    h256 emptyKeccak256(
+    h256 emptySM3(
         *fromHexString("1ab21d8355cfa17f8e61194831e81a8f22bec8c728fefb747ed035eb5082aa2b"));
-    BOOST_REQUIRE_EQUAL(emptyKeccak256, sm3->emptyHash());
+    BOOST_REQUIRE_EQUAL(emptySM3, sm3->emptyHash());
 
     BOOST_REQUIRE_EQUAL(cryptoSuite->hash(""),
         h256("1ab21d8355cfa17f8e61194831e81a8f22bec8c728fefb747ed035eb5082aa2b"));
 
     BOOST_REQUIRE_EQUAL(cryptoSuite->hash("hello"),
         h256("becbbfaae6548b8bf0cfcad5a27183cd1be6093b1cceccc303d9c61d0a645268"));
+}
+BOOST_AUTO_TEST_CASE(testSha3)
+{
+    auto sha3 = std::make_shared<Sha3>();
+    auto cryptoSuite = std::make_shared<CryptoSuite>(sha3, nullptr, nullptr);
+    std::string ts = sha3->emptyHash().hex();
+    BOOST_CHECK_EQUAL(
+        ts, std::string("a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a"));
+
+    std::string hashData = "abcde";
+    ts = sha3->hash(hashData).hex();
+    BOOST_CHECK_EQUAL(
+        ts, std::string("d716ec61e18904a8f58679b71cb065d4d5db72e0e0c3f155a4feff7add0e58eb"));
+
+    h256 emptySha3(
+        *fromHexString("a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a"));
+    BOOST_REQUIRE_EQUAL(emptySha3, sha3->emptyHash());
+
+    BOOST_REQUIRE_EQUAL(cryptoSuite->hash(""),
+        h256("a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a"));
+
+    BOOST_REQUIRE_EQUAL(cryptoSuite->hash("hello"),
+        h256("3338be694f50c5f338814986cdf0686453a888b84f424d792af4b9202398f392"));
 }
 BOOST_AUTO_TEST_SUITE_END()
 }  // namespace test
