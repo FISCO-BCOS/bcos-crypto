@@ -25,7 +25,6 @@ namespace bcos
 namespace crypto
 {
 Public secp256k1PriToPub(Secret const& _secret);
-Address secp256k1ToAddress(Public const& _pubKey);
 class Secp256k1KeyPair : public KeyPair
 {
 public:
@@ -41,7 +40,6 @@ public:
       : KeyPair(_secretKey, _publicKey)
     {}
     explicit Secp256k1KeyPair(KeyPair const& _keyPair) : KeyPair(_keyPair) {}
-    Address calculateAddress(Public const& _pubKey) override { return secp256k1ToAddress(_pubKey); }
     Public priToPub(Secret const& _secret) override { return secp256k1PriToPub(_secret); }
 };
 }  // namespace crypto

@@ -25,10 +25,7 @@ namespace bcos
 {
 namespace crypto
 {
-Address sm2ToAddress(Public const& _pubKey);
 Public sm2PriToPub(Secret const& _secret);
-Address sm2ToAddress(Secret const& _secretKey);
-
 class SM2KeyPair : public KeyPair
 {
 public:
@@ -42,7 +39,6 @@ public:
     {}
     explicit SM2KeyPair(KeyPair const& _keyPair) : KeyPair(_keyPair) {}
     ~SM2KeyPair() override {}
-    Address calculateAddress(Public const& _pubKey) override { return sm2ToAddress(_pubKey); }
     Public priToPub(Secret const& _secretKey) override { return sm2PriToPub(_secretKey); }
 };
 }  // namespace crypto

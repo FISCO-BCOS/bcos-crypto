@@ -24,25 +24,16 @@
 
 using namespace bcos;
 using namespace bcos::crypto;
-
-Address bcos::crypto::sm2ToAddress(Public const& _pubKey)
-{
-    return right160(sm3Hash(_pubKey.ref()));
-}
 Public bcos::crypto::sm2PriToPub(Secret const& _secretKey)
 {
+    CInputBuffer privateKey{(const char*)_secretKey.data(), Secret::size};
     Public pubKey;
-    PublicKey publicKey{(char*)pubKey.data(), Public::size};
-    auto retCode = wedpr_sm2_derive_binary_public_key(
-        &publicKey, (const char*)_secretKey.data(), Secret::size);
+    COutputBuffer publicKey{(char*)pubKey.data(), Public::size};
+    auto retCode = wedpr_sm2_derive_public_key(&privateKey, &publicKey);
     if (retCode != 0)
     {
         BOOST_THROW_EXCEPTION(
             PriToPublicKeyException() << errinfo_comment("sm2PriToPub exception"));
     }
     return pubKey;
-}
-Address bcos::crypto::sm2ToAddress(Secret const& _secretKey)
-{
-    return sm2ToAddress(sm2PriToPub(_secretKey));
 }

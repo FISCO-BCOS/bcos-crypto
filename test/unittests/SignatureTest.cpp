@@ -20,6 +20,8 @@
 #include <bcos-crypto/hash/Keccak256.h>
 #include <bcos-crypto/hash/SM3.h>
 #include <bcos-crypto/signature/Exceptions.h>
+#include <bcos-crypto/signature/codec/SignatureDataWithPub.h>
+#include <bcos-crypto/signature/codec/SignatureDataWithV.h>
 #include <bcos-crypto/signature/secp256k1/Secp256k1Crypto.h>
 #include <bcos-crypto/signature/secp256k1/Secp256k1KeyPair.h>
 #include <bcos-crypto/signature/sm2/SM2Crypto.h>
@@ -48,21 +50,24 @@ BOOST_AUTO_TEST_CASE(testSecp256k1KeyPair)
     bcos::crypto::Public pub2 = secp256k1PriToPub(sec2);
     BOOST_CHECK(pub1 != pub2);
     // check address
+    auto hashImpl = std::make_shared<Keccak256>();
     auto secp256k1KeyPair1 = std::make_shared<Secp256k1KeyPair>(sec1);
     auto secp256k1KeyPair2 = std::make_shared<Secp256k1KeyPair>(sec2);
 
-    Address address1 = secp256k1KeyPair1->address();
-    Address address2 = secp256k1KeyPair2->address();
+    Address address1 = secp256k1KeyPair1->address(hashImpl);
+    Address address2 = secp256k1KeyPair2->address(hashImpl);
     BOOST_CHECK(address1 != address2);
     // test calculateAddress
-    BOOST_CHECK(secp256k1KeyPair1->address() == secp256k1KeyPair1->calculateAddress(pub1));
-    BOOST_CHECK(secp256k1KeyPair2->address() == secp256k1KeyPair2->calculateAddress(pub2));
-    BOOST_CHECK(secp256k1KeyPair1->calculateAddressBySecret(sec1) ==
-                secp256k1KeyPair1->calculateAddress(pub1));
-    BOOST_CHECK(secp256k1KeyPair2->calculateAddressBySecret(sec2) ==
-                secp256k1KeyPair2->calculateAddress(pub2));
-    BOOST_CHECK(secp256k1KeyPair1->calculateAddressBySecret(sec1) !=
-                secp256k1KeyPair2->calculateAddressBySecret(sec2));
+    BOOST_CHECK(secp256k1KeyPair1->address(hashImpl) ==
+                secp256k1KeyPair1->calculateAddress(hashImpl, pub1));
+    BOOST_CHECK(secp256k1KeyPair2->address(hashImpl) ==
+                secp256k1KeyPair2->calculateAddress(hashImpl, pub2));
+    BOOST_CHECK(secp256k1KeyPair1->calculateAddressBySecret(hashImpl, sec1) ==
+                secp256k1KeyPair1->calculateAddress(hashImpl, pub1));
+    BOOST_CHECK(secp256k1KeyPair2->calculateAddressBySecret(hashImpl, sec2) ==
+                secp256k1KeyPair2->calculateAddress(hashImpl, pub2));
+    BOOST_CHECK(secp256k1KeyPair1->calculateAddressBySecret(hashImpl, sec1) !=
+                secp256k1KeyPair2->calculateAddressBySecret(hashImpl, sec2));
 
     // create KeyPair
     auto keyPair = secp256k1GenerateKeyPair();
@@ -125,21 +130,21 @@ BOOST_AUTO_TEST_CASE(testSecp256k1SignAndVerify)
     h256 r(keccak256Hash(std::string("+++")));
     h256 s(keccak256Hash(std::string("24324")));
     byte v = 4;
-    auto signatureData = std::make_shared<Secp256k1SignatureData>(r, s, v);
+    auto signatureData = std::make_shared<SignatureDataWithV>(r, s, v, SECP256K1_SIGNATURE_LEN);
     auto secp256k1Crypto = std::make_shared<Secp256k1Crypto>();
     BOOST_CHECK_THROW(secp256k1Crypto->recoverSignature(hashData, signatureData), InvalidSignature);
 
     // test signatureData encode and decode
     auto encodedData = std::make_shared<bytes>();
     signatureData->encode(encodedData);
-    auto signatureData2 = std::make_shared<Secp256k1SignatureData>(
-        bytesConstRef(encodedData->data(), encodedData->size()));
+    auto signatureData2 = std::make_shared<SignatureDataWithV>(
+        bytesConstRef(encodedData->data(), encodedData->size()), SECP256K1_SIGNATURE_LEN);
     BOOST_CHECK(signatureData2->r() == signatureData->r());
     BOOST_CHECK(signatureData2->s() == signatureData->s());
     BOOST_CHECK(signatureData2->v() == signatureData->v());
 
-    auto signatureData3 =
-        std::make_shared<Secp256k1SignatureData>(bytesConstRef(signData->data(), signData->size()));
+    auto signatureData3 = std::make_shared<SignatureDataWithV>(
+        bytesConstRef(signData->data(), signData->size()), SECP256K1_SIGNATURE_LEN);
     signatureData3->encode(encodedData);
     BOOST_CHECK(*signData == *encodedData);
     auto publicKey = secp256k1Crypto->recoverSignature(hashData, signatureData3);
@@ -155,17 +160,20 @@ BOOST_AUTO_TEST_CASE(testSM2KeyPair)
         "bcec428d5205abe0f0cc8a7340839"
         "08d9eb8563e31f943d760786edf42ad67dd");
     auto pub1 = sm2PriToPub(sec1);
+    auto keyPair1 = std::make_shared<SM2KeyPair>(sec1);
     Secret sec2("bcec428d5205abe0");
     auto pub2 = sm2PriToPub(sec2);
+    auto keyPair2 = std::make_shared<SM2KeyPair>(sec2);
     BOOST_CHECK(pub1 != pub2);
 
     // check public to address
-    Address address1 = sm2ToAddress(pub1);
-    Address address2 = sm2ToAddress(pub2);
+    auto hashImpl = std::make_shared<SM3>();
+    Address address1 = getAddress(hashImpl, pub1);
+    Address address2 = getAddress(hashImpl, pub2);
     BOOST_CHECK(address1 != address2);
     // check secret to address
-    Address addressSec1 = sm2ToAddress(sec1);
-    Address addressSec2 = sm2ToAddress(sec2);
+    Address addressSec1 = keyPair1->address(hashImpl);
+    Address addressSec2 = keyPair2->address(hashImpl);
     BOOST_CHECK(addressSec1 != addressSec2);
     BOOST_CHECK(address1 == addressSec1);
     BOOST_CHECK(address2 == addressSec2);
@@ -176,7 +184,7 @@ BOOST_AUTO_TEST_CASE(testSM2KeyPair)
     pub1 = sm2PriToPub(keyPair->secretKey());
     BOOST_CHECK_EQUAL(keyPair->publicKey(), pub1);
 
-/// TODO: fix the wedpr-crypto panic bug
+// TODO: uncomment this when wedpr-crypto fix the panic
 #if 0
     // empty case
     Secret empty;
@@ -229,12 +237,13 @@ BOOST_AUTO_TEST_CASE(testSM2SignAndVerify)
         keyPair2->publicKey(), hashData, bytesConstRef(sig->data(), sig->size()));
     BOOST_CHECK(result == false);
 
-    auto signatureStruct =
-        std::make_shared<SM2SignatureData>(bytesConstRef(sig->data(), sig->size()));
+    auto signatureStruct = std::make_shared<SignatureDataWithPub>(
+        bytesConstRef(sig->data(), sig->size()), SM2_SIGNATURE_LEN);
     auto r = signatureStruct->r();
     auto s = signatureStruct->s();
 
-    auto signatureStruct2 = std::make_shared<SM2SignatureData>(r, s, signatureStruct->pub());
+    auto signatureStruct2 =
+        std::make_shared<SignatureDataWithPub>(r, s, signatureStruct->pub(), SM2_SIGNATURE_LEN);
     auto encodedData = std::make_shared<bytes>();
     signatureStruct2->encode(encodedData);
     auto recoverKey =
@@ -246,7 +255,7 @@ BOOST_AUTO_TEST_CASE(testSM2SignAndVerify)
     h256 r(crypto::Hash("+++"));
     h256 s(crypto::Hash("24324"));
     h512 v(crypto::Hash("123456"));
-    auto signatureData = std::make_shared<SM2SignatureData>(r, s, v);
+    auto signatureData = std::make_shared<SignatureDataWithPub>(r, s, v, SM2_SIGNATURE_LEN);
     // check recover
     signatureData->encode(encodedData);
     BOOST_CHECK_THROW(signatureCrypto->recover(hashData, encodedData), InvalidSignature);

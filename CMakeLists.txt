@@ -27,8 +27,8 @@ list(APPEND CMAKE_MODULE_PATH ${BCOS_CRYPTO_CMAKE_DIR})
 #init hunter
 include(HunterGate)
 HunterGate(
-    URL "https://github.com/FISCO-BCOS/hunter/archive/ba6423d54a2a910445eeb901c4faae49907040b7.tar.gz"
-    SHA1 "ea41ec8b70ef7d92aca6724224afe1095834c2a7"
+    URL "https://github.com/cyjseagull/hunter/archive/4de1cfee6295dec8892dca2db4d22408359aef5f.tar.gz"
+    SHA1 "c25382b06f61c569b8de72fc496afccaedf369dd"
 )
 project(bcos-crypto VERSION "3.0.0")
 set(VERSION_SUFFIX "")
@@ -51,7 +51,7 @@ include(Sources)
 
 set(BCOS_CRYPTO_TARGET bcos-crypto)
 add_library(${BCOS_CRYPTO_TARGET} ${SRC_LIST} ${HEADERS})
-target_link_libraries(${BCOS_CRYPTO_TARGET} PUBLIC bcos-framework::utilities wedpr-crypto::wedpr-crypto)
+target_link_libraries(${BCOS_CRYPTO_TARGET} PUBLIC bcos-framework::utilities wedpr-crypto::crypto)
 
 if (TESTS)
     enable_testing()
