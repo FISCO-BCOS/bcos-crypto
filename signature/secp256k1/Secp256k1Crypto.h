@@ -26,11 +26,11 @@ namespace bcos
 {
 namespace crypto
 {
-std::shared_ptr<bytes> secp256k1Sign(KeyPair const& _keyPair, const h256& _hash);
-bool secp256k1Verify(Public const& _pubKey, const h256& _hash, bytesConstRef _signatureData);
+std::shared_ptr<bytes> secp256k1Sign(KeyPair const& _keyPair, const HashType& _hash);
+bool secp256k1Verify(Public const& _pubKey, const HashType& _hash, bytesConstRef _signatureData);
 std::shared_ptr<KeyPair> secp256k1GenerateKeyPair();
 
-Public secp256k1Recover(const h256& _hash, bytesConstRef _signatureData);
+Public secp256k1Recover(const HashType& _hash, bytesConstRef _signatureData);
 std::pair<bool, bytes> secp256k1Recover(bytesConstRef _in);
 
 class Secp256k1SignatureData : public SignatureData
@@ -75,16 +75,16 @@ public:
     using Ptr = std::shared_ptr<Secp256k1Crypto>;
     Secp256k1Crypto() = default;
     ~Secp256k1Crypto() override {}
-    std::shared_ptr<bytes> sign(KeyPair const& _keyPair, const h256& _hash) override
+    std::shared_ptr<bytes> sign(KeyPair const& _keyPair, const HashType& _hash) override
     {
         return secp256k1Sign(_keyPair, _hash);
     }
-    bool verify(Public const& _pubKey, const h256& _hash, bytesConstRef _signatureData) override
+    bool verify(Public const& _pubKey, const HashType& _hash, bytesConstRef _signatureData) override
     {
         return secp256k1Verify(_pubKey, _hash, _signatureData);
     }
 
-    Public recover(const h256& _hash, bytesConstRef _signatureData) override
+    Public recover(const HashType& _hash, bytesConstRef _signatureData) override
     {
         return secp256k1Recover(_hash, _signatureData);
     }

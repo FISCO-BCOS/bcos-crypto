@@ -176,13 +176,10 @@ BOOST_AUTO_TEST_CASE(testSM2KeyPair)
     pub1 = sm2PriToPub(keyPair->secretKey());
     BOOST_CHECK_EQUAL(keyPair->publicKey(), pub1);
 
-/// TODO: fix the wedpr-crypto panic bug
-#if 0
     // empty case
     Secret empty;
     SM2KeyPair sm2KeyPair(empty);
     BOOST_CHECK(!sm2KeyPair.address());
-#endif
 }
 BOOST_AUTO_TEST_CASE(testSM2SignAndVerify)
 {

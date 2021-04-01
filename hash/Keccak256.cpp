@@ -17,20 +17,21 @@
  * @file Keccak256.cpp
  */
 #include "Keccak256.h"
-#include "WeDPRCrypto.h"
+#include <wedpr-crypto/WeDPRCrypto.h>
 
 using namespace bcos;
 using namespace bcos::crypto;
-h256 bcos::crypto::keccak256Hash(bytesConstRef _data)
+HashType bcos::crypto::keccak256Hash(bytesConstRef _data)
 {
     h256 hashData;
-    HashResult hashResult{(char*)hashData.data(), h256::size};
-    wedpr_keccak256_hash_binary(&hashResult, (const char*)_data.data(), _data.size());
+    CInputBuffer hashInput{(const char*)_data.data(), _data.size()};
+    COutputBuffer hashResult{(char*)hashData.data(), HashType::size};
+    wedpr_keccak256_hash(&hashInput, &hashResult);
     // Note: Due to the return value optimize of the C++ compiler, there will be no additional copy
     // overhead
     return hashData;
 }
-h256 Keccak256::hash(bytesConstRef _data)
+HashType Keccak256::hash(bytesConstRef _data)
 {
     return keccak256Hash(_data);
 }

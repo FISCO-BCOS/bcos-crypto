@@ -21,18 +21,18 @@
 
 #include "Secp256k1Crypto.h"
 #include "Secp256k1KeyPair.h"
-#include <WeDPRCrypto.h>
 #include <bcos-crypto/signature/Exceptions.h>
+#include <wedpr-crypto/WeDPRCrypto.h>
 
 using namespace bcos;
 using namespace bcos::crypto;
-std::shared_ptr<bytes> bcos::crypto::secp256k1Sign(KeyPair const& _keyPair, const h256& _hash)
+std::shared_ptr<bytes> bcos::crypto::secp256k1Sign(KeyPair const& _keyPair, const HashType& _hash)
 {
     FixedBytes<65> signatureDataArray;
-    SignatureResult secp256k1SignatureResult{(char*)signatureDataArray.data(), 65};
-    auto retCode = wedpr_secp256k1_sign_binary(&secp256k1SignatureResult,
-        (const char*)_keyPair.secretKey().data(), Secret::size, (const char*)_hash.data(),
-        h256::size);
+    CInputBuffer privateKey{(const char*)_keyPair.secretKey().data(), Secret::size};
+    CInputBuffer msgHash{(const char*)_hash.data(), HashType::size};
+    COutputBuffer secp256k1SignatureResult{(char*)signatureDataArray.data(), 65};
+    auto retCode = wedpr_secp256k1_sign(&privateKey, &msgHash, &secp256k1SignatureResult);
     if (retCode != 0)
     {
         BOOST_THROW_EXCEPTION(SignException() << errinfo_comment(
@@ -44,11 +44,12 @@ std::shared_ptr<bytes> bcos::crypto::secp256k1Sign(KeyPair const& _keyPair, cons
 }
 
 bool bcos::crypto::secp256k1Verify(
-    Public const& _pubKey, const h256& _hash, bytesConstRef _signatureData)
+    Public const& _pubKey, const HashType& _hash, bytesConstRef _signatureData)
 {
-    auto verifyResult = wedpr_secp256k1_verify_binary((const char*)_pubKey.data(), Public::size,
-        (const char*)_hash.data(), h256::size, (const char*)_signatureData.data(),
-        _signatureData.size());
+    CInputBuffer publicKey{(const char*)_pubKey.data(), Public::size};
+    CInputBuffer msgHash{(const char*)_hash.data(), HashType::size};
+    CInputBuffer signature{(const char*)_signatureData.data(), _signatureData.size()};
+    auto verifyResult = wedpr_secp256k1_verify(&publicKey, &msgHash, &signature);
     if (verifyResult == 0)
     {
         return true;
@@ -59,9 +60,9 @@ bool bcos::crypto::secp256k1Verify(
 std::shared_ptr<KeyPair> bcos::crypto::secp256k1GenerateKeyPair()
 {
     auto keyPair = std::make_shared<Secp256k1KeyPair>();
-    KeyPairData keyPairData = {(char*)keyPair->mutPublicKey().data(), Public::size,
-        (char*)keyPair->mutSecretKey().data(), Secret::size};
-    auto retCode = wedpr_secp256k1_gen_binary_key_pair(&keyPairData);
+    COutputBuffer publicKey{(char*)keyPair->mutPublicKey().data(), Public::size};
+    COutputBuffer privateKey{(char*)keyPair->mutSecretKey().data(), Secret::size};
+    auto retCode = wedpr_secp256k1_gen_key_pair(&publicKey, &privateKey);
     if (retCode != 0)
     {
         BOOST_THROW_EXCEPTION(
@@ -70,13 +71,13 @@ std::shared_ptr<KeyPair> bcos::crypto::secp256k1GenerateKeyPair()
     return keyPair;
 }
 
-Public bcos::crypto::secp256k1Recover(const h256& _hash, bytesConstRef _signatureData)
+Public bcos::crypto::secp256k1Recover(const HashType& _hash, bytesConstRef _signatureData)
 {
+    CInputBuffer msgHash{(const char*)_hash.data(), HashType::size};
+    CInputBuffer signature{(const char*)_signatureData.data(), _signatureData.size()};
     Public pubKey;
-    PublicKey publicKeyResult{(char*)pubKey.data(), Public::size};
-    auto retCode =
-        wedpr_secp256k1_recover_binary_public_key(&publicKeyResult, (const char*)_hash.data(),
-            h256::size, (const char*)_signatureData.data(), _signatureData.size());
+    COutputBuffer publicKeyResult{(char*)pubKey.data(), Public::size};
+    auto retCode = wedpr_secp256k1_recover_public_key(&msgHash, &signature, &publicKeyResult);
     if (retCode != 0)
     {
         BOOST_THROW_EXCEPTION(InvalidSignature() << errinfo_comment(
@@ -90,7 +91,7 @@ std::pair<bool, bytes> bcos::crypto::secp256k1Recover(bytesConstRef _input)
 {
     struct
     {
-        h256 hash;
+        HashType hash;
         h256 v;
         h256 r;
         h256 s;

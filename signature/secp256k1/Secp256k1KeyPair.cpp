@@ -24,10 +24,10 @@
 
 bcos::crypto::Public bcos::crypto::secp256k1PriToPub(bcos::crypto::Secret const& _secret)
 {
+    CInputBuffer privateKey{(char*)_secret.data(), Secret::size};
     Public pubKey;
-    PublicKey publicKey{(char*)pubKey.data(), Public::size};
-    auto retCode =
-        wedpr_secp256k1_derive_binary_public_key(&publicKey, (char*)_secret.data(), Secret::size);
+    COutputBuffer publicKey{(char*)pubKey.data(), Public::size};
+    auto retCode = wedpr_secp256k1_derive_public_key(&privateKey, &publicKey);
     if (retCode != 0)
     {
         BOOST_THROW_EXCEPTION(

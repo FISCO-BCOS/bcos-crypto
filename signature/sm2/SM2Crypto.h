@@ -26,10 +26,10 @@ namespace bcos
 {
 namespace crypto
 {
-std::shared_ptr<bytes> sm2Sign(KeyPair const& _keyPair, const h256& _hash);
-bool sm2Verify(Public const& _pubKey, const h256& _hash, bytesConstRef _signatureData);
+std::shared_ptr<bytes> sm2Sign(KeyPair const& _keyPair, const HashType& _hash);
+bool sm2Verify(Public const& _pubKey, const HashType& _hash, bytesConstRef _signatureData);
 std::shared_ptr<KeyPair> sm2GenerateKeyPair();
-Public sm2Recover(const h256& _hash, bytesConstRef _signData);
+Public sm2Recover(const HashType& _hash, bytesConstRef _signData);
 std::pair<bool, bytes> sm2Recover(bytesConstRef _in);
 
 class SM2SignatureData : public SignatureData
@@ -77,17 +77,17 @@ public:
     using Ptr = std::shared_ptr<SM2Crypto>;
     SM2Crypto() = default;
     ~SM2Crypto() override {}
-    std::shared_ptr<bytes> sign(KeyPair const& _keyPair, const h256& _hash) override
+    std::shared_ptr<bytes> sign(KeyPair const& _keyPair, const HashType& _hash) override
     {
         return sm2Sign(_keyPair, _hash);
     }
 
-    bool verify(Public const& _pubKey, const h256& _hash, bytesConstRef _signatureData) override
+    bool verify(Public const& _pubKey, const HashType& _hash, bytesConstRef _signatureData) override
     {
         return sm2Verify(_pubKey, _hash, _signatureData);
     }
 
-    Public recover(const h256& _hash, bytesConstRef _signatureData) override
+    Public recover(const HashType& _hash, bytesConstRef _signatureData) override
     {
         return sm2Recover(_hash, _signatureData);
     }
