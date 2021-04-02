@@ -29,7 +29,7 @@ bcos::crypto::PublicPtr bcos::crypto::secp256k1PriToPub(bcos::crypto::SecretPtr 
     PublicPtr pubKey = std::make_shared<KeyImpl>(SECP256K1_PUBLIC_LEN);
     COutputBuffer publicKey{pubKey->mutableData(), pubKey->size()};
     auto retCode = wedpr_secp256k1_derive_public_key(&privateKey, &publicKey);
-    if (retCode != 0)
+    if (retCode != WEDPR_SUCCESS)
     {
         BOOST_THROW_EXCEPTION(
             PriToPublicKeyException() << errinfo_comment("secp256k1PriToPub exception"));

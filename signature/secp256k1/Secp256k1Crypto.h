@@ -58,6 +58,11 @@ public:
         return secp256k1Recover(_hash, _signatureData);
     }
     KeyPairInterface::Ptr generateKeyPair() override { return secp256k1GenerateKeyPair(); }
+
+    std::pair<bool, bytes> recoverAddress(Hash::Ptr _hashImpl, bytesConstRef _in) override
+    {
+        return secp256k1Recover(_hashImpl, _in);
+    }
 };
 }  // namespace crypto
 }  // namespace bcos

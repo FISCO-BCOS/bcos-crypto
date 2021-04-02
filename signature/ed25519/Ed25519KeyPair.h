@@ -13,9 +13,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * @brief implementation for secp256k1 KeyPair
- * @file Secp256k1KeyPair.h
- * @date 2021.03.05
+ * @brief implementation for ed25519 keyPair algorithm
+ * @file Ed25519KeyPair.h
+ * @date 2021.04.01
  * @author yujiechen
  */
 #pragma once
@@ -26,21 +26,21 @@ namespace bcos
 {
 namespace crypto
 {
-const int SECP256K1_PUBLIC_LEN = 64;
-const int SECP256K1_PRIVATE_LEN = 32;
+const int ED25519_PUBLIC_LEN = 32;
+const int ED25519_PRIVATE_LEN = 32;
 
-PublicPtr secp256k1PriToPub(SecretPtr _secret);
-class Secp256k1KeyPair : public KeyPair
+PublicPtr ed25519PriToPub(SecretPtr _secretKey);
+class Ed25519KeyPair : public KeyPair
 {
 public:
-    using Ptr = std::shared_ptr<Secp256k1KeyPair>;
-    Secp256k1KeyPair() : KeyPair(SECP256K1_PUBLIC_LEN, SECP256K1_PRIVATE_LEN) {}
-    explicit Secp256k1KeyPair(SecretPtr _secretKey) : Secp256k1KeyPair()
+    Ed25519KeyPair() : KeyPair(ED25519_PUBLIC_LEN, ED25519_PRIVATE_LEN) {}
+    explicit Ed25519KeyPair(SecretPtr _secretKey) : Ed25519KeyPair()
     {
         m_secretKey = _secretKey;
         m_publicKey = priToPub(_secretKey);
     }
-    virtual PublicPtr priToPub(SecretPtr _secret) { return secp256k1PriToPub(_secret); }
+    ~Ed25519KeyPair() override {}
+    virtual PublicPtr priToPub(SecretPtr _secretKey) { return ed25519PriToPub(_secretKey); }
 };
 }  // namespace crypto
 }  // namespace bcos

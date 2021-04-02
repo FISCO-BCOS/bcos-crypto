@@ -20,7 +20,7 @@
  */
 #pragma once
 #include <bcos-framework/interfaces/crypto/Hash.h>
-#include <wedpr-crypto/WeDPRCrypto.h>
+#include <wedpr-crypto/WedprCrypto.h>
 
 namespace bcos
 {

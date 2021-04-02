@@ -27,7 +27,7 @@
 using namespace bcos;
 using namespace bcos::crypto;
 std::shared_ptr<bytes> bcos::crypto::sm2Sign(
-    KeyPairInterface::Ptr _keyPair, const HashType& _hash, bool _withPubKey)
+    KeyPairInterface::Ptr _keyPair, const HashType& _hash, bool _signatureWithPub)
 {
     FixedBytes<SM2_SIGNATURE_LEN> signatureDataArray;
     CInputBuffer rawPrivateKey{_keyPair->secretKey()->constData(), _keyPair->secretKey()->size()};
@@ -36,7 +36,7 @@ std::shared_ptr<bytes> bcos::crypto::sm2Sign(
     COutputBuffer sm2SignatureResult{(char*)signatureDataArray.data(), SM2_SIGNATURE_LEN};
     auto retCode =
         wedpr_sm2_sign_fast(&rawPrivateKey, &rawPublicKey, &rawMsgHash, &sm2SignatureResult);
-    if (retCode != 0)
+    if (retCode != WEDPR_SUCCESS)
     {
         BOOST_THROW_EXCEPTION(
             SignException() << errinfo_comment("sm2Sign failed, raw data: " + _hash.hex()));
@@ -44,7 +44,7 @@ std::shared_ptr<bytes> bcos::crypto::sm2Sign(
     std::shared_ptr<bytes> signatureData = std::make_shared<bytes>();
     *signatureData = signatureDataArray.asBytes();
     // append the public key
-    if (_withPubKey)
+    if (_signatureWithPub)
     {
         signatureData->insert(signatureData->end(), _keyPair->publicKey()->mutableData(),
             _keyPair->publicKey()->mutableData() + _keyPair->publicKey()->size());
@@ -58,7 +58,7 @@ KeyPairInterface::Ptr bcos::crypto::sm2GenerateKeyPair()
     COutputBuffer publicKey{keyPair->publicKey()->mutableData(), keyPair->publicKey()->size()};
     COutputBuffer privateKey{keyPair->secretKey()->mutableData(), keyPair->secretKey()->size()};
     auto retCode = wedpr_sm2_gen_key_pair(&publicKey, &privateKey);
-    if (retCode != 0)
+    if (retCode != WEDPR_SUCCESS)
     {
         BOOST_THROW_EXCEPTION(
             GenerateKeyPairException() << errinfo_comment("sm2GenerateKeyPair exception"));
@@ -74,7 +74,7 @@ bool bcos::crypto::sm2Verify(PublicPtr _pubKey, const HashType& _hash, bytesCons
     auto signatureWithoutPub = bytesConstRef(_signatureData.data(), SM2_SIGNATURE_LEN);
     CInputBuffer signature{(const char*)signatureWithoutPub.data(), signatureWithoutPub.size()};
     auto verifyResult = wedpr_sm2_verify(&publicKey, &messageHash, &signature);
-    if (verifyResult == 0)
+    if (verifyResult == WEDPR_SUCCESS)
     {
         return true;
     }

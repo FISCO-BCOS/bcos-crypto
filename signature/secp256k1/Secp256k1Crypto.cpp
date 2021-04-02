@@ -23,7 +23,7 @@
 #include "Secp256k1KeyPair.h"
 #include <bcos-crypto/signature/Exceptions.h>
 #include <bcos-crypto/signature/codec/SignatureDataWithV.h>
-#include <wedpr-crypto/WeDPRCrypto.h>
+#include <wedpr-crypto/WedprCrypto.h>
 
 using namespace bcos;
 using namespace bcos::crypto;
@@ -37,7 +37,7 @@ std::shared_ptr<bytes> bcos::crypto::secp256k1Sign(
     COutputBuffer secp256k1SignatureResult{
         (char*)signatureDataArray.data(), SECP256K1_SIGNATURE_LEN};
     auto retCode = wedpr_secp256k1_sign(&privateKey, &msgHash, &secp256k1SignatureResult);
-    if (retCode != 0)
+    if (retCode != WEDPR_SUCCESS)
     {
         BOOST_THROW_EXCEPTION(SignException() << errinfo_comment(
                                   "secp256k1Sign exception, raw data: " + _hash.hex()));
@@ -54,7 +54,7 @@ bool bcos::crypto::secp256k1Verify(
     CInputBuffer msgHash{(const char*)_hash.data(), HashType::size};
     CInputBuffer signature{(const char*)_signatureData.data(), _signatureData.size()};
     auto verifyResult = wedpr_secp256k1_verify(&publicKey, &msgHash, &signature);
-    if (verifyResult == 0)
+    if (verifyResult == WEDPR_SUCCESS)
     {
         return true;
     }
@@ -67,7 +67,7 @@ KeyPairInterface::Ptr bcos::crypto::secp256k1GenerateKeyPair()
     COutputBuffer publicKey{keyPair->publicKey()->mutableData(), keyPair->publicKey()->size()};
     COutputBuffer privateKey{keyPair->secretKey()->mutableData(), keyPair->secretKey()->size()};
     auto retCode = wedpr_secp256k1_gen_key_pair(&publicKey, &privateKey);
-    if (retCode != 0)
+    if (retCode != WEDPR_SUCCESS)
     {
         BOOST_THROW_EXCEPTION(
             GenerateKeyPairException() << errinfo_comment("secp256k1GenerateKeyPair exception"));
@@ -82,7 +82,7 @@ PublicPtr bcos::crypto::secp256k1Recover(const HashType& _hash, bytesConstRef _s
     auto pubKey = std::make_shared<KeyImpl>(SECP256K1_PUBLIC_LEN);
     COutputBuffer publicKeyResult{pubKey->mutableData(), pubKey->size()};
     auto retCode = wedpr_secp256k1_recover_public_key(&msgHash, &signature, &publicKeyResult);
-    if (retCode != 0)
+    if (retCode != WEDPR_SUCCESS)
     {
         BOOST_THROW_EXCEPTION(InvalidSignature() << errinfo_comment(
                                   "invalid signature: secp256k1Recover failed, msgHash : " +

@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * @brief test cases for secp256k1/sm2
+ * @brief test cases for secp256k1/sm2/ed25519
  * @file SignatureTest.h
  * @date 2021.03.06
  */
@@ -194,14 +194,9 @@ BOOST_AUTO_TEST_CASE(testSM2KeyPair)
     pub1 = sm2PriToPub(keyPair->secretKey());
     BOOST_CHECK(keyPair->publicKey()->data() == pub1->data());
 
-
-// TODO: uncomment this when wedpr-crypto fix the panic
-#if 0
     // empty case
-    Secret empty;
-    SM2KeyPair sm2KeyPair(empty);
-    BOOST_CHECK(!sm2KeyPair.address());
-#endif
+    auto emptySecret = std::make_shared<KeyImpl>(SM2_PRIVATE_KEY_LEN);
+    BOOST_CHECK_THROW(SM2KeyPair sm2KeyPair(emptySecret), PriToPublicKeyException);
 }
 
 BOOST_AUTO_TEST_CASE(testSM2SignAndVerify)

@@ -48,7 +48,7 @@ public:
     bool operator==(KeyImpl const& _comparedKey) { return (*m_keyData == _comparedKey.data()); }
     bool operator!=(KeyImpl const& _comparedKey) { return !operator==(_comparedKey); }
 
-    virtual ~KeyImpl() override {}
+    ~KeyImpl() override {}
 
     const bytes& data() const override { return *m_keyData; }
     size_t size() const override { return m_keyData->size(); }

@@ -30,7 +30,7 @@ PublicPtr bcos::crypto::sm2PriToPub(SecretPtr _secretKey)
     auto pubKey = std::make_shared<KeyImpl>(SM2_PUBLIC_KEY_LEN);
     COutputBuffer publicKey{pubKey->mutableData(), pubKey->size()};
     auto retCode = wedpr_sm2_derive_public_key(&privateKey, &publicKey);
-    if (retCode != 0)
+    if (retCode != WEDPR_SUCCESS)
     {
         BOOST_THROW_EXCEPTION(
             PriToPublicKeyException() << errinfo_comment("sm2PriToPub exception"));

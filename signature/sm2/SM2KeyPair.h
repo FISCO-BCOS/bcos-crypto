@@ -35,7 +35,7 @@ public:
     SM2KeyPair() : KeyPair(SM2_PUBLIC_KEY_LEN, SM2_PRIVATE_KEY_LEN) {}
     explicit SM2KeyPair(SecretPtr _secretKey);
     ~SM2KeyPair() override {}
-    PublicPtr priToPub(SecretPtr _secretKey) override { return sm2PriToPub(_secretKey); }
+    virtual PublicPtr priToPub(SecretPtr _secretKey) { return sm2PriToPub(_secretKey); }
 };
 }  // namespace crypto
 }  // namespace bcos

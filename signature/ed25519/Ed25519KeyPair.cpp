@@ -13,25 +13,29 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * @brief Hash algorithm of keccak256
- * @file Keccak256.cpp
+ * @brief implementation for ed25519 keyPair algorithm
+ * @file Ed25519KeyPair.cpp
+ * @date 2021.04.01
+ * @author yujiechen
  */
-#include "Keccak256.h"
+
+#include "Ed25519KeyPair.h"
+#include <bcos-crypto/signature/Exceptions.h>
 #include <wedpr-crypto/WedprCrypto.h>
 
 using namespace bcos;
 using namespace bcos::crypto;
-HashType bcos::crypto::keccak256Hash(bytesConstRef _data)
+
+PublicPtr bcos::crypto::ed25519PriToPub(SecretPtr _secretKey)
 {
-    h256 hashData;
-    CInputBuffer hashInput{(const char*)_data.data(), _data.size()};
-    COutputBuffer hashResult{(char*)hashData.data(), HashType::size};
-    wedpr_keccak256_hash(&hashInput, &hashResult);
-    // Note: Due to the return value optimize of the C++ compiler, there will be no additional copy
-    // overhead
-    return hashData;
-}
-HashType Keccak256::hash(bytesConstRef _data)
-{
-    return keccak256Hash(_data);
+    CInputBuffer privateKey{_secretKey->constData(), _secretKey->size()};
+    auto pub = std::make_shared<KeyImpl>(ED25519_PUBLIC_LEN);
+    COutputBuffer publicKey{pub->mutableData(), pub->size()};
+    // get public key
+    if (wedpr_ed25519_derive_public_key(&privateKey, &publicKey) != WEDPR_SUCCESS)
+    {
+        BOOST_THROW_EXCEPTION(
+            PriToPublicKeyException() << errinfo_comment("ed25519PriToPub exception"));
+    }
+    return pub;
 }

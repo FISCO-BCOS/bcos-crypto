@@ -27,10 +27,11 @@ namespace crypto
 {
 const int SM2_SIGNATURE_LEN = 64;
 std::shared_ptr<bytes> sm2Sign(
-    KeyPairInterface::Ptr _keyPair, const HashType& _hash, bool _withPubKey = false);
+    KeyPairInterface::Ptr _keyPair, const HashType& _hash, bool _signatureWithPub = false);
 bool sm2Verify(PublicPtr _pubKey, const HashType& _hash, bytesConstRef _signatureData);
 KeyPairInterface::Ptr sm2GenerateKeyPair();
 PublicPtr sm2Recover(const HashType& _hash, bytesConstRef _signData);
+
 std::pair<bool, bytes> sm2Recover(Hash::Ptr _hashImpl, bytesConstRef _in);
 
 class SM2Crypto : public SignatureCrypto
@@ -39,10 +40,10 @@ public:
     using Ptr = std::shared_ptr<SM2Crypto>;
     SM2Crypto() = default;
     ~SM2Crypto() override {}
-    std::shared_ptr<bytes> sign(
-        KeyPairInterface::Ptr _keyPair, const HashType& _hash, bool _withPub = false) override
+    std::shared_ptr<bytes> sign(KeyPairInterface::Ptr _keyPair, const HashType& _hash,
+        bool _signatureWithPub = false) override
     {
-        return sm2Sign(_keyPair, _hash, _withPub);
+        return sm2Sign(_keyPair, _hash, _signatureWithPub);
     }
 
     bool verify(PublicPtr _pubKey, const HashType& _hash, bytesConstRef _signatureData) override
@@ -58,6 +59,11 @@ public:
         return sm2Recover(_hash, _signatureData);
     }
     KeyPairInterface::Ptr generateKeyPair() override { return sm2GenerateKeyPair(); }
+
+    std::pair<bool, bytes> recoverAddress(Hash::Ptr _hashImpl, bytesConstRef _in) override
+    {
+        return sm2Recover(_hashImpl, _in);
+    }
 
 private:
 };
