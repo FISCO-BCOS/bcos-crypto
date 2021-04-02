@@ -27,11 +27,11 @@ namespace bcos
 namespace crypto
 {
 const int SECP256K1_SIGNATURE_LEN = 65;
-std::shared_ptr<bytes> secp256k1Sign(KeyPair const& _keyPair, const HashType& _hash);
-bool secp256k1Verify(Public const& _pubKey, const HashType& _hash, bytesConstRef _signatureData);
-std::shared_ptr<KeyPair> secp256k1GenerateKeyPair();
+std::shared_ptr<bytes> secp256k1Sign(KeyPairInterface::Ptr _keyPair, const HashType& _hash);
+bool secp256k1Verify(PublicPtr _pubKey, const HashType& _hash, bytesConstRef _signatureData);
+KeyPairInterface::Ptr secp256k1GenerateKeyPair();
 
-Public secp256k1Recover(const HashType& _hash, bytesConstRef _signatureData);
+PublicPtr secp256k1Recover(const HashType& _hash, bytesConstRef _signatureData);
 std::pair<bool, bytes> secp256k1Recover(Hash::Ptr _hashImpl, bytesConstRef _in);
 
 class Secp256k1Crypto : public SignatureCrypto
@@ -40,20 +40,24 @@ public:
     using Ptr = std::shared_ptr<Secp256k1Crypto>;
     Secp256k1Crypto() = default;
     ~Secp256k1Crypto() override {}
-    std::shared_ptr<bytes> sign(KeyPair const& _keyPair, const HashType& _hash) override
+    std::shared_ptr<bytes> sign(
+        KeyPairInterface::Ptr _keyPair, const HashType& _hash, bool) override
     {
         return secp256k1Sign(_keyPair, _hash);
     }
-    bool verify(Public const& _pubKey, const HashType& _hash, bytesConstRef _signatureData) override
+    bool verify(PublicPtr _pubKey, const HashType& _hash, bytesConstRef _signatureData) override
     {
         return secp256k1Verify(_pubKey, _hash, _signatureData);
     }
 
-    Public recover(const HashType& _hash, bytesConstRef _signatureData) override
+    bool verify(std::shared_ptr<bytes> _pubKeyBytes, const HashType& _hash,
+        bytesConstRef _signatureData) override;
+
+    PublicPtr recover(const HashType& _hash, bytesConstRef _signatureData) override
     {
         return secp256k1Recover(_hash, _signatureData);
     }
-    std::shared_ptr<KeyPair> generateKeyPair() override { return secp256k1GenerateKeyPair(); }
+    KeyPairInterface::Ptr generateKeyPair() override { return secp256k1GenerateKeyPair(); }
 };
 }  // namespace crypto
 }  // namespace bcos

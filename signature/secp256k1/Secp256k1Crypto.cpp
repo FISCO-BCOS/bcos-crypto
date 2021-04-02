@@ -28,10 +28,11 @@
 using namespace bcos;
 using namespace bcos::crypto;
 
-std::shared_ptr<bytes> bcos::crypto::secp256k1Sign(KeyPair const& _keyPair, const HashType& _hash)
+std::shared_ptr<bytes> bcos::crypto::secp256k1Sign(
+    KeyPairInterface::Ptr _keyPair, const HashType& _hash)
 {
     FixedBytes<SECP256K1_SIGNATURE_LEN> signatureDataArray;
-    CInputBuffer privateKey{(const char*)_keyPair.secretKey().data(), Secret::size};
+    CInputBuffer privateKey{_keyPair->secretKey()->constData(), _keyPair->secretKey()->size()};
     CInputBuffer msgHash{(const char*)_hash.data(), HashType::size};
     COutputBuffer secp256k1SignatureResult{
         (char*)signatureDataArray.data(), SECP256K1_SIGNATURE_LEN};
@@ -47,9 +48,9 @@ std::shared_ptr<bytes> bcos::crypto::secp256k1Sign(KeyPair const& _keyPair, cons
 }
 
 bool bcos::crypto::secp256k1Verify(
-    Public const& _pubKey, const HashType& _hash, bytesConstRef _signatureData)
+    PublicPtr _pubKey, const HashType& _hash, bytesConstRef _signatureData)
 {
-    CInputBuffer publicKey{(const char*)_pubKey.data(), Public::size};
+    CInputBuffer publicKey{_pubKey->constData(), _pubKey->size()};
     CInputBuffer msgHash{(const char*)_hash.data(), HashType::size};
     CInputBuffer signature{(const char*)_signatureData.data(), _signatureData.size()};
     auto verifyResult = wedpr_secp256k1_verify(&publicKey, &msgHash, &signature);
@@ -60,11 +61,11 @@ bool bcos::crypto::secp256k1Verify(
     return false;
 }
 
-std::shared_ptr<KeyPair> bcos::crypto::secp256k1GenerateKeyPair()
+KeyPairInterface::Ptr bcos::crypto::secp256k1GenerateKeyPair()
 {
     auto keyPair = std::make_shared<Secp256k1KeyPair>();
-    COutputBuffer publicKey{(char*)keyPair->mutPublicKey().data(), Public::size};
-    COutputBuffer privateKey{(char*)keyPair->mutSecretKey().data(), Secret::size};
+    COutputBuffer publicKey{keyPair->publicKey()->mutableData(), keyPair->publicKey()->size()};
+    COutputBuffer privateKey{keyPair->secretKey()->mutableData(), keyPair->secretKey()->size()};
     auto retCode = wedpr_secp256k1_gen_key_pair(&publicKey, &privateKey);
     if (retCode != 0)
     {
@@ -74,12 +75,12 @@ std::shared_ptr<KeyPair> bcos::crypto::secp256k1GenerateKeyPair()
     return keyPair;
 }
 
-Public bcos::crypto::secp256k1Recover(const HashType& _hash, bytesConstRef _signatureData)
+PublicPtr bcos::crypto::secp256k1Recover(const HashType& _hash, bytesConstRef _signatureData)
 {
     CInputBuffer msgHash{(const char*)_hash.data(), HashType::size};
     CInputBuffer signature{(const char*)_signatureData.data(), _signatureData.size()};
-    Public pubKey;
-    COutputBuffer publicKeyResult{(char*)pubKey.data(), Public::size};
+    auto pubKey = std::make_shared<KeyImpl>(SECP256K1_PUBLIC_LEN);
+    COutputBuffer publicKeyResult{pubKey->mutableData(), pubKey->size()};
     auto retCode = wedpr_secp256k1_recover_public_key(&msgHash, &signature, &publicKeyResult);
     if (retCode != 0)
     {
@@ -103,15 +104,13 @@ std::pair<bool, bytes> bcos::crypto::secp256k1Recover(Hash::Ptr _hashImpl, bytes
     u256 v = (u256)in.v;
     if (v >= 27 && v <= 28)
     {
-        auto signatureData = std::make_shared<SignatureDataWithV>(
-            in.r, in.s, (byte)((int)v - 27), SECP256K1_SIGNATURE_LEN);
+        auto signatureData = std::make_shared<SignatureDataWithV>(in.r, in.s, (byte)((int)v - 27));
         try
         {
-            auto encodedBytes = std::make_shared<bytes>();
-            signatureData->encode(encodedBytes);
+            auto encodedBytes = signatureData->encode();
             auto publicKey = secp256k1Recover(
                 in.hash, bytesConstRef(encodedBytes->data(), encodedBytes->size()));
-            auto address = getAddress(_hashImpl, publicKey);
+            auto address = calculateAddress(_hashImpl, publicKey);
             return {true, address.asBytes()};
         }
         catch (const std::exception& e)
@@ -121,4 +120,11 @@ std::pair<bool, bytes> bcos::crypto::secp256k1Recover(Hash::Ptr _hashImpl, bytes
         }
     }
     return {false, {}};
+}
+
+bool Secp256k1Crypto::verify(
+    std::shared_ptr<bytes> _pubKeyBytes, const HashType& _hash, bytesConstRef _signatureData)
+{
+    return secp256k1Verify(
+        std::make_shared<KeyImpl>(SECP256K1_PUBLIC_LEN, _pubKeyBytes), _hash, _signatureData);
 }

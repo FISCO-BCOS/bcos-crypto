@@ -19,28 +19,28 @@
  * @author yujiechen
  */
 #pragma once
+#include <bcos-crypto/signature/key/KeyPair.h>
 #include <bcos-framework/interfaces/crypto/Signature.h>
+
 namespace bcos
 {
 namespace crypto
 {
-Public secp256k1PriToPub(Secret const& _secret);
+const int SECP256K1_PUBLIC_LEN = 64;
+const int SECP256K1_PRIVATE_LEN = 32;
+
+PublicPtr secp256k1PriToPub(SecretPtr _secret);
 class Secp256k1KeyPair : public KeyPair
 {
 public:
     using Ptr = std::shared_ptr<Secp256k1KeyPair>;
-    Secp256k1KeyPair() = default;
-    explicit Secp256k1KeyPair(Secret const& _secretKey) : KeyPair()
+    Secp256k1KeyPair() : KeyPair(SECP256K1_PUBLIC_LEN, SECP256K1_PRIVATE_LEN) {}
+    explicit Secp256k1KeyPair(SecretPtr _secretKey) : Secp256k1KeyPair()
     {
         m_secretKey = _secretKey;
         m_publicKey = priToPub(_secretKey);
     }
-
-    Secp256k1KeyPair(Secret const& _secretKey, Public const& _publicKey)
-      : KeyPair(_secretKey, _publicKey)
-    {}
-    explicit Secp256k1KeyPair(KeyPair const& _keyPair) : KeyPair(_keyPair) {}
-    Public priToPub(Secret const& _secret) override { return secp256k1PriToPub(_secret); }
+    PublicPtr priToPub(SecretPtr _secret) override { return secp256k1PriToPub(_secret); }
 };
 }  // namespace crypto
 }  // namespace bcos
