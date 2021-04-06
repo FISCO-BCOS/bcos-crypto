@@ -20,6 +20,7 @@
  */
 
 #pragma once
+#include "SignatureData.h"
 #include <bcos-framework/interfaces/crypto/Signature.h>
 
 namespace bcos
@@ -30,29 +31,33 @@ class SignatureDataWithV : public SignatureData
 {
 public:
     using Ptr = std::shared_ptr<SignatureDataWithV>;
-    explicit SignatureDataWithV(bytesConstRef _data, int _signatureLen)
-    {
-        m_signatureLen = _signatureLen;
-        decode(_data);
-    }
-    SignatureDataWithV(h256 const& _r, h256 const& _s, byte const& _v, int _signatureLen)
+    explicit SignatureDataWithV(bytesConstRef _data) { decode(_data); }
+    SignatureDataWithV(h256 const& _r, h256 const& _s, byte const& _v)
       : SignatureData(_r, _s), m_v(_v)
-    {
-        m_signatureLen = _signatureLen;
-    }
+    {}
+
     ~SignatureDataWithV() override {}
 
     byte const& v() { return m_v; }
 
-    void encode(bytesPointer _signatureData) const override
+    bytesPointer encode() const override
     {
-        encodeCommonFields(_signatureData);
-        (*_signatureData)[m_signatureLen - 1] = m_v;
+        auto encodedData = std::make_shared<bytes>();
+        encodeCommonFields(encodedData);
+        encodedData->emplace_back(m_v);
+        return encodedData;
     }
     void decode(bytesConstRef _signatureData) override
     {
+        if (_signatureData.size() < m_signatureLen + 1)
+        {
+            BOOST_THROW_EXCEPTION(
+                InvalidSignatureData() << errinfo_comment(
+                    "InvalidSignatureData: the signature data size must be at least " +
+                    std::to_string(m_signatureLen + 1)));
+        }
         decodeCommonFields(_signatureData);
-        m_v = (byte)(_signatureData[m_signatureLen - 1]);
+        m_v = (byte)(_signatureData[m_signatureLen]);
     }
 
 private:

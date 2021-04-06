@@ -28,6 +28,9 @@ namespace crypto
 DERIVE_BCOS_EXCEPTION(PriToPublicKeyException);
 DERIVE_BCOS_EXCEPTION(SignException);
 DERIVE_BCOS_EXCEPTION(InvalidSignature);
+DERIVE_BCOS_EXCEPTION(InvalidSignatureData);
+DERIVE_BCOS_EXCEPTION(InvalidKey);
 DERIVE_BCOS_EXCEPTION(GenerateKeyPairException);
+DERIVE_BCOS_EXCEPTION(InvalidSecretKey);
 }  // namespace crypto
 }  // namespace bcos

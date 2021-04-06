@@ -19,6 +19,7 @@
  * @author yujiechen
  */
 #pragma once
+#include "SignatureData.h"
 #include <bcos-framework/interfaces/crypto/Signature.h>
 namespace bcos
 {
@@ -28,39 +29,42 @@ class SignatureDataWithPub : public SignatureData
 {
 public:
     using Ptr = std::shared_ptr<SignatureDataWithPub>;
-    explicit SignatureDataWithPub(bytesConstRef _data, int _signatureLen)
+    explicit SignatureDataWithPub(bytesConstRef _data) : m_pub(std::make_shared<bytes>())
     {
-        m_signatureLen = _signatureLen + Public::size;
-        m_signatureLenWithoutPub = _signatureLen;
         decode(_data);
     }
+    SignatureDataWithPub(h256 const& _r, h256 const& _s, bytesConstRef _pub)
+      : SignatureData(_r, _s), m_pub(std::make_shared<bytes>(_pub.begin(), _pub.end()))
+    {}
 
-    SignatureDataWithPub(h256 const& _r, h256 const& _s, Public const& _pub, int _signatureLen)
+    SignatureDataWithPub(h256 const& _r, h256 const& _s, bytesPointer _pub)
       : SignatureData(_r, _s), m_pub(_pub)
-    {
-        m_signatureLen = _signatureLen + Public::size;
-        m_signatureLenWithoutPub = _signatureLen;
-    }
+    {}
+
     ~SignatureDataWithPub() override {}
 
-    Public const& pub() { return m_pub; }
-
-    void encode(bytesPointer _signatureData) const override
+    bytesPointer pub() const { return m_pub; }
+    bytesPointer encode() const override
     {
-        encodeCommonFields(_signatureData);
-        memcpy(_signatureData->data() + m_signatureLenWithoutPub, m_pub.data(), Public::size);
+        auto encodedData = std::make_shared<bytes>();
+        encodeCommonFields(encodedData);
+        encodedData->insert(encodedData->end(), m_pub->begin(), m_pub->end());
+        return encodedData;
     }
 
     void decode(bytesConstRef _signatureData) override
     {
+        m_pub->clear();
         decodeCommonFields(_signatureData);
-        m_pub = Public(
-            _signatureData.data() + m_signatureLenWithoutPub, Public::ConstructorType::FromPointer);
+        if (_signatureData.size() > m_signatureLen)
+        {
+            m_pub->insert(
+                m_pub->end(), _signatureData.data() + m_signatureLen, _signatureData.end());
+        }
     }
 
 private:
-    Public m_pub;
-    int m_signatureLenWithoutPub;
+    bytesPointer m_pub;
 };
 }  // namespace crypto
 }  // namespace bcos

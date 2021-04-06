@@ -19,27 +19,23 @@
  * @author yujiechen
  */
 #pragma once
+#include <bcos-crypto/signature/key/KeyPair.h>
 #include <bcos-framework/interfaces/crypto/Signature.h>
 
 namespace bcos
 {
 namespace crypto
 {
-Public sm2PriToPub(Secret const& _secret);
+const int SM2_PRIVATE_KEY_LEN = 32;
+const int SM2_PUBLIC_KEY_LEN = 64;
+PublicPtr sm2PriToPub(SecretPtr _secret);
 class SM2KeyPair : public KeyPair
 {
 public:
-    SM2KeyPair() = default;
-    explicit SM2KeyPair(Secret const& _secretKey) : KeyPair()
-    {
-        m_secretKey = _secretKey;
-        m_publicKey = priToPub(_secretKey);
-    }
-    SM2KeyPair(Secret const& _secretKey, Public const& _publicKey) : KeyPair(_secretKey, _publicKey)
-    {}
-    explicit SM2KeyPair(KeyPair const& _keyPair) : KeyPair(_keyPair) {}
+    SM2KeyPair() : KeyPair(SM2_PUBLIC_KEY_LEN, SM2_PRIVATE_KEY_LEN) {}
+    explicit SM2KeyPair(SecretPtr _secretKey);
     ~SM2KeyPair() override {}
-    Public priToPub(Secret const& _secretKey) override { return sm2PriToPub(_secretKey); }
+    virtual PublicPtr priToPub(SecretPtr _secretKey) { return sm2PriToPub(_secretKey); }
 };
 }  // namespace crypto
 }  // namespace bcos

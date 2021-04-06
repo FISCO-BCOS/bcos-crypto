@@ -22,13 +22,14 @@
 #include <bcos-crypto/hash/Keccak256.h>
 #include <bcos-crypto/signature/Exceptions.h>
 
-bcos::crypto::Public bcos::crypto::secp256k1PriToPub(bcos::crypto::Secret const& _secret)
+bcos::crypto::PublicPtr bcos::crypto::secp256k1PriToPub(bcos::crypto::SecretPtr _secret)
 {
-    CInputBuffer privateKey{(char*)_secret.data(), Secret::size};
-    Public pubKey;
-    COutputBuffer publicKey{(char*)pubKey.data(), Public::size};
+    CInputBuffer privateKey{_secret->constData(), _secret->size()};
+
+    PublicPtr pubKey = std::make_shared<KeyImpl>(SECP256K1_PUBLIC_LEN);
+    COutputBuffer publicKey{pubKey->mutableData(), pubKey->size()};
     auto retCode = wedpr_secp256k1_derive_public_key(&privateKey, &publicKey);
-    if (retCode != 0)
+    if (retCode != WEDPR_SUCCESS)
     {
         BOOST_THROW_EXCEPTION(
             PriToPublicKeyException() << errinfo_comment("secp256k1PriToPub exception"));
