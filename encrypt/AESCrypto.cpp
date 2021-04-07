@@ -21,22 +21,20 @@
 #include "AESCrypto.h"
 #include "Exceptions.h"
 #include <bcos-framework/libutilities/FixedBytes.h>
-#include <wedpr-crypto/WeDprCrypto.h>
+#include <wedpr-crypto/WedprCrypto.h>
 
 using namespace bcos;
 using namespace bcos::crypto;
 
 bytesPointer bcos::crypto::AESEncrypt(const unsigned char* _plainData, size_t _plainDataSize,
-    const unsigned char* _key, size_t, const unsigned char* _ivData, size_t)
+    const unsigned char* _key, size_t _keySize, const unsigned char* _ivData, size_t _ivDataSize)
 {
     CInputBuffer plainText{(const char*)_plainData, _plainDataSize};
 
-    FixedBytes<AES_KEY_SIZE> fixedKeyData(
-        _key, FixedBytes<AES_KEY_SIZE>::ConstructorType::FromPointer);
+    FixedBytes<AES_KEY_SIZE> fixedKeyData(_key, _keySize);
     CInputBuffer key{(const char*)fixedKeyData.data(), AES_KEY_SIZE};
 
-    FixedBytes<AES_IV_DATA_SIZE> FixedIVData(
-        _ivData, FixedBytes<AES_IV_DATA_SIZE>::ConstructorType::FromPointer);
+    FixedBytes<AES_IV_DATA_SIZE> FixedIVData(_ivData, _ivDataSize);
     CInputBuffer ivData{(const char*)FixedIVData.data(), AES_IV_DATA_SIZE};
 
     auto encryptedData = std::make_shared<bytes>();
@@ -53,16 +51,14 @@ bytesPointer bcos::crypto::AESEncrypt(const unsigned char* _plainData, size_t _p
 }
 
 bytesPointer bcos::crypto::AESDecrypt(const unsigned char* _cipherData, size_t _cipherDataSize,
-    const unsigned char* _key, size_t, const unsigned char* _ivData, size_t)
+    const unsigned char* _key, size_t _keySize, const unsigned char* _ivData, size_t _ivDataSize)
 {
     CInputBuffer ciper{(const char*)_cipherData, _cipherDataSize};
 
-    FixedBytes<AES_KEY_SIZE> fixedKeyData(
-        _key, FixedBytes<AES_KEY_SIZE>::ConstructorType::FromPointer);
+    FixedBytes<AES_KEY_SIZE> fixedKeyData(_key, _keySize);
     CInputBuffer key{(const char*)fixedKeyData.data(), AES_KEY_SIZE};
 
-    FixedBytes<AES_IV_DATA_SIZE> fixedIVData(
-        _ivData, FixedBytes<AES_IV_DATA_SIZE>::ConstructorType::FromPointer);
+    FixedBytes<AES_IV_DATA_SIZE> fixedIVData(_ivData, _ivDataSize);
     CInputBuffer iv{(const char*)fixedIVData.data(), AES_IV_DATA_SIZE};
 
     auto decodedData = std::make_shared<bytes>();

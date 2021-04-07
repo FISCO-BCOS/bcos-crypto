@@ -32,7 +32,7 @@ namespace test
 {
 BOOST_FIXTURE_TEST_SUITE(EncryptionTest, TestPromptFixture)
 
-void testEncryption(SymmetricEncryption::Ptr _encrypt, bool _smCrypto)
+void testEncryption(SymmetricEncryption::Ptr _encrypt)
 {
     std::string plainData = "testAESx%$234sdfjl234129p";
     std::string key = "abcd";
@@ -54,19 +54,10 @@ void testEncryption(SymmetricEncryption::Ptr _encrypt, bool _smCrypto)
 
     // invalid ciper
     (*ciperData)[0] += 10;
-    if (_smCrypto)
-    {
-        decryptedData = _encrypt->symmetricDecrypt((const unsigned char*)ciperData->data(),
-            ciperData->size(), (const unsigned char*)key.c_str(), key.size());
-        plainDataBytes = bytes(plainData.begin(), plainData.end());
-        BOOST_CHECK(*decryptedData != plainDataBytes);
-    }
-    else
-    {
-        BOOST_CHECK_THROW(_encrypt->symmetricDecrypt((const unsigned char*)ciperData->data(),
-                              ciperData->size(), (const unsigned char*)key.c_str(), key.size()),
-            DecryptException);
-    }
+    decryptedData = _encrypt->symmetricDecrypt((const unsigned char*)ciperData->data(),
+        ciperData->size(), (const unsigned char*)key.c_str(), key.size());
+    plainDataBytes = bytes(plainData.begin(), plainData.end());
+    BOOST_CHECK(*decryptedData != plainDataBytes);
     // test encrypt/decrypt with given ivData
     std::string ivData = "adfwerivswerwerwerpi9werlwerwasdfa234523423dsfa";
     key = "werwlerewkrjewwwwwwwr4234981034%wer23423&3453453453465646778)7897678";
@@ -92,13 +83,13 @@ void testEncryption(SymmetricEncryption::Ptr _encrypt, bool _smCrypto)
 BOOST_AUTO_TEST_CASE(testAES)
 {
     auto aes = std::make_shared<AESCrypto>();
-    testEncryption(aes, false);
+    testEncryption(aes);
 }
 
 BOOST_AUTO_TEST_CASE(testSM4)
 {
     auto sm4 = std::make_shared<SM4Crypto>();
-    testEncryption(sm4, true);
+    testEncryption(sm4);
 }
 BOOST_AUTO_TEST_SUITE_END()
 }  // namespace test

@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
-# Top-level CMake file for FISCO-BCOS.
+# Top-level CMake file for bcos-crypto
 # ------------------------------------------------------------------------------
-# Copyright (C) 2021 FISCO BCOS.
+# Copyright (C) 2021 bcos-crypto
 # SPDX-License-Identifier: Apache-2.0
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ list(APPEND CMAKE_MODULE_PATH ${BCOS_CRYPTO_CMAKE_DIR})
 #init hunter
 include(HunterGate)
 HunterGate(
-    URL "https://github.com/FISCO-BCOS/hunter/archive/6e4416b0bc7c5db71079429b144c1053dc2c6c15.tar.gz"
-    SHA1 "5c5d23c1445dc906e8e844361c56ed4f39075789"
+    URL "https://github.com/FISCO-BCOS/hunter/archive/3a6e68dd1359d27de88c5a1c3306445ca79aa806.tar.gz"
+    SHA1 "34d3d21bf6ef110c45b36ba3d579b955481faab5"
 )
 project(bcos-crypto VERSION "3.0.0")
 set(VERSION_SUFFIX "")
@@ -52,6 +52,8 @@ include(Sources)
 set(BCOS_CRYPTO_TARGET bcos-crypto)
 add_library(${BCOS_CRYPTO_TARGET} ${SRC_LIST} ${HEADERS})
 target_link_libraries(${BCOS_CRYPTO_TARGET} PUBLIC bcos-framework::utilities wedpr-crypto::crypto)
+
+add_subdirectory(demo)
 
 if (TESTS)
     enable_testing()
