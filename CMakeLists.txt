@@ -27,8 +27,8 @@ list(APPEND CMAKE_MODULE_PATH ${BCOS_CRYPTO_CMAKE_DIR})
 #init hunter
 include(HunterGate)
 HunterGate(
-    URL "https://github.com/FISCO-BCOS/hunter/archive/3a6e68dd1359d27de88c5a1c3306445ca79aa806.tar.gz"
-    SHA1 "34d3d21bf6ef110c45b36ba3d579b955481faab5"
+    URL "https://github.com/FISCO-BCOS/hunter/archive/5a02ff6cd98a47538e077b3ae07e5142cf1c363a.tar.gz"
+    SHA1 "0013602ad7f8d50ec39e5066f06de61f4702c434"
 )
 project(bcos-crypto VERSION "3.0.0")
 set(VERSION_SUFFIX "")
@@ -56,6 +56,7 @@ target_link_libraries(${BCOS_CRYPTO_TARGET} PUBLIC bcos-framework::utilities wed
 add_subdirectory(demo)
 
 if (TESTS)
+    hunter_add_package(Boost COMPONENTS test)
     enable_testing()
     set(CTEST_OUTPUT_ON_FAILURE TRUE)
     add_subdirectory(test)
