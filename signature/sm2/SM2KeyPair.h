@@ -19,7 +19,7 @@
  * @author yujiechen
  */
 #pragma once
-#include <bcos-crypto/signature/key/KeyPair.h>
+#include "signature/key/KeyPair.h"
 #include <bcos-framework/interfaces/crypto/Signature.h>
 
 namespace bcos

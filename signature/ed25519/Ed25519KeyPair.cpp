@@ -20,7 +20,7 @@
  */
 
 #include "Ed25519KeyPair.h"
-#include <bcos-crypto/signature/Exceptions.h>
+#include "signature/Exceptions.h"
 #include <wedpr-crypto/WedprCrypto.h>
 
 using namespace bcos;

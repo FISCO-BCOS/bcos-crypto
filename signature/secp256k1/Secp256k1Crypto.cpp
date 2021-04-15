@@ -21,8 +21,8 @@
 
 #include "Secp256k1Crypto.h"
 #include "Secp256k1KeyPair.h"
-#include <bcos-crypto/signature/Exceptions.h>
-#include <bcos-crypto/signature/codec/SignatureDataWithV.h>
+#include "signature/Exceptions.h"
+#include "signature/codec/SignatureDataWithV.h"
 #include <wedpr-crypto/WedprCrypto.h>
 
 using namespace bcos;

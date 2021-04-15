@@ -19,8 +19,8 @@
  * @author yujiechen
  */
 #include "SM2KeyPair.h"
-#include <bcos-crypto/hash/SM3.h>
-#include <bcos-crypto/signature/Exceptions.h>
+#include "hash/SM3.h"
+#include "signature/Exceptions.h"
 
 using namespace bcos;
 using namespace bcos::crypto;
