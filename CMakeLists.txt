@@ -27,8 +27,8 @@ list(APPEND CMAKE_MODULE_PATH ${BCOS_CRYPTO_CMAKE_DIR})
 #init hunter
 include(HunterGate)
 HunterGate(
-    URL "https://github.com/FISCO-BCOS/hunter/archive/5a02ff6cd98a47538e077b3ae07e5142cf1c363a.tar.gz"
-    SHA1 "0013602ad7f8d50ec39e5066f06de61f4702c434"
+    URL "https://github.com/FISCO-BCOS/hunter/archive/4ba91e1dc10bd74cb757be4ea40d2b3657d808ac.tar.gz"
+    SHA1 "9d92a895063ce5f174593686c5f0b0f52377e39d"
 )
 project(bcos-crypto VERSION "3.0.0")
 set(VERSION_SUFFIX "")
@@ -37,12 +37,15 @@ set(VERSION_SUFFIX "")
 include(Options)
 configure_project()
 include(CompilerSettings)
-include(CopyInclude)
 
 include_directories(${CMAKE_INSTALL_INCLUDEDIR})
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
 # install dependencies
 include(InstallBcosFrameworkDependencies)
+get_target_property(BCOS_FRAME_WORK_INCLUDE bcos-framework::utilities INTERFACE_INCLUDE_DIRECTORIES)
+include_directories(${BCOS_FRAME_WORK_INCLUDE}/bcos-framework)
+
 hunter_add_package(wedpr-crypto)
 find_package(wedpr-crypto CONFIG REQUIRED)
 
@@ -56,7 +59,6 @@ target_link_libraries(${BCOS_CRYPTO_TARGET} PUBLIC bcos-framework::utilities wed
 add_subdirectory(demo)
 
 if (TESTS)
-    hunter_add_package(Boost COMPONENTS test)
     enable_testing()
     set(CTEST_OUTPUT_ON_FAILURE TRUE)
     add_subdirectory(test)

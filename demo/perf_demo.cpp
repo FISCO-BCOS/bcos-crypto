@@ -18,14 +18,14 @@
  * @date 2021.04.07
  * @author yujiechen
  */
-#include <bcos-crypto/encrypt/AESCrypto.h>
-#include <bcos-crypto/encrypt/SM4Crypto.h>
-#include <bcos-crypto/hash/Keccak256.h>
-#include <bcos-crypto/hash/SM3.h>
-#include <bcos-crypto/hash/Sha3.h>
-#include <bcos-crypto/signature/ed25519/Ed25519Crypto.h>
-#include <bcos-crypto/signature/secp256k1/Secp256k1Crypto.h>
-#include <bcos-crypto/signature/sm2/SM2Crypto.h>
+#include "encrypt/AESCrypto.h"
+#include "encrypt/SM4Crypto.h"
+#include "hash/Keccak256.h"
+#include "hash/SM3.h"
+#include "hash/Sha3.h"
+#include "signature/ed25519/Ed25519Crypto.h"
+#include "signature/secp256k1/Secp256k1Crypto.h"
+#include "signature/sm2/SM2Crypto.h"
 #include <bcos-framework/libutilities/Common.h>
 
 using namespace bcos;
