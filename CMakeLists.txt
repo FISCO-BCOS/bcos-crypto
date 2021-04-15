@@ -19,8 +19,16 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version")
 
-set(BCOS_CMAKE_SCRIPTS "bcos-cmake-scripts")
-set(BCOS_CMAKE_SCRIPTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${BCOS_CMAKE_SCRIPTS}" CACHE PATH "The path for the ${BCOS_CMAKE_SCRIPTS} submodule")
+include(FetchContent)
+set(FETCH_URL_BASE "github.com")
+set(BCOS_CMAKE_SCRIPTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bcos-cmake-scripts)
+FetchContent_Declare(bcos-cmake-scripts
+    GIT_REPOSITORY https://${FETCH_URL_BASE}/FISCO-BCOS/bcos-cmake-scripts.git
+    GIT_TAG dev
+    SOURCE_DIR ${BCOS_CMAKE_SCRIPTS_DIR}
+)
+FetchContent_MakeAvailable(bcos-cmake-scripts)
+
 set(BCOS_CRYPTO_CMAKE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake" CACHE PATH "The cmake path for the library")
 list(APPEND CMAKE_MODULE_PATH ${BCOS_CMAKE_SCRIPTS_DIR})
 list(APPEND CMAKE_MODULE_PATH ${BCOS_CRYPTO_CMAKE_DIR})
@@ -43,9 +51,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # install dependencies
 include(InstallBcosFrameworkDependencies)
-get_target_property(BCOS_FRAME_WORK_INCLUDE bcos-framework::utilities INTERFACE_INCLUDE_DIRECTORIES)
-include_directories(${BCOS_FRAME_WORK_INCLUDE}/bcos-framework)
-
 hunter_add_package(wedpr-crypto)
 find_package(wedpr-crypto CONFIG REQUIRED)
 
@@ -59,6 +64,14 @@ target_link_libraries(${BCOS_CRYPTO_TARGET} PUBLIC bcos-framework::utilities wed
 add_subdirectory(demo)
 
 if (TESTS)
+    # fetch bcos-test
+    set(BCOS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test/bcos-test)
+    FetchContent_Declare(bcos-test
+    GIT_REPOSITORY https://${FETCH_URL_BASE}/FISCO-BCOS/bcos-test.git
+    GIT_TAG dev
+    SOURCE_DIR ${BCOS_TEST_DIR})
+    FetchContent_MakeAvailable(bcos-test)
+
     enable_testing()
     set(CTEST_OUTPUT_ON_FAILURE TRUE)
     add_subdirectory(test)

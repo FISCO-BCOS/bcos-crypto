@@ -18,9 +18,6 @@
 file(GLOB_RECURSE SOURCES "*.cpp" "*.h" "*.sol")
 
 # cmake settings
-set(BCOS_CMAKE_SCRIPTS "bcos-cmake-scripts")
-set(BCOS_CMAKE_SCRIPTS_DIR "${PROJECT_SOURCE_DIR}/${BCOS_CMAKE_SCRIPTS}" CACHE PATH "The path for the ${BCOS_CMAKE_SCRIPTS} subtree")
-list(APPEND CMAKE_MODULE_PATH ${BCOS_CMAKE_SCRIPTS_DIR})
 include(SearchTestCases)
 set(TEST_BINARY_NAME test-bcos-crypto)
 config_test_cases("" "${SOURCES}" bin/${TEST_BINARY_NAME} "")
