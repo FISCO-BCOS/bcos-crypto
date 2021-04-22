@@ -89,6 +89,8 @@ BOOST_AUTO_TEST_CASE(testSecp256k1SignAndVerify)
     auto keyPair = secp256k1GenerateKeyPair();
     auto hashData = keccak256Hash((std::string)("abcd"));
     std::cout << "### hashData:" << *toHexString(hashData) << std::endl;
+    std::cout << "#### publicKey:" << keyPair->publicKey()->hex() << std::endl;
+    std::cout << "#### publicKey shortHex:" << keyPair->publicKey()->shortHex() << std::endl;
     /// normal check
     // sign
     auto signData = secp256k1Sign(keyPair, hashData);
