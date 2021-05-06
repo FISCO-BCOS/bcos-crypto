@@ -31,11 +31,12 @@ class KeyImpl : public KeyInterface
 public:
     using Ptr = std::shared_ptr<KeyImpl>;
     explicit KeyImpl(size_t _keySize) : m_keyData(std::make_shared<bytes>(_keySize)) {}
-    explicit KeyImpl(size_t _keySize, bytes const& _data) : KeyImpl(_keySize)
+    explicit KeyImpl(bytes const& _data) : m_keyData(std::make_shared<bytes>())
     {
         decode(ref(_data));
     }
-    explicit KeyImpl(size_t _keySize, std::shared_ptr<bytes> _data)
+    explicit KeyImpl(size_t _keySize, std::shared_ptr<const bytes> _data)
+      : m_keyData(std::make_shared<bytes>())
     {
         if (_data->size() < _keySize)
         {
@@ -43,7 +44,7 @@ public:
                                       "invalidKey, the key size: " + std::to_string(_data->size()) +
                                       ", expected size:" + std::to_string(_keySize)));
         }
-        m_keyData = _data;
+        *m_keyData = *_data;
     }
 
     bool operator==(KeyImpl const& _comparedKey) { return (*m_keyData == _comparedKey.data()); }
@@ -56,10 +57,7 @@ public:
     char* mutableData() override { return (char*)m_keyData->data(); }
     const char* constData() const override { return (const char*)m_keyData->data(); }
     std::shared_ptr<bytes> encode() const override { return m_keyData; }
-    void decode(bytesConstRef _data) override
-    {
-        memcpy(m_keyData->data(), _data.data(), _data.size());
-    }
+    void decode(bytesConstRef _data) override { *m_keyData = _data.toBytes(); }
 
     void decode(bytes&& _data) override { *m_keyData = std::move(_data); }
 

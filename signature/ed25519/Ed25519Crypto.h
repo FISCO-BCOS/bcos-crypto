@@ -52,7 +52,7 @@ public:
         return ed25519Verify(_pubKey, _messageHash, _signatureData);
     }
 
-    bool verify(std::shared_ptr<bytes> _pubKeyBytes, const HashType& _hash,
+    bool verify(std::shared_ptr<const bytes> _pubKeyBytes, const HashType& _hash,
         bytesConstRef _signatureData) override;
 
     PublicPtr recover(const HashType& _messageHash, bytesConstRef _signatureData) override
@@ -67,7 +67,7 @@ public:
         return ed25519Recover(_hashImpl, _in);
     }
 
-private:
+    KeyPairInterface::Ptr createKeyPair(SecretPtr _secretKey) override;
 };
 }  // namespace crypto
 }  // namespace bcos

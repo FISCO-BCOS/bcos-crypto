@@ -48,12 +48,19 @@ BOOST_AUTO_TEST_CASE(testSecp256k1KeyPair)
     auto fixedSec1 = h256(
         "bcec428d5205abe0f0cc8a7340839"
         "08d9eb8563e31f943d760786edf42ad67dd");
-    auto sec1 = std::make_shared<bcos::crypto::KeyImpl>(h256::size, fixedSec1.asBytes());
+    auto sec1 = std::make_shared<bcos::crypto::KeyImpl>(fixedSec1.asBytes());
     auto pub1 = secp256k1PriToPub(sec1);
+    auto signatureImpl = std::make_shared<Secp256k1Crypto>();
+    auto keyPair1 = signatureImpl->createKeyPair(sec1);
+    BOOST_CHECK(pub1->data() == keyPair1->publicKey()->data());
+    BOOST_CHECK(sec1->data() == keyPair1->secretKey()->data());
 
     auto fixedSec2 = h256("bcec428d5205abe0");
-    auto sec2 = std::make_shared<bcos::crypto::KeyImpl>(h256::size, fixedSec2.asBytes());
+    auto sec2 = std::make_shared<bcos::crypto::KeyImpl>(fixedSec2.asBytes());
     auto pub2 = secp256k1PriToPub(sec2);
+    auto keyPair2 = signatureImpl->createKeyPair(sec2);
+    BOOST_CHECK(pub2->data() == keyPair2->publicKey()->data());
+    BOOST_CHECK(sec2->data() == keyPair2->secretKey()->data());
     BOOST_CHECK(pub1->data() != pub2->data());
 
     // check address
@@ -164,12 +171,17 @@ BOOST_AUTO_TEST_CASE(testSM2KeyPair)
     h256 fixedSec1(
         "bcec428d5205abe0f0cc8a7340839"
         "08d9eb8563e31f943d760786edf42ad67dd");
-    auto sec1 = std::make_shared<KeyImpl>(SM2_PRIVATE_KEY_LEN, fixedSec1.asBytes());
+    auto sec1 = std::make_shared<KeyImpl>(fixedSec1.asBytes());
     auto pub1 = sm2PriToPub(sec1);
     auto keyPair1 = std::make_shared<SM2KeyPair>(sec1);
 
+    auto signatureImpl = std::make_shared<SM2Crypto>();
+    auto keyPairTest = signatureImpl->createKeyPair(sec1);
+    BOOST_CHECK(keyPairTest->publicKey()->data() == keyPair1->publicKey()->data());
+    BOOST_CHECK(keyPairTest->secretKey()->data() == keyPair1->secretKey()->data());
+
     h256 fixedSec2("bcec428d5205abe0");
-    auto sec2 = std::make_shared<KeyImpl>(SM2_PRIVATE_KEY_LEN, fixedSec2.asBytes());
+    auto sec2 = std::make_shared<KeyImpl>(fixedSec2.asBytes());
     auto pub2 = sm2PriToPub(sec2);
     auto keyPair2 = std::make_shared<SM2KeyPair>(sec2);
 
