@@ -125,8 +125,13 @@ std::pair<bool, bytes> bcos::crypto::sm2Recover(Hash::Ptr _hashImpl, bytesConstR
 }
 
 bool SM2Crypto::verify(
-    std::shared_ptr<bytes> _pubKeyBytes, const HashType& _hash, bytesConstRef _signatureData)
+    std::shared_ptr<bytes const> _pubKeyBytes, const HashType& _hash, bytesConstRef _signatureData)
 {
     return sm2Verify(
         std::make_shared<KeyImpl>(SM2_PUBLIC_KEY_LEN, _pubKeyBytes), _hash, _signatureData);
+}
+
+KeyPairInterface::Ptr SM2Crypto::createKeyPair(SecretPtr _secretKey)
+{
+    return std::make_shared<SM2KeyPair>(_secretKey);
 }

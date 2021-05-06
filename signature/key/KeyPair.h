@@ -40,6 +40,11 @@ public:
         m_secretKey(std::make_shared<KeyImpl>(_secretLen))
     {}
 
+    KeyPair(Public const& _publicKey, Secret const& _secretKey)
+      : m_publicKey(std::make_shared<KeyImpl>(_publicKey.data())),
+        m_secretKey(std::make_shared<KeyImpl>(_secretKey.data()))
+    {}
+
     ~KeyPair() override {}
     SecretPtr secretKey() const override { return m_secretKey; }
     PublicPtr publicKey() const override { return m_publicKey; }

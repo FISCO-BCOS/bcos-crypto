@@ -25,7 +25,7 @@ if (NOT DEFINED URL_BASE)
 endif()
 
 include(FetchContent)
-set(BCOS_CMAKE_SCRIPTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bcos-cmake-scripts)
+set(BCOS_CMAKE_SCRIPTS_DIR ${CMAKE_CURRENT_BINARY_DIR}/bcos-cmake-scripts)
 FetchContent_Declare(bcos-cmake-scripts
     GIT_REPOSITORY https://${URL_BASE}/FISCO-BCOS/bcos-cmake-scripts.git
     GIT_TAG dev
@@ -39,8 +39,8 @@ list(APPEND CMAKE_MODULE_PATH ${BCOS_CRYPTO_CMAKE_DIR})
 #init hunter
 include(HunterGate)
 HunterGate(
-    URL "https://github.com/FISCO-BCOS/hunter/archive/4ba91e1dc10bd74cb757be4ea40d2b3657d808ac.tar.gz"
-    SHA1 "9d92a895063ce5f174593686c5f0b0f52377e39d"
+    URL "https://github.com/FISCO-BCOS/hunter/archive/8c81ea454c0c268b257da1fe3e3f2f69bd59a67d.tar.gz"
+    SHA1 "13292adf48c4c053ff2ceb7173631a296c08d1ac"
     FILEPATH "${BCOS_CRYPTO_CMAKE_DIR}/config.cmake"
 )
 project(bcos-crypto VERSION "3.0.0")
@@ -53,6 +53,7 @@ include(CompilerSettings)
 
 include_directories(${CMAKE_INSTALL_INCLUDEDIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # install dependencies
 include(InstallBcosFrameworkDependencies)

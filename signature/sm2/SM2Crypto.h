@@ -51,7 +51,7 @@ public:
         return sm2Verify(_pubKey, _hash, _signatureData);
     }
 
-    bool verify(std::shared_ptr<bytes> _pubKeyBytes, const HashType& _hash,
+    bool verify(std::shared_ptr<bytes const> _pubKeyBytes, const HashType& _hash,
         bytesConstRef _signatureData) override;
 
     PublicPtr recover(const HashType& _hash, bytesConstRef _signatureData) override
@@ -65,7 +65,7 @@ public:
         return sm2Recover(_hashImpl, _in);
     }
 
-private:
+    KeyPairInterface::Ptr createKeyPair(SecretPtr _secretKey) override;
 };
 }  // namespace crypto
 }  // namespace bcos
