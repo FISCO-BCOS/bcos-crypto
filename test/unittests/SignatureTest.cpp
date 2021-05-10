@@ -25,6 +25,7 @@
 #include "signature/codec/SignatureDataWithV.h"
 #include "signature/ed25519/Ed25519Crypto.h"
 #include "signature/ed25519/Ed25519KeyPair.h"
+#include "signature/key/KeyFactoryImpl.h"
 #include "signature/secp256k1/Secp256k1Crypto.h"
 #include "signature/secp256k1/Secp256k1KeyPair.h"
 #include "signature/sm2/SM2Crypto.h"
@@ -172,6 +173,10 @@ BOOST_AUTO_TEST_CASE(testSM2KeyPair)
         "bcec428d5205abe0f0cc8a7340839"
         "08d9eb8563e31f943d760786edf42ad67dd");
     auto sec1 = std::make_shared<KeyImpl>(fixedSec1.asBytes());
+    auto keyFactory = std::make_shared<KeyFactoryImpl>();
+    auto secCreated = keyFactory->createKey(fixedSec1.asBytes());
+    BOOST_CHECK(sec1->data() == secCreated->data());
+
     auto pub1 = sm2PriToPub(sec1);
     auto keyPair1 = std::make_shared<SM2KeyPair>(sec1);
 

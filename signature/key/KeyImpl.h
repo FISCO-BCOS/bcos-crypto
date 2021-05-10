@@ -31,10 +31,8 @@ class KeyImpl : public KeyInterface
 public:
     using Ptr = std::shared_ptr<KeyImpl>;
     explicit KeyImpl(size_t _keySize) : m_keyData(std::make_shared<bytes>(_keySize)) {}
-    explicit KeyImpl(bytes const& _data) : m_keyData(std::make_shared<bytes>())
-    {
-        decode(ref(_data));
-    }
+    explicit KeyImpl(bytesConstRef _data) : m_keyData(std::make_shared<bytes>()) { decode(_data); }
+    explicit KeyImpl(bytes const& _data) : KeyImpl(ref(_data)) {}
     explicit KeyImpl(size_t _keySize, std::shared_ptr<const bytes> _data)
       : m_keyData(std::make_shared<bytes>())
     {
