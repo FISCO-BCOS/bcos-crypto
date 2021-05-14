@@ -105,8 +105,7 @@ void signaturePerf(SignatureCrypto::Ptr _signatureImpl, HashType const& _msgHash
     startT = utcTime();
     for (size_t i = 0; i < _count; i++)
     {
-        bool ret = _signatureImpl->verify(keyPair->publicKey(), _msgHash, ref(*signedData));
-        assert(ret);
+        assert(_signatureImpl->verify(keyPair->publicKey(), _msgHash, ref(*signedData)));
     }
     std::cout << "TPS of " << _signatureName << " verify:" << getTPS(utcTime(), startT, _count)
               << std::endl;
