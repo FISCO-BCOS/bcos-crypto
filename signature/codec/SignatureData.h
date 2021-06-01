@@ -20,7 +20,7 @@
  */
 
 #pragma once
-#include "signature/Exceptions.h"
+#include "../Exceptions.h"
 #include <bcos-framework/libutilities/FixedBytes.h>
 namespace bcos
 {

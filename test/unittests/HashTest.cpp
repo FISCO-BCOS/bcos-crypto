@@ -17,9 +17,9 @@
  * @file HashTest.h
  * @date 2021.03.04
  */
-#include "hash/Keccak256.h"
-#include "hash/SM3.h"
-#include "hash/Sha3.h"
+#include "../../hash/Keccak256.h"
+#include "../../hash/SM3.h"
+#include "../../hash/Sha3.h"
 #include <bcos-framework/interfaces/crypto/CryptoSuite.h>
 #include <bcos-test/libutils/TestPromptFixture.h>
 #include <boost/test/unit_test.hpp>
