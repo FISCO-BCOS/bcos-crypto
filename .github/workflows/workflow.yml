@@ -133,7 +133,7 @@ jobs:
       - name: configure
         run: |
           export CPATH=/Library/Developer/CommandLineTools/usr/include/c++/v1
-          cmake . -DTESTS=ON -DCOVERAGE=ON
+          cmake . -DTESTS=ON -DCOVERAGE=OFF
       - name: compile
         run: make -j2
       - name: run test

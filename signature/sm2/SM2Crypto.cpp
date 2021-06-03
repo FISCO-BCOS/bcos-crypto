@@ -20,9 +20,9 @@
  */
 #include "SM2Crypto.h"
 #include "SM2KeyPair.h"
-#include "hash/SM3.h"
-#include "signature/Exceptions.h"
-#include "signature/codec/SignatureDataWithPub.h"
+#include "../../hash/SM3.h"
+#include "../Exceptions.h"
+#include "../codec/SignatureDataWithPub.h"
 
 using namespace bcos;
 using namespace bcos::crypto;

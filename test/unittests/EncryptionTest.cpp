@@ -17,9 +17,9 @@
  * @file SignatureTest.h
  * @date 2021.03.06
  */
-#include "encrypt/AESCrypto.h"
-#include "encrypt/Exceptions.h"
-#include "encrypt/SM4Crypto.h"
+#include "../../encrypt/AESCrypto.h"
+#include "../../encrypt/Exceptions.h"
+#include "../../encrypt/SM4Crypto.h"
 #include <bcos-test/libutils/TestPromptFixture.h>
 #include <boost/test/unit_test.hpp>
 

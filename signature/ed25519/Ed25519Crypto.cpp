@@ -20,8 +20,8 @@
  */
 #include "Ed25519Crypto.h"
 #include "Ed25519KeyPair.h"
-#include "signature/Exceptions.h"
-#include "signature/codec/SignatureDataWithPub.h"
+#include "../Exceptions.h"
+#include "../codec/SignatureDataWithPub.h"
 #include <wedpr-crypto/WedprCrypto.h>
 
 using namespace bcos;

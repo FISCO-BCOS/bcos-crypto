@@ -19,7 +19,7 @@
  * @author yujiechen
  */
 #pragma once
-#include "signature/Exceptions.h"
+#include "../Exceptions.h"
 #include <bcos-framework/interfaces/crypto/KeyInterface.h>
 #include <bcos-framework/libutilities/DataConvertUtility.h>
 namespace bcos
