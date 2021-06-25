@@ -19,9 +19,9 @@
  * @author yujiechen
  */
 #include "Ed25519Crypto.h"
-#include "Ed25519KeyPair.h"
 #include "../Exceptions.h"
 #include "../codec/SignatureDataWithPub.h"
+#include "Ed25519KeyPair.h"
 #include <wedpr-crypto/WedprCrypto.h>
 
 using namespace bcos;
@@ -118,8 +118,8 @@ std::pair<bool, bytes> bcos::crypto::ed25519Recover(Hash::Ptr _hashImpl, bytesCo
     }
     catch (const std::exception& e)
     {
-        LOG(WARNING) << LOG_DESC("ed25519Recover failed")
-                     << LOG_KV("error", boost::diagnostic_information(e));
+        BCOS_LOG(WARNING) << LOG_DESC("ed25519Recover failed")
+                          << LOG_KV("error", boost::diagnostic_information(e));
     }
     return {false, {}};
 }

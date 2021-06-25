@@ -19,10 +19,10 @@
  * @author yujiechen
  */
 #include "SM2Crypto.h"
-#include "SM2KeyPair.h"
 #include "../../hash/SM3.h"
 #include "../Exceptions.h"
 #include "../codec/SignatureDataWithPub.h"
+#include "SM2KeyPair.h"
 
 using namespace bcos;
 using namespace bcos::crypto;
@@ -118,8 +118,8 @@ std::pair<bool, bytes> bcos::crypto::sm2Recover(Hash::Ptr _hashImpl, bytesConstR
     }
     catch (const std::exception& e)
     {
-        LOG(WARNING) << LOG_DESC("sm2Recover failed")
-                     << LOG_KV("error", boost::diagnostic_information(e));
+        BCOS_LOG(WARNING) << LOG_DESC("sm2Recover failed")
+                          << LOG_KV("error", boost::diagnostic_information(e));
     }
     return {false, {}};
 }
