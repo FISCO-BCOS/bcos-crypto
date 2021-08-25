@@ -40,7 +40,7 @@ class SM3 : public Hash
 {
 public:
     using Ptr = std::shared_ptr<SM3>;
-    SM3() {}
+    SM3() { setHashImplType(HashImplType::Sm3Hash); }
     virtual ~SM3() {}
     HashType hash(bytesConstRef _data) override { return sm3Hash(_data); }
 };

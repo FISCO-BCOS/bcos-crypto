@@ -20,6 +20,8 @@
  */
 #pragma once
 #include <bcos-framework/interfaces/crypto/Hash.h>
+#include <wedpr-crypto/WedprCrypto.h>
+#include <wedpr-crypto/WedprUtilities.h>
 
 namespace bcos
 {
@@ -39,7 +41,7 @@ class Sha3 : public Hash
 {
 public:
     using Ptr = std::shared_ptr<Sha3>;
-    Sha3() {}
+    Sha3() { setHashImplType(HashImplType::Sha3); }
     virtual ~Sha3() {}
     HashType hash(bytesConstRef _data) override { return sha3Hash(_data); }
 };
