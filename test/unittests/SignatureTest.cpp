@@ -278,7 +278,7 @@ BOOST_AUTO_TEST_CASE(testSM2SignAndVerify)
 BOOST_AUTO_TEST_CASE(testED25519SignAndVerify)
 {
     auto signatureCrypto = std::make_shared<Ed25519Crypto>();
-    auto hashCrypto = std::make_shared<Sha3>();
+    auto hashCrypto = std::make_shared<class Sha3>();
     auto keyPair = signatureCrypto->generateKeyPair();
     auto hashData = hashCrypto->hash(std::string("abcd"));
     // sign

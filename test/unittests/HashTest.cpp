@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(testSM3)
 }
 BOOST_AUTO_TEST_CASE(testSha3)
 {
-    auto sha3 = std::make_shared<Sha3>();
+    auto sha3 = std::make_shared<class Sha3>();
     auto cryptoSuite = std::make_shared<CryptoSuite>(sha3, nullptr, nullptr);
     std::string ts = sha3->emptyHash().hex();
     BOOST_CHECK_EQUAL(

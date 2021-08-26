@@ -73,20 +73,20 @@ jobs:
         id: cache
         with:
           path: /home/runner/.hunter
-          key: hunter-ubuntu20-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
+          key: hunter-ubuntu20-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
           restore-keys: |
-            hunter-ubuntu20-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
-            hunter-ubuntu20-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-
-            hunter-ubuntu20-v1-notest-${{ runner.temp }}-
+            hunter-ubuntu20-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
+            hunter-ubuntu20-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-
+            hunter-ubuntu20-v2-notest-${{ runner.temp }}-
       - uses: actions/cache@v2
         id: ccache
         with:
           path: ccache
-          key: ccache-ubuntu20-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
+          key: ccache-ubuntu20-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
           restore-keys: |
-            ccache-ubuntu20-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
-            ccache-ubuntu20-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-
-            ccache-ubuntu20-v1-notest-${{ runner.temp }}-
+            ccache-ubuntu20-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
+            ccache-ubuntu20-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-
+            ccache-ubuntu20-v2-notest-${{ runner.temp }}-
       - name: Nightly default
         run: rustup default nightly
       - name: install Ubuntu dependencies
@@ -112,20 +112,20 @@ jobs:
         id: cache
         with:
           path: /home/runner/.hunter
-          key: hunter-ubuntu-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
+          key: hunter-ubuntu-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
           restore-keys: |
-            hunter-ubuntu-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
-            hunter-ubuntu-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-
-            hunter-ubuntu-v1-notest-${{ runner.temp }}-
+            hunter-ubuntu-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
+            hunter-ubuntu-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-
+            hunter-ubuntu-v2-notest-${{ runner.temp }}-
       - uses: actions/cache@v2
         id: ccache
         with:
           path: ccache
-          key: ccache-ubuntu-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
+          key: ccache-ubuntu-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
           restore-keys: |
-            ccache-ubuntu-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
-            ccache-ubuntu-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-
-            ccache-ubuntu-v1-notest-${{ runner.temp }}-
+            ccache-ubuntu-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
+            ccache-ubuntu-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-
+            ccache-ubuntu-v2-notest-${{ runner.temp }}-
       - name: Nightly default
         run: rustup default nightly
       - name: install Ubuntu dependencies
@@ -165,17 +165,18 @@ jobs:
             /home/runner/.hunter
             /github/home/.hunter
             ccache
-          key: hunter-centos-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
+          key: hunter-centos-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
           restore-keys: |
-            hunter-centos-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
-            hunter-centos-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-
-            hunter-centos-v1-notest-${{ runner.temp }}-
+            hunter-centos-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
+            hunter-centos-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-
+            hunter-centos-v2-notest-${{ runner.temp }}-
       - name: install CentOS dependencies
         run: |
           yum install -y epel-release centos-release-scl
           yum install -y git make gcc gcc-c++ glibc-static glibc-devel cmake3 ccache devtoolset-7 && source /opt/rh/devtoolset-7/enable
       - name: configure and compile
         run: |
+          rustup override set stable
           cargo --version
           source /opt/rh/devtoolset-7/enable
           mkdir -p build && cd build

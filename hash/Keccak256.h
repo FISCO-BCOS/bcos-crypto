@@ -30,7 +30,7 @@ class Keccak256 : public Hash
 {
 public:
     using Ptr = std::shared_ptr<Keccak256>;
-    Keccak256() {}
+    Keccak256() { setHashImplType(HashImplType::Keccak256Hash); }
     virtual ~Keccak256() {}
     HashType hash(bytesConstRef _data) override;
 };

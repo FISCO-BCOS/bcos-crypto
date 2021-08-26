@@ -74,7 +74,7 @@ void hashPerf(size_t _count)
         inputData += deltaData;
     }
     // sha3 perf
-    Hash::Ptr hashImpl = std::make_shared<Sha3>();
+    Hash::Ptr hashImpl = std::make_shared<class Sha3>();
     hashPerf(hashImpl, "SHA3", inputData, _count);
     // keccak256 perf
     hashImpl = std::make_shared<Keccak256>();
