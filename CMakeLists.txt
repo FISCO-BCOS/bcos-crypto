@@ -73,14 +73,6 @@ add_subdirectory(demo)
 endif()
 
 if (TESTS)
-    # fetch bcos-test
-    set(BCOS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test/bcos-test)
-    FetchContent_Declare(bcos-test
-    GIT_REPOSITORY https://${URL_BASE}/FISCO-BCOS/bcos-test.git
-    GIT_TAG dev
-    SOURCE_DIR ${BCOS_TEST_DIR})
-    FetchContent_MakeAvailable(bcos-test)
-
     enable_testing()
     set(CTEST_OUTPUT_ON_FAILURE TRUE)
     add_subdirectory(test)

@@ -21,7 +21,7 @@
 #include "../../hash/SM3.h"
 #include "../../hash/Sha3.h"
 #include <bcos-framework/interfaces/crypto/CryptoSuite.h>
-#include <bcos-test/libutils/TestPromptFixture.h>
+#include <bcos-framework/testutils/TestPromptFixture.h>
 #include <boost/test/unit_test.hpp>
 #include <string>
 
