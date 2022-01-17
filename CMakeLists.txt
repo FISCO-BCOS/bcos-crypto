@@ -57,7 +57,7 @@ option(DEMO "compile demo or not" OFF)
 
 set(BCOS_CRYPTO_TARGET bcos-crypto)
 add_library(${BCOS_CRYPTO_TARGET} ${SRC_LIST} ${HEADERS})
-target_link_libraries(${BCOS_CRYPTO_TARGET} PUBLIC bcos-utilities::bcos-utilities wedpr-crypto::crypto)
+target_link_libraries(${BCOS_CRYPTO_TARGET} PUBLIC bcos-utilities::bcos-utilities wedpr-crypto::crypto pthread dl)
 
 if(DEMO)
 add_subdirectory(demo)
