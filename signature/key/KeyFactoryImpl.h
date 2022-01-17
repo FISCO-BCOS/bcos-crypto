@@ -20,7 +20,7 @@
  */
 #pragma once
 #include "KeyImpl.h"
-#include <bcos-framework/interfaces/crypto/KeyFactory.h>
+#include "interfaces/crypto/KeyFactory.h"
 
 namespace bcos
 {

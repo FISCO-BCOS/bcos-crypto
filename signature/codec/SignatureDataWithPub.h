@@ -20,7 +20,7 @@
  */
 #pragma once
 #include "SignatureData.h"
-#include <bcos-framework/interfaces/crypto/Signature.h>
+#include "interfaces/crypto/Signature.h"
 namespace bcos
 {
 namespace crypto
