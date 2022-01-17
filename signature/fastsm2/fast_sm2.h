@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2021 FISCO BCOS.
+ *  Copyright (C) 2022 FISCO BCOS.
  *  SPDX-License-Identifier: Apache-2.0
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,23 +13,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * @brief common types for crypto
- * @file CommonType.h
- * @author: yujiechen
- * @date 2021-04-01
+ * @brief implementation for ed25519 keyPair algorithm
+ * @file fast_sm2.h
+ * @date 2022.01.17
+ * @author yujiechen
  */
 #pragma once
-#include <bcos-utilities/FixedBytes.h>
-#include <bcos-utilities/LOG.h>
+#include "wedpr-crypto/WedprUtilities.h"
 
-#define CRYPTO_LOG(LEVEL) BCOS_LOG(LEVEL) << LOG_BADGE("CRYPTO")
 namespace bcos
 {
 namespace crypto
 {
-using HashType = h256;
-using HashList = std::vector<HashType>;
-using HashListPtr = std::shared_ptr<HashList>;
+const char* c_userId = "1234567812345678";
+/// C interface for 'fast_sm2_sign'.
+int8_t fast_sm2_sign(const CInputBuffer* raw_private_key, const CInputBuffer* raw_public_key,
+    const CInputBuffer* raw_message_hash, COutputBuffer* output_signature);
 
+/// C interface for 'fast_sm2_verify'.
+int8_t fast_sm2_verify(const CInputBuffer* raw_public_key, const CInputBuffer* raw_message_hash,
+    const CInputBuffer* raw_signature);
 }  // namespace crypto
 }  // namespace bcos

@@ -118,8 +118,8 @@ std::pair<bool, bytes> bcos::crypto::ed25519Recover(Hash::Ptr _hashImpl, bytesCo
     }
     catch (const std::exception& e)
     {
-        BCOS_LOG(WARNING) << LOG_DESC("ed25519Recover failed")
-                          << LOG_KV("error", boost::diagnostic_information(e));
+        CRYPTO_LOG(WARNING) << LOG_DESC("ed25519Recover failed")
+                            << LOG_KV("error", boost::diagnostic_information(e));
     }
     return {false, {}};
 }
