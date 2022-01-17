@@ -13,24 +13,26 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * @brief define the exceptions for signature of bcos-crypto
- * @file Execptions.h
- * @date 2021.03.05
- * @author yujiechen
+ * @brief interface for Public/Secret key creation
+ * @file KeyFactory.h
+ * @author: yujiechen
+ * @date 2021-05-10
  */
 #pragma once
-#include <bcos-utilities/Exceptions.h>
-
+#include "KeyInterface.h"
 namespace bcos
 {
 namespace crypto
 {
-DERIVE_BCOS_EXCEPTION(PriToPublicKeyException);
-DERIVE_BCOS_EXCEPTION(SignException);
-DERIVE_BCOS_EXCEPTION(InvalidSignature);
-DERIVE_BCOS_EXCEPTION(InvalidSignatureData);
-DERIVE_BCOS_EXCEPTION(InvalidKey);
-DERIVE_BCOS_EXCEPTION(GenerateKeyPairException);
-DERIVE_BCOS_EXCEPTION(InvalidSecretKey);
+class KeyFactory
+{
+public:
+    using Ptr = std::shared_ptr<KeyFactory>;
+    KeyFactory() = default;
+    virtual ~KeyFactory() {}
+
+    virtual KeyInterface::Ptr createKey(bytesConstRef _keyData) = 0;
+    virtual KeyInterface::Ptr createKey(bytes const& _keyData) = 0;
+};
 }  // namespace crypto
 }  // namespace bcos

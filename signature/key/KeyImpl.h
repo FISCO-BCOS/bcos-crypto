@@ -20,8 +20,8 @@
  */
 #pragma once
 #include "../Exceptions.h"
-#include <bcos-framework/interfaces/crypto/KeyInterface.h>
-#include <bcos-framework/libutilities/DataConvertUtility.h>
+#include "interfaces/crypto/KeyInterface.h"
+#include <bcos-utilities/DataConvertUtility.h>
 namespace bcos
 {
 namespace crypto

@@ -19,7 +19,7 @@
  * @author yujiechen
  */
 #pragma once
-#include <bcos-framework/interfaces/crypto/Hash.h>
+#include "interfaces/crypto/Hash.h"
 #include <wedpr-crypto/WedprCrypto.h>
 #include <wedpr-crypto/WedprUtilities.h>
 

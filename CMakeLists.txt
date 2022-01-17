@@ -24,49 +24,40 @@ if (NOT DEFINED URL_BASE)
     # set(URL_BASE "github.com.cnpmjs.org")
 endif()
 
-include(FetchContent)
-set(BCOS_CMAKE_SCRIPTS_DIR ${CMAKE_CURRENT_BINARY_DIR}/bcos-cmake-scripts)
-FetchContent_Declare(bcos-cmake-scripts
-    GIT_REPOSITORY https://${URL_BASE}/FISCO-BCOS/bcos-cmake-scripts.git
-    GIT_TAG 9b2ac5b979cbc97f640b2285feb2c74a18cfb935
-    SOURCE_DIR ${BCOS_CMAKE_SCRIPTS_DIR}
-)
-FetchContent_MakeAvailable(bcos-cmake-scripts)
-
+set(BCOS_CMAKE_SCRIPTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bcos-cmake-scripts)
 set(BCOS_CRYPTO_CMAKE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake" CACHE PATH "The cmake path for the library")
 list(APPEND CMAKE_MODULE_PATH ${BCOS_CMAKE_SCRIPTS_DIR})
 list(APPEND CMAKE_MODULE_PATH ${BCOS_CRYPTO_CMAKE_DIR})
 #init hunter
 include(HunterGate)
 HunterGate(
-    URL "https://${URL_BASE}/FISCO-BCOS/hunter/archive/203039fdd0826330facd9c3841082dbf35d0c808.tar.gz"
-    SHA1 "26ca1840eb26da410913469f2f278569c8d383ae"
+    URL "https://${URL_BASE}/FISCO-BCOS/hunter/archive/9bb4c2aa139cfa53af5779105cd0d5570c31fbf5.tar.gz"
+    SHA1 "02165406cd653bedfe88538926453ede8eca84ba"
     FILEPATH "${BCOS_CRYPTO_CMAKE_DIR}/config.cmake"
 )
 project(bcos-crypto VERSION "3.0.0")
-set(VERSION_SUFFIX "-rc1")
+set(VERSION_SUFFIX "-rc3")
 
 # basic settings
 include(Options)
 configure_project()
 include(CompilerSettings)
 
-include_directories(${CMAKE_INSTALL_INCLUDEDIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # install dependencies
-include(InstallBcosFrameworkDependencies)
+include(InstallBcosUtilities)
 hunter_add_package(wedpr-crypto)
 find_package(wedpr-crypto CONFIG REQUIRED)
 
 # add source directory
 include(Sources)
+option(DEMO "compile demo or not" OFF)
 
 set(BCOS_CRYPTO_TARGET bcos-crypto)
 add_library(${BCOS_CRYPTO_TARGET} ${SRC_LIST} ${HEADERS})
-target_link_libraries(${BCOS_CRYPTO_TARGET} PUBLIC bcos-framework::utilities wedpr-crypto::crypto)
-
-option(DEMO "compile demo or not" OFF)
+target_link_libraries(${BCOS_CRYPTO_TARGET} PUBLIC bcos-utilities::bcos-utilities wedpr-crypto::crypto)
 
 if(DEMO)
 add_subdirectory(demo)

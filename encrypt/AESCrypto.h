@@ -19,7 +19,7 @@
  * @author yujiechen
  */
 #pragma once
-#include <bcos-framework/interfaces/crypto/SymmetricEncryption.h>
+#include "interfaces/crypto/SymmetricEncryption.h"
 
 namespace bcos
 {
