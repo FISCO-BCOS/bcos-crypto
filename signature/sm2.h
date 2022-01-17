@@ -14,23 +14,25 @@
  *  limitations under the License.
  *
  * @brief implementation for ed25519 keyPair algorithm
- * @file fast_sm2.h
+ * @file sm2.h
  * @date 2022.01.17
  * @author yujiechen
  */
 #pragma once
-#include "wedpr-crypto/WedprUtilities.h"
-
+#include <bcos-utilities/Common.h>
+#include <interfaces/crypto/CommonType.h>
+#include <interfaces/crypto/KeyInterface.h>
+#include <interfaces/crypto/KeyPairInterface.h>
 namespace bcos
 {
 namespace crypto
 {
-/// C interface for 'fast_sm2_sign'.
-int8_t fast_sm2_sign(const CInputBuffer* raw_private_key, const CInputBuffer* raw_public_key,
-    const CInputBuffer* raw_message_hash, COutputBuffer* output_signature);
+std::shared_ptr<bytes> sm2Sign(
+    KeyPairInterface::Ptr _keyPair, const HashType& _hash, bool _signatureWithPub = false);
+bool sm2Verify(PublicPtr _pubKey, const HashType& _hash, bytesConstRef _signatureData);
+KeyPairInterface::Ptr sm2GenerateKeyPair();
+PublicPtr sm2Recover(const HashType& _hash, bytesConstRef _signData);
 
-/// C interface for 'fast_sm2_verify'.
-int8_t fast_sm2_verify(const CInputBuffer* raw_public_key, const CInputBuffer* raw_message_hash,
-    const CInputBuffer* raw_signature);
+std::pair<bool, bytes> sm2Recover(Hash::Ptr _hashImpl, bytesConstRef _in);
 }  // namespace crypto
 }  // namespace bcos

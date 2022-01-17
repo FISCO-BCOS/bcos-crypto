@@ -18,14 +18,15 @@
  * @date 2021.04.07
  * @author yujiechen
  */
-#include "../encrypt/AESCrypto.h"
-#include "../encrypt/SM4Crypto.h"
-#include "../hash/Keccak256.h"
-#include "../hash/SM3.h"
-#include "../hash/Sha3.h"
-#include "../signature/ed25519/Ed25519Crypto.h"
-#include "../signature/secp256k1/Secp256k1Crypto.h"
-#include "../signature/sm2/SM2Crypto.h"
+#include "encrypt/AESCrypto.h"
+#include "encrypt/SM4Crypto.h"
+#include "hash/Keccak256.h"
+#include "hash/SM3.h"
+#include "hash/Sha3.h"
+#include "signature/ed25519/Ed25519Crypto.h"
+#include "signature/fastsm2/FastSM2Crypto.h"
+#include "signature/secp256k1/Secp256k1Crypto.h"
+#include "signature/sm2/SM2Crypto.h"
 #include <bcos-utilities/Common.h>
 
 using namespace bcos;
@@ -134,6 +135,12 @@ void signaturePerf(size_t _count)
     // sm2 perf
     signatureImpl = std::make_shared<SM2Crypto>();
     signaturePerf(signatureImpl, msgHash, "SM2", _count);
+
+#if SM2_OPTIMIZE
+    // fastsm2 perf
+    signatureImpl = std::make_shared<FastSM2Crypto>();
+    signaturePerf(signatureImpl, msgHash, "FastSM2", _count);
+#endif
 
     // ed25519 perf
     signatureImpl = std::make_shared<Ed25519Crypto>();

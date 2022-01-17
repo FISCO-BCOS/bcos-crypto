@@ -30,6 +30,7 @@
 using namespace bcos;
 using namespace bcos::crypto;
 
+const char* c_userId = "1234567812345678";
 const int c_R_FIELD_LEN = 32;
 const int c_S_FIELD_LEN = 32;
 
