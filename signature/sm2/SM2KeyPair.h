@@ -21,6 +21,7 @@
 #pragma once
 #include "../key/KeyPair.h"
 #include "interfaces/crypto/Signature.h"
+#include <wedpr-crypto/WedprCrypto.h>
 
 namespace bcos
 {
@@ -32,10 +33,17 @@ PublicPtr sm2PriToPub(SecretPtr _secret);
 class SM2KeyPair : public KeyPair
 {
 public:
-    SM2KeyPair() : KeyPair(SM2_PUBLIC_KEY_LEN, SM2_PRIVATE_KEY_LEN) {}
+    SM2KeyPair() : KeyPair(SM2_PUBLIC_KEY_LEN, SM2_PRIVATE_KEY_LEN)
+    {
+        m_publicKeyDeriver = wedpr_sm2_derive_public_key;
+    }
     explicit SM2KeyPair(SecretPtr _secretKey);
     ~SM2KeyPair() override {}
-    virtual PublicPtr priToPub(SecretPtr _secretKey) { return sm2PriToPub(_secretKey); }
+    virtual PublicPtr priToPub(SecretPtr _secretKey);
+
+protected:
+    std::function<int8_t(const CInputBuffer* private_key, COutputBuffer* output_public_key)>
+        m_publicKeyDeriver;
 };
 }  // namespace crypto
 }  // namespace bcos

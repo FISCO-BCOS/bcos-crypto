@@ -14,3 +14,8 @@ hunter_config(
     CMAKE_ARGS
     CONFIG_MACRO=BOOST_UUID_RANDOM_PROVIDER_FORCE_POSIX
 )
+
+hunter_config(OpenSSL VERSION tassl_1.1.1b_v1.4-local
+    URL https://${URL_BASE}/FISCO-BCOS/TASSL-1.1.1b/archive/6a0fddd0eb33433c190c796e5b6d80db4db52810.tar.gz
+    SHA1 14f7590e09b54bb71926ad5853343f20893ee536
+)

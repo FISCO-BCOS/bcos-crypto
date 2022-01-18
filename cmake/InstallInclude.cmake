@@ -13,6 +13,7 @@ install(
     DIRECTORY "signature"
     DESTINATION "${DESTINATION_INCLUDE_DIR}"
     FILES_MATCHING PATTERN "*.h"
+    PATTERN "${ExcludePattern}" EXCLUDE
 )
 
 install(

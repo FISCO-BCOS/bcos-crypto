@@ -17,22 +17,26 @@
  * @file SignatureTest.h
  * @date 2021.03.06
  */
-#include "../../hash/Keccak256.h"
-#include "../../hash/SM3.h"
-#include "../../hash/Sha3.h"
-#include "../../signature/Exceptions.h"
-#include "../../signature/codec/SignatureDataWithPub.h"
-#include "../../signature/codec/SignatureDataWithV.h"
-#include "../../signature/ed25519/Ed25519Crypto.h"
-#include "../../signature/ed25519/Ed25519KeyPair.h"
-#include "../../signature/key/KeyFactoryImpl.h"
-#include "../../signature/secp256k1/Secp256k1Crypto.h"
-#include "../../signature/secp256k1/Secp256k1KeyPair.h"
-#include "../../signature/sm2/SM2Crypto.h"
-#include "../../signature/sm2/SM2KeyPair.h"
+#include "hash/Keccak256.h"
+#include "hash/SM3.h"
+#include "hash/Sha3.h"
+#include "signature/Exceptions.h"
+#include "signature/codec/SignatureDataWithPub.h"
+#include "signature/codec/SignatureDataWithV.h"
+#include "signature/ed25519/Ed25519Crypto.h"
+#include "signature/ed25519/Ed25519KeyPair.h"
+#include "signature/key/KeyFactoryImpl.h"
+#include "signature/secp256k1/Secp256k1Crypto.h"
+#include "signature/secp256k1/Secp256k1KeyPair.h"
+#include "signature/sm2.h"
+#include "signature/sm2/SM2Crypto.h"
+#include "signature/sm2/SM2KeyPair.h"
 #include <bcos-utilities/testutils/TestPromptFixture.h>
 #include <boost/test/unit_test.hpp>
 #include <string>
+#if SM2_OPTIMIZE
+#include "signature/fastsm2/FastSM2Crypto.h"
+#endif
 using namespace bcos;
 using namespace bcos::crypto;
 
@@ -218,21 +222,35 @@ BOOST_AUTO_TEST_CASE(testSM2KeyPair)
     BOOST_CHECK_THROW(SM2KeyPair sm2KeyPair(emptySecret), PriToPublicKeyException);
 }
 
-BOOST_AUTO_TEST_CASE(testSM2SignAndVerify)
+inline void SM2SignAndVerifyTest(SM2Crypto::Ptr _smCrypto)
 {
-    auto signatureCrypto = std::make_shared<SM2Crypto>();
     auto hashCrypto = std::make_shared<SM3>();
-    auto keyPair = signatureCrypto->generateKeyPair();
     auto hashData = hashCrypto->hash(std::string("abcd"));
+
+    h256 secret("ca508b2b49c1d2dc46cbd5a011686fdc19937dbc704afe6c547a862b3e2b6c69");
+    auto sec = std::make_shared<KeyImpl>(secret.asBytes());
+    auto keyPair = _smCrypto->createKeyPair(sec);
+    auto signatureData = fromHexString(
+        "cd39bf939d999ca710576a629c962edfc28608701a3a7b61c971daeac5a1399cf4a7272fa80783e171c7fd5b03"
+        "8a3af4521f681ebe9fd44db3b60e750c438293f7dee65e76603ed7cd4c598d53cabe875c459e0fae4c6fd7b858"
+        "189fd4741081e970bca0d5cb571a7ac30586aec71b23187d4b25e59143812f74a2744604d42b");
+    // check verify
+    bool result = _smCrypto->verify(keyPair->publicKey(), hashData,
+        bytesConstRef(signatureData->data(), signatureData->size()));
+    BOOST_CHECK(result == true);
+
+    keyPair = _smCrypto->generateKeyPair();
     // sign
-    auto sig = signatureCrypto->sign(keyPair, hashData, true);
+    auto sig = _smCrypto->sign(keyPair, hashData, true);
     // verify
-    bool result = signatureCrypto->verify(
-        keyPair->publicKey(), hashData, bytesConstRef(sig->data(), sig->size()));
+    result =
+        _smCrypto->verify(keyPair->publicKey(), hashData, bytesConstRef(sig->data(), sig->size()));
+
+    std::cout << "#### privateKey:" << *toHexString(keyPair->secretKey()->data()) << std::endl;
     std::cout << "#### phase 1, signatureData:" << *toHexString(*sig) << std::endl;
     BOOST_CHECK(result == true);
     // recover
-    auto pub = signatureCrypto->recover(hashData, bytesConstRef(sig->data(), sig->size()));
+    auto pub = _smCrypto->recover(hashData, bytesConstRef(sig->data(), sig->size()));
     std::cout << "#### phase 2" << std::endl;
     BOOST_CHECK(pub->data() == keyPair->publicKey()->data());
 
@@ -240,27 +258,26 @@ BOOST_AUTO_TEST_CASE(testSM2SignAndVerify)
     // exception case
     // invalid payload(hash)
     auto invalidHash = hashCrypto->hash(std::string("abce"));
-    result = signatureCrypto->verify(
+    result = _smCrypto->verify(
         keyPair->publicKey(), invalidHash, bytesConstRef(sig->data(), sig->size()));
     BOOST_CHECK(result == false);
     // recover
     BOOST_CHECK_THROW(
-        signatureCrypto->recover(invalidHash, bytesConstRef(sig->data(), sig->size())),
-        InvalidSignature);
+        _smCrypto->recover(invalidHash, bytesConstRef(sig->data(), sig->size())), InvalidSignature);
 
     // invalid signature
-    auto anotherSig = signatureCrypto->sign(keyPair, invalidHash, true);
-    result = signatureCrypto->verify(
+    auto anotherSig = _smCrypto->sign(keyPair, invalidHash, true);
+    result = _smCrypto->verify(
         keyPair->publicKey(), hashData, bytesConstRef(anotherSig->data(), anotherSig->size()));
     BOOST_CHECK(result == false);
     BOOST_CHECK_THROW(
-        signatureCrypto->recover(hashData, bytesConstRef(anotherSig->data(), anotherSig->size())),
+        _smCrypto->recover(hashData, bytesConstRef(anotherSig->data(), anotherSig->size())),
         InvalidSignature);
 
     // invalid sig
-    auto keyPair2 = signatureCrypto->generateKeyPair();
-    result = signatureCrypto->verify(
-        keyPair2->publicKey(), hashData, bytesConstRef(sig->data(), sig->size()));
+    auto keyPair2 = _smCrypto->generateKeyPair();
+    result =
+        _smCrypto->verify(keyPair2->publicKey(), hashData, bytesConstRef(sig->data(), sig->size()));
     BOOST_CHECK(result == false);
     auto signatureStruct =
         std::make_shared<SignatureDataWithPub>(bytesConstRef(sig->data(), sig->size()));
@@ -270,8 +287,20 @@ BOOST_AUTO_TEST_CASE(testSM2SignAndVerify)
     auto signatureStruct2 = std::make_shared<SignatureDataWithPub>(r, s, signatureStruct->pub());
     auto encodedData = signatureStruct2->encode();
     auto recoverKey =
-        signatureCrypto->recover(hashData, bytesConstRef(encodedData->data(), encodedData->size()));
+        _smCrypto->recover(hashData, bytesConstRef(encodedData->data(), encodedData->size()));
     BOOST_CHECK(recoverKey->data() == keyPair->publicKey()->data());
+}
+
+BOOST_AUTO_TEST_CASE(testSM2SignAndVerify)
+{
+    std::cout << "### testSM2SignAndVerify: SM2Crypto" << std::endl;
+    auto signatureCrypto = std::make_shared<SM2Crypto>();
+    SM2SignAndVerifyTest(signatureCrypto);
+#if SM2_OPTIMIZE
+    std::cout << "### testSM2SignAndVerify: FastSM2Crypto" << std::endl;
+    auto fastCrypto = std::make_shared<FastSM2Crypto>();
+    SM2SignAndVerifyTest(fastCrypto);
+#endif
 }
 
 

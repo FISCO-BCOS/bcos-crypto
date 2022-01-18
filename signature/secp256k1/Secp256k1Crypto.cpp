@@ -115,8 +115,8 @@ std::pair<bool, bytes> bcos::crypto::secp256k1Recover(Hash::Ptr _hashImpl, bytes
         }
         catch (const std::exception& e)
         {
-            BCOS_LOG(WARNING) << LOG_DESC("secp256k1Recover failed")
-                              << LOG_KV("error", boost::diagnostic_information(e));
+            CRYPTO_LOG(WARNING) << LOG_DESC("secp256k1Recover failed")
+                                << LOG_KV("error", boost::diagnostic_information(e));
         }
     }
     return {false, {}};

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2021 FISCO BCOS.
+ *  Copyright (C) 2022 FISCO BCOS.
  *  SPDX-License-Identifier: Apache-2.0
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,23 +13,32 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * @brief common types for crypto
- * @file CommonType.h
- * @author: yujiechen
- * @date 2021-04-01
+ * @file FastSM2Crypto.h
+ * @date 2022.01.17
+ * @author yujiechen
  */
-#pragma once
-#include <bcos-utilities/FixedBytes.h>
-#include <bcos-utilities/Log.h>
 
-#define CRYPTO_LOG(LEVEL) BCOS_LOG(LEVEL) << LOG_BADGE("CRYPTO")
+#pragma once
+#include "FastSM2KeyPairFactory.h"
+#include "fast_sm2.h"
+#include "signature/sm2/SM2Crypto.h"
+#include <memory>
+
 namespace bcos
 {
 namespace crypto
 {
-using HashType = h256;
-using HashList = std::vector<HashType>;
-using HashListPtr = std::shared_ptr<HashList>;
-
+class FastSM2Crypto : public SM2Crypto
+{
+public:
+    using Ptr = std::shared_ptr<FastSM2Crypto>;
+    FastSM2Crypto() : SM2Crypto()
+    {
+        m_signer = fast_sm2_sign;
+        m_verifier = fast_sm2_verify;
+        m_keyPairFactory = std::make_shared<FastSM2KeyPairFactory>();
+    }
+    ~FastSM2Crypto() override {}
+};
 }  // namespace crypto
 }  // namespace bcos

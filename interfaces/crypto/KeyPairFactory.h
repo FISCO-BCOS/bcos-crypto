@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2021 FISCO BCOS.
+ *  Copyright (C) 2022 FISCO BCOS.
  *  SPDX-License-Identifier: Apache-2.0
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,23 +13,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * @brief common types for crypto
- * @file CommonType.h
+ * @file KeyPairFactory.h
  * @author: yujiechen
- * @date 2021-04-01
+ * @date 2022-01-18
  */
 #pragma once
-#include <bcos-utilities/FixedBytes.h>
-#include <bcos-utilities/Log.h>
-
-#define CRYPTO_LOG(LEVEL) BCOS_LOG(LEVEL) << LOG_BADGE("CRYPTO")
+#include "KeyPairInterface.h"
+#include <bcos-utilities/Common.h>
 namespace bcos
 {
 namespace crypto
 {
-using HashType = h256;
-using HashList = std::vector<HashType>;
-using HashListPtr = std::shared_ptr<HashList>;
-
+class KeyPairFactory
+{
+public:
+    using Ptr = std::shared_ptr<KeyPairFactory>;
+    KeyPairFactory() = default;
+    virtual ~KeyPairFactory() {}
+    virtual KeyPairInterface::Ptr createKeyPair(SecretPtr _secretKey) = 0;
+    virtual KeyPairInterface::Ptr generateKeyPair() = 0;
+};
 }  // namespace crypto
 }  // namespace bcos
