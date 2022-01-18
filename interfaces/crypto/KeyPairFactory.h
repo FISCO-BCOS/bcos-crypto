@@ -13,32 +13,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * @file FastSM2Crypto.h
- * @date 2022.01.17
- * @author yujiechen
+ * @file KeyPairFactory.h
+ * @author: yujiechen
+ * @date 2022-01-18
  */
-
 #pragma once
-#include "FastSM2KeyPairFactory.h"
-#include "fast_sm2.h"
-#include "signature/sm2/SM2Crypto.h"
-#include <memory>
-
+#include "KeyPairInterface.h"
+#include <bcos-utilities/Common.h>
 namespace bcos
 {
 namespace crypto
 {
-class FastSM2Crypto : public SM2Crypto
+class KeyPairFactory
 {
 public:
-    using Ptr = std::shared_ptr<FastSM2Crypto>;
-    FastSM2Crypto() : SM2Crypto()
-    {
-        m_signer = fast_sm2_sign;
-        m_verifier = fast_sm2_verify;
-        m_keyPairFactory = std::make_shared<FastSM2KeyPairFactory>();
-    }
-    ~FastSM2Crypto() override {}
+    using Ptr = std::shared_ptr<KeyPairFactory>;
+    KeyPairFactory() = default;
+    virtual ~KeyPairFactory() {}
+    virtual KeyPairInterface::Ptr createKeyPair(SecretPtr _secretKey) = 0;
+    virtual KeyPairInterface::Ptr generateKeyPair() = 0;
 };
 }  // namespace crypto
 }  // namespace bcos

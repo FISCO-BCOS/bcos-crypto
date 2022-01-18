@@ -33,6 +33,7 @@ using namespace bcos::crypto;
 const char* c_userId = "1234567812345678";
 const int c_R_FIELD_LEN = 32;
 const int c_S_FIELD_LEN = 32;
+const int c_PUBLICKEY_LEN = 64;
 // Note: EC_GROUP_new_by_curve_name cost performance, So only one copy is created globally to
 // improve performance
 EC_GROUP* sm2Group = EC_GROUP_new_by_curve_name(NID_sm2);
@@ -220,6 +221,84 @@ done:
     if (signData)
     {
         ECDSA_SIG_free(signData);
+    }
+    return ret;
+}
+
+// C interface for 'fast_sm2_derive_public_key'.
+int8_t bcos::crypto::fast_sm2_derive_public_key(
+    const CInputBuffer* raw_private_key, COutputBuffer* output_public_key)
+{
+    int8_t ret = WEDPR_ERROR;
+    EC_KEY* sm2Key = NULL;
+    EC_POINT* pubPoint = NULL;
+    BN_CTX* ctx = NULL;
+    char* publicKey = NULL;
+    BIGNUM* privateKey =
+        BN_bin2bn((const unsigned char*)raw_private_key->data, raw_private_key->len, NULL);
+    if (!privateKey)
+    {
+        CRYPTO_LOG(ERROR) << "sm2: fast_sm2_derive_public_key: error of BN_bin2bn for privateKey";
+        goto done;
+    }
+    ctx = BN_CTX_new();
+    if (!ctx)
+    {
+        CRYPTO_LOG(ERROR) << "sm2: fast_sm2_derive_public_key: error of BN_CTX_new";
+        goto done;
+    }
+    sm2Key = EC_KEY_new_by_curve_name(NID_sm2);
+    if (!sm2Key)
+    {
+        CRYPTO_LOG(ERROR) << "sm2: fast_sm2_derive_public_key: error of EC_KEY_new_by_curve_name";
+        goto done;
+    }
+    if (!EC_KEY_set_private_key(sm2Key, privateKey))
+    {
+        CRYPTO_LOG(ERROR) << "sm2: fast_sm2_derive_public_key: error EC_KEY_set_private_key";
+        goto done;
+    }
+    pubPoint = EC_POINT_new(sm2Group);
+    if (!pubPoint)
+    {
+        CRYPTO_LOG(ERROR) << "sm2: fast_sm2_derive_public_key: error EC_POINT_new";
+        goto done;
+    }
+    if (!EC_POINT_mul(sm2Group, pubPoint, privateKey, NULL, NULL, NULL))
+    {
+        CRYPTO_LOG(ERROR) << "sm2: fast_sm2_derive_public_key: error of EC_POINT_mul";
+        goto done;
+    }
+    if (!EC_POINT_point2buf(
+            sm2Group, pubPoint, POINT_CONVERSION_UNCOMPRESSED, (unsigned char**)&publicKey, ctx))
+    {
+        CRYPTO_LOG(ERROR)
+            << "sm2: fast_sm2_derive_public_key: error of EC_POINT_point2bin for publicKey";
+        goto done;
+    }
+    // remove the prefix 04
+    memcpy(output_public_key->data, publicKey + 1, c_PUBLICKEY_LEN);
+    ret = WEDPR_SUCCESS;
+done:
+    if (sm2Key)
+    {
+        EC_KEY_free(sm2Key);
+    }
+    if (pubPoint)
+    {
+        EC_POINT_free(pubPoint);
+    }
+    if (ctx)
+    {
+        BN_CTX_free(ctx);
+    }
+    if (privateKey)
+    {
+        BN_free(privateKey);
+    }
+    if (publicKey)
+    {
+        OPENSSL_free(publicKey);
     }
     return ret;
 }

@@ -25,12 +25,16 @@ namespace bcos
 {
 namespace crypto
 {
-/// C interface for 'fast_sm2_sign'.
+// C interface for 'fast_sm2_sign'.
 int8_t fast_sm2_sign(const CInputBuffer* raw_private_key, const CInputBuffer* raw_public_key,
     const CInputBuffer* raw_message_hash, COutputBuffer* output_signature);
 
-/// C interface for 'fast_sm2_verify'.
+// C interface for 'fast_sm2_verify'.
 int8_t fast_sm2_verify(const CInputBuffer* raw_public_key, const CInputBuffer* raw_message_hash,
     const CInputBuffer* raw_signature);
+
+// C interface for 'fast_sm2_verify'.
+int8_t fast_sm2_derive_public_key(
+    const CInputBuffer* raw_private_key, COutputBuffer* output_public_key);
 }  // namespace crypto
 }  // namespace bcos

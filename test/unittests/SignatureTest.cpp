@@ -225,13 +225,28 @@ BOOST_AUTO_TEST_CASE(testSM2KeyPair)
 inline void SM2SignAndVerifyTest(SM2Crypto::Ptr _smCrypto)
 {
     auto hashCrypto = std::make_shared<SM3>();
-    auto keyPair = _smCrypto->generateKeyPair();
     auto hashData = hashCrypto->hash(std::string("abcd"));
+
+    h256 secret("ca508b2b49c1d2dc46cbd5a011686fdc19937dbc704afe6c547a862b3e2b6c69");
+    auto sec = std::make_shared<KeyImpl>(secret.asBytes());
+    auto keyPair = _smCrypto->createKeyPair(sec);
+    auto signatureData = fromHexString(
+        "cd39bf939d999ca710576a629c962edfc28608701a3a7b61c971daeac5a1399cf4a7272fa80783e171c7fd5b03"
+        "8a3af4521f681ebe9fd44db3b60e750c438293f7dee65e76603ed7cd4c598d53cabe875c459e0fae4c6fd7b858"
+        "189fd4741081e970bca0d5cb571a7ac30586aec71b23187d4b25e59143812f74a2744604d42b");
+    // check verify
+    bool result = _smCrypto->verify(keyPair->publicKey(), hashData,
+        bytesConstRef(signatureData->data(), signatureData->size()));
+    BOOST_CHECK(result == true);
+
+    keyPair = _smCrypto->generateKeyPair();
     // sign
     auto sig = _smCrypto->sign(keyPair, hashData, true);
     // verify
-    bool result =
+    result =
         _smCrypto->verify(keyPair->publicKey(), hashData, bytesConstRef(sig->data(), sig->size()));
+
+    std::cout << "#### privateKey:" << *toHexString(keyPair->secretKey()->data()) << std::endl;
     std::cout << "#### phase 1, signatureData:" << *toHexString(*sig) << std::endl;
     BOOST_CHECK(result == true);
     // recover

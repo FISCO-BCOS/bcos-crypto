@@ -74,6 +74,7 @@ macro(configure_project)
         add_definitions(-DFISCO_DEBUG)
     endif()
 
+    default_option(SM2_OPTIMIZE OFF)
     if (SM2_OPTIMIZE)
         add_definitions(-DSM2_OPTIMIZE)
     endif()

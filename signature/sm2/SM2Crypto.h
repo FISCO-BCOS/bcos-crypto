@@ -19,6 +19,8 @@
  * @author yujiechen
  */
 #pragma once
+#include "SM2KeyPairFactory.h"
+#include "interfaces/crypto/KeyPairFactory.h"
 #include "interfaces/crypto/Signature.h"
 #include <wedpr-crypto/WedprCrypto.h>
 
@@ -35,6 +37,7 @@ public:
     {
         m_signer = wedpr_sm2_sign_fast;
         m_verifier = wedpr_sm2_verify;
+        m_keyPairFactory = std::make_shared<SM2KeyPairFactory>();
     }
     ~SM2Crypto() override {}
     std::shared_ptr<bytes> sign(KeyPairInterface::Ptr _keyPair, const HashType& _hash,
@@ -60,6 +63,7 @@ protected:
     std::function<int8_t(const CInputBuffer* public_key, const CInputBuffer* message_hash,
         const CInputBuffer* signature)>
         m_verifier;
+    KeyPairFactory::Ptr m_keyPairFactory;
 };
 }  // namespace crypto
 }  // namespace bcos

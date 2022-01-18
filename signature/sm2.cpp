@@ -13,24 +13,33 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * @brief implementation for ed25519 keyPair algorithm
+ * @brief implementation for sm2 algorithm
  * @file sm2.cpp
  * @date 2022.01.17
  * @author yujiechen
  */
 #include "sm2.h"
+#include "signature/fastsm2/FastSM2KeyPair.h"
 #include "signature/sm2/SM2Crypto.h"
+#include "signature/sm2/SM2KeyPair.h"
 
 #if SM2_OPTIMIZE
 #include "signature/fastsm2/FastSM2Crypto.h"
 bcos::crypto::FastSM2Crypto c_sm2Crypto;
+bcos::crypto::FastSM2KeyPair c_sm2KeyPair;
 #else
 bcos::crypto::SM2Crypto c_sm2Crypto;
+bcos::crypto::SM2KeyPair c_sm2KeyPair;
 #endif
+
 
 using namespace bcos;
 using namespace bcos::crypto;
 
+PublicPtr bcos::crypto::sm2PriToPub(SecretPtr _secretKey)
+{
+    return c_sm2KeyPair.priToPub(_secretKey);
+}
 
 std::shared_ptr<bytes> bcos::crypto::sm2Sign(
     KeyPairInterface::Ptr _keyPair, const HashType& _hash, bool _signatureWithPub)

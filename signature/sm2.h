@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * @brief implementation for ed25519 keyPair algorithm
+ * @brief implementation for sm2 algorithm
  * @file sm2.h
  * @date 2022.01.17
  * @author yujiechen
@@ -34,5 +34,6 @@ KeyPairInterface::Ptr sm2GenerateKeyPair();
 PublicPtr sm2Recover(const HashType& _hash, bytesConstRef _signData);
 
 std::pair<bool, bytes> sm2Recover(Hash::Ptr _hashImpl, bytesConstRef _in);
+PublicPtr sm2PriToPub(SecretPtr _secret);
 }  // namespace crypto
 }  // namespace bcos

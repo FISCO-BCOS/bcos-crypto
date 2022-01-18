@@ -35,7 +35,7 @@ bool SM2Crypto::verify(
 
 KeyPairInterface::Ptr SM2Crypto::createKeyPair(SecretPtr _secretKey)
 {
-    return std::make_shared<SM2KeyPair>(_secretKey);
+    return m_keyPairFactory->createKeyPair(_secretKey);
 }
 
 std::shared_ptr<bytes> SM2Crypto::sign(
@@ -123,14 +123,5 @@ std::pair<bool, bytes> SM2Crypto::recoverAddress(Hash::Ptr _hashImpl, bytesConst
 
 KeyPairInterface::Ptr SM2Crypto::generateKeyPair()
 {
-    auto keyPair = std::make_shared<SM2KeyPair>();
-    COutputBuffer publicKey{keyPair->publicKey()->mutableData(), keyPair->publicKey()->size()};
-    COutputBuffer privateKey{keyPair->secretKey()->mutableData(), keyPair->secretKey()->size()};
-    auto retCode = wedpr_sm2_gen_key_pair(&publicKey, &privateKey);
-    if (retCode != WEDPR_SUCCESS)
-    {
-        BOOST_THROW_EXCEPTION(
-            GenerateKeyPairException() << errinfo_comment("generateKeyPair exception"));
-    }
-    return keyPair;
+    return m_keyPairFactory->generateKeyPair();
 }
