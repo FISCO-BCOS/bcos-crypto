@@ -292,6 +292,19 @@ inline void SM2SignAndVerifyTest(SM2Crypto::Ptr _smCrypto)
     auto recoverKey =
         _smCrypto->recover(hashData, bytesConstRef(encodedData->data(), encodedData->size()));
     BOOST_CHECK(recoverKey->data() == keyPair->publicKey()->data());
+
+    // test padding
+    unsigned fieldLen = 32;
+    std::shared_ptr<bytes> data = std::make_shared<bytes>(fieldLen, 0);
+    auto binData = fromHexString("508b2b49c1d2dc46cbd5a011686fdc19937dbc704afe6c547a862b3e2b6c69");
+    memcpy(data->data(), binData->data(), binData->size());
+    // padding zero to the r field
+    memmove(data->data() + (fieldLen - binData->size()), data->data(), binData->size());
+    memset(data->data(), 0, (fieldLen - binData->size()));
+    std::cout << "#### data:" << *toHexString(*data) << std::endl;
+    std::cout << "#### binData:" << *toHexString(*binData) << std::endl;
+    std::cout << "### data 0:" << int((*data)[0]) << std::endl;
+    std::cout << "### data 1:" << int((*data)[1]) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(testSM2SignAndVerify)
