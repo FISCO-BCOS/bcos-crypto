@@ -33,6 +33,9 @@ using namespace bcos::crypto;
 const char* c_userId = "1234567812345678";
 const int c_R_FIELD_LEN = 32;
 const int c_S_FIELD_LEN = 32;
+// Note: EC_GROUP_new_by_curve_name cost performance, So only one copy is created globally to
+// improve performance
+EC_GROUP* sm2Group = EC_GROUP_new_by_curve_name(NID_sm2);
 
 // C interface for 'fast_sm2_sign'.
 int8_t bcos::crypto::fast_sm2_sign(const CInputBuffer* raw_private_key,
@@ -48,12 +51,7 @@ int8_t bcos::crypto::fast_sm2_sign(const CInputBuffer* raw_private_key,
     EC_POINT* publicKey = NULL;
     BIGNUM* privateKey = NULL;
     int8_t ret = WEDPR_ERROR;
-    EC_GROUP* sm2Group = EC_GROUP_new_by_curve_name(NID_sm2);
-    if (sm2Group == NULL)
-    {
-        CRYPTO_LOG(ERROR) << LOG_DESC("sm2: fast_sm2_sign: error of EC_GROUP_new_by_curve_name");
-        goto done;
-    }
+
     // load privateKey
     privateKey = BN_bin2bn((const unsigned char*)raw_private_key->data, raw_private_key->len, NULL);
     if (privateKey == NULL)
@@ -117,9 +115,13 @@ int8_t bcos::crypto::fast_sm2_sign(const CInputBuffer* raw_private_key,
     }
     ret = WEDPR_SUCCESS;
 done:
-    if (sm2Group)
+    if (sm2Key)
     {
-        EC_GROUP_free(sm2Group);
+        EC_KEY_free(sm2Key);
+    }
+    if (sig)
+    {
+        ECDSA_SIG_free(sig);
     }
     if (privateKey)
     {
@@ -128,14 +130,6 @@ done:
     if (publicKey)
     {
         EC_POINT_free(publicKey);
-    }
-    if (sm2Key)
-    {
-        EC_KEY_free(sm2Key);
-    }
-    if (sig)
-    {
-        ECDSA_SIG_free(sig);
     }
     return ret;
 }
@@ -151,12 +145,6 @@ int8_t bcos::crypto::fast_sm2_verify(const CInputBuffer* raw_public_key,
     BIGNUM* s = NULL;
     ECDSA_SIG* signData = NULL;
     int8_t ret = WEDPR_ERROR;
-    EC_GROUP* sm2Group = EC_GROUP_new_by_curve_name(NID_sm2);
-    if (sm2Group == NULL)
-    {
-        CRYPTO_LOG(ERROR) << "sm2: fast_sm2_verify: error of EC_GROUP_new_by_curve_name";
-        goto done;
-    }
     point = EC_POINT_new(sm2Group);
     if (point == NULL)
     {
@@ -216,9 +204,13 @@ int8_t bcos::crypto::fast_sm2_verify(const CInputBuffer* raw_public_key,
         ret = WEDPR_SUCCESS;
     }
 done:
-    if (sm2Group)
+    if (sm2Key)
     {
-        EC_GROUP_free(sm2Group);
+        EC_KEY_free(sm2Key);
+    }
+    if (point)
+    {
+        EC_POINT_free(point);
     }
     if (signData == NULL)
     {
@@ -228,14 +220,6 @@ done:
     if (signData)
     {
         ECDSA_SIG_free(signData);
-    }
-    if (point)
-    {
-        EC_POINT_free(point);
-    }
-    if (sm2Key)
-    {
-        EC_KEY_free(sm2Key);
     }
     return ret;
 }
