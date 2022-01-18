@@ -221,6 +221,6 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1
       - name: configure
         if: runner.os == 'Windows'
-        run: mkdir -p build && cd build && cmake -G "Visual Studio 16 2019" -A x64 .. -DHUNTER_CONFIGURATION_TYPES=Release -DHUNTER_STATUS_DEBUG=ON
+        run: mkdir -p build && cd build && cmake -G "Visual Studio 16 2019" -A x64 .. -DTESTS=ON -DDEMO=ON -DSM2_OPTIMIZE=ON -DHUNTER_CONFIGURATION_TYPES=Release -DHUNTER_STATUS_DEBUG=ON
       - name: compile
         run: cd build && MSBuild bcos-crypto.sln /p:Configuration=Release /p:Platform=x64
