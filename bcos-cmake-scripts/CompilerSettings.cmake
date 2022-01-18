@@ -167,7 +167,7 @@ endif()
 # rust static library linking requirements for macos
 if(APPLE)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework Security")
-else()
+elseif(NOT WIN32)
    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -ldl")
 endif()
 set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY ON)

@@ -15,7 +15,7 @@ include_directories(./encrypt)
 set(DependLibraries bcos-utilities::bcos-utilities wedpr-crypto::crypto)
 
 if (WIN32)
-set(DependLibraries ${DependLibraries} Ws2_32 Wldap32 Crypt32)
+set(DependLibraries ${DependLibraries} Ws2_32 Wldap32 Crypt32 userenv)
 else()
 set(DependLibraries ${DependLibraries} pthread dl)
 endif()
