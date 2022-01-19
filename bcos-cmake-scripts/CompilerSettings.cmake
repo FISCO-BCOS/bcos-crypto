@@ -17,8 +17,6 @@
 # Function: Common cmake file for setting compilation environment variables
 # ------------------------------------------------------------------------------
 
-add_definitions(-Wno-unused-value -Wunused-parameter)
-
 if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU") OR ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang"))
     find_program(CCACHE_PROGRAM ccache)
     if(CCACHE_PROGRAM)
@@ -30,6 +28,7 @@ if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU") OR ("${CMAKE_CXX_COMPILER_ID}" MA
     # Use ISO C++17 standard language.
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_FLAGS "-std=c++17 -pthread -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -fexceptions")
+    set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
     set(CMAKE_CXX_VISIBILITY_PRESET hidden)
     # Enables all the warnings about constructions that some users consider questionable,
     # and that are easy to avoid.  Also enable some extra warning flags that are not
@@ -104,8 +103,10 @@ if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU") OR ("${CMAKE_CXX_COMPILER_ID}" MA
 		# Strong stack protection was only added in GCC 4.9.
 		# Use it if we have the option to do so.
 		# See https://lwn.net/Articles/584225/
-        add_compile_options(-fstack-protector-strong)
-        add_compile_options(-fstack-protector)
+        if (GCC_VERSION VERSION_GREATER 4.9 OR GCC_VERSION VERSION_EQUAL 4.9)
+            add_compile_options(-fstack-protector-strong)
+            add_compile_options(-fstack-protector)
+        endif()
     # Additional Clang-specific compiler settings.
     elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
         if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.0)
@@ -136,12 +137,28 @@ if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU") OR ("${CMAKE_CXX_COMPILER_ID}" MA
             set(CMAKE_C_FLAGS "-g -fprofile-arcs -ftest-coverage ${CMAKE_C_FLAGS}")
         endif()
     endif ()
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
+    
+    # Only support visual studio 2017 and visual studio 2019
+    set(MSVC_MIN_VERSION "1914") # VS2017 15.7, for full-ish C++17 support
+    
+    message(STATUS "Compile On Windows, MSVC_TOOLSET_VERSION: ${MSVC_TOOLSET_VERSION}")
+
+    if (MSVC_TOOLSET_VERSION EQUAL 141)
+        message(STATUS "Compile On Visual Studio 2017")
+    elseif(MSVC_TOOLSET_VERSION EQUAL 142)
+        message(STATUS "Compile On Visual Studio 2019")
+    else()
+        message(FATAL_ERROR "Unsupported Visual Studio, supported list: [2017, 2019]. Current MSVC_TOOLSET_VERSION: ${MSVC_TOOLSET_VERSION}")
+    endif()
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
 else ()
     message(WARNING "Your compiler is not tested, if you run into any issues, we'd welcome any patches.")
 endif ()
 
 if (SANITIZE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address -fsanitize=leak -fsanitize-recover=all")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=${SANITIZE}")
     if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
         set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize-blacklist=${CMAKE_SOURCE_DIR}/sanitizer-blacklist.txt")
     endif()
@@ -150,7 +167,7 @@ endif()
 # rust static library linking requirements for macos
 if(APPLE)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework Security")
-else()
-   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed -ldl")
+elseif(NOT WIN32)
+   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -ldl")
 endif()
 set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY ON)

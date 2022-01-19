@@ -230,6 +230,9 @@ inline void SM2SignAndVerifyTest(SM2Crypto::Ptr _smCrypto)
     h256 secret("ca508b2b49c1d2dc46cbd5a011686fdc19937dbc704afe6c547a862b3e2b6c69");
     auto sec = std::make_shared<KeyImpl>(secret.asBytes());
     auto keyPair = _smCrypto->createKeyPair(sec);
+    BOOST_CHECK(keyPair->publicKey()->data() ==
+                *(fromHexString("f7dee65e76603ed7cd4c598d53cabe875c459e0fae4c6fd7b858189fd4741081e9"
+                                "70bca0d5cb571a7ac30586aec71b23187d4b25e59143812f74a2744604d42b")));
     auto signatureData = fromHexString(
         "cd39bf939d999ca710576a629c962edfc28608701a3a7b61c971daeac5a1399cf4a7272fa80783e171c7fd5b03"
         "8a3af4521f681ebe9fd44db3b60e750c438293f7dee65e76603ed7cd4c598d53cabe875c459e0fae4c6fd7b858"
@@ -289,6 +292,19 @@ inline void SM2SignAndVerifyTest(SM2Crypto::Ptr _smCrypto)
     auto recoverKey =
         _smCrypto->recover(hashData, bytesConstRef(encodedData->data(), encodedData->size()));
     BOOST_CHECK(recoverKey->data() == keyPair->publicKey()->data());
+
+    // test padding
+    unsigned fieldLen = 32;
+    std::shared_ptr<bytes> data = std::make_shared<bytes>(fieldLen, 0);
+    auto binData = fromHexString("508b2b49c1d2dc46cbd5a011686fdc19937dbc704afe6c547a862b3e2b6c69");
+    memcpy(data->data(), binData->data(), binData->size());
+    // padding zero to the r field
+    memmove(data->data() + (fieldLen - binData->size()), data->data(), binData->size());
+    memset(data->data(), 0, (fieldLen - binData->size()));
+    std::cout << "#### data:" << *toHexString(*data) << std::endl;
+    std::cout << "#### binData:" << *toHexString(*binData) << std::endl;
+    std::cout << "### data 0:" << int((*data)[0]) << std::endl;
+    std::cout << "### data 1:" << int((*data)[1]) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(testSM2SignAndVerify)
