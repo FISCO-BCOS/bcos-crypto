@@ -30,8 +30,8 @@ public:
     using Ptr = std::shared_ptr<KeyPairFactory>;
     KeyPairFactory() = default;
     virtual ~KeyPairFactory() {}
-    virtual KeyPairInterface::Ptr createKeyPair(SecretPtr _secretKey) = 0;
-    virtual KeyPairInterface::Ptr generateKeyPair() = 0;
+    virtual KeyPairInterface::UniquePtr createKeyPair(SecretPtr _secretKey) = 0;
+    virtual KeyPairInterface::UniquePtr generateKeyPair() = 0;
 };
 }  // namespace crypto
 }  // namespace bcos

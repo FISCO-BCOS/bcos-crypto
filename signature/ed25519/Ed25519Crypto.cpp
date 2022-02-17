@@ -23,13 +23,14 @@
 #include "../codec/SignatureDataWithPub.h"
 #include "Ed25519KeyPair.h"
 #include <wedpr-crypto/WedprCrypto.h>
+#include <memory>
 
 using namespace bcos;
 using namespace bcos::crypto;
 std::shared_ptr<bytes> bcos::crypto::ed25519Sign(
-    KeyPairInterface::Ptr _keyPair, const HashType& _messageHash, bool _signatureWithPub)
+    const KeyPairInterface& _keyPair, const HashType& _messageHash, bool _signatureWithPub)
 {
-    CInputBuffer privateKey{_keyPair->secretKey()->constData(), _keyPair->secretKey()->size()};
+    CInputBuffer privateKey{_keyPair.secretKey()->constData(), _keyPair.secretKey()->size()};
     CInputBuffer messagHash{(const char*)_messageHash.data(), HashType::size};
     FixedBytes<ED25519_SIGNATURE_LEN> signatureArray;
     COutputBuffer signatureResult{(char*)signatureArray.data(), ED25519_SIGNATURE_LEN};
@@ -43,15 +44,15 @@ std::shared_ptr<bytes> bcos::crypto::ed25519Sign(
     *signatureData = signatureArray.asBytes();
     if (_signatureWithPub)
     {
-        signatureData->insert(signatureData->end(), _keyPair->publicKey()->mutableData(),
-            _keyPair->publicKey()->mutableData() + _keyPair->publicKey()->size());
+        signatureData->insert(signatureData->end(), _keyPair.publicKey()->mutableData(),
+            _keyPair.publicKey()->mutableData() + _keyPair.publicKey()->size());
     }
     return signatureData;
 }
 
-KeyPairInterface::Ptr bcos::crypto::ed25519GenerateKeyPair()
+KeyPairInterface::UniquePtr bcos::crypto::ed25519GenerateKeyPair()
 {
-    auto ed25519KeyPair = std::make_shared<Ed25519KeyPair>();
+    auto ed25519KeyPair = std::make_unique<Ed25519KeyPair>();
     COutputBuffer publicKey{
         ed25519KeyPair->publicKey()->mutableData(), ed25519KeyPair->publicKey()->size()};
     COutputBuffer privateKey{
@@ -132,7 +133,7 @@ bool Ed25519Crypto::verify(
         std::make_shared<KeyImpl>(ED25519_PUBLIC_LEN, _pubKeyBytes), _hash, _signatureData);
 }
 
-KeyPairInterface::Ptr Ed25519Crypto::createKeyPair(SecretPtr _secretKey)
+KeyPairInterface::UniquePtr Ed25519Crypto::createKeyPair(SecretPtr _secretKey)
 {
-    return std::make_shared<Ed25519KeyPair>(_secretKey);
+    return std::make_unique<Ed25519KeyPair>(_secretKey);
 }

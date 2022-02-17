@@ -28,9 +28,9 @@ namespace bcos
 namespace crypto
 {
 std::shared_ptr<bytes> sm2Sign(
-    KeyPairInterface::Ptr _keyPair, const HashType& _hash, bool _signatureWithPub = false);
+    const KeyPairInterface& _keyPair, const HashType& _hash, bool _signatureWithPub = false);
 bool sm2Verify(PublicPtr _pubKey, const HashType& _hash, bytesConstRef _signatureData);
-KeyPairInterface::Ptr sm2GenerateKeyPair();
+KeyPairInterface::UniquePtr sm2GenerateKeyPair();
 PublicPtr sm2Recover(const HashType& _hash, bytesConstRef _signData);
 
 std::pair<bool, bytes> sm2Recover(Hash::Ptr _hashImpl, bytesConstRef _in);

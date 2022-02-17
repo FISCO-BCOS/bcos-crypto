@@ -42,12 +42,12 @@ PublicPtr bcos::crypto::sm2PriToPub(SecretPtr _secretKey)
 }
 
 std::shared_ptr<bytes> bcos::crypto::sm2Sign(
-    KeyPairInterface::Ptr _keyPair, const HashType& _hash, bool _signatureWithPub)
+    const KeyPairInterface& _keyPair, const HashType& _hash, bool _signatureWithPub)
 {
     return c_sm2Crypto.sign(_keyPair, _hash, _signatureWithPub);
 }
 
-KeyPairInterface::Ptr bcos::crypto::sm2GenerateKeyPair()
+KeyPairInterface::UniquePtr bcos::crypto::sm2GenerateKeyPair()
 {
     return c_sm2Crypto.generateKeyPair();
 }

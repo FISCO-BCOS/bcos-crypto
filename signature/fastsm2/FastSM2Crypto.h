@@ -38,7 +38,7 @@ public:
         m_verifier = fast_sm2_verify;
         m_keyPairFactory = std::make_shared<FastSM2KeyPairFactory>();
     }
-    ~FastSM2Crypto() override {}
+    virtual ~FastSM2Crypto() override {}
 };
 }  // namespace crypto
 }  // namespace bcos

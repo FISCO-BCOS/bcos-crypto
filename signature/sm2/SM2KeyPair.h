@@ -33,7 +33,7 @@ PublicPtr sm2PriToPub(SecretPtr _secret);
 class SM2KeyPair : public KeyPair
 {
 public:
-    SM2KeyPair() : KeyPair(SM2_PUBLIC_KEY_LEN, SM2_PRIVATE_KEY_LEN)
+    SM2KeyPair() : KeyPair(SM2_PUBLIC_KEY_LEN, SM2_PRIVATE_KEY_LEN, KeyPairType::SM2)
     {
         m_publicKeyDeriver = wedpr_sm2_derive_public_key;
     }

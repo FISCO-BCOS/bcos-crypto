@@ -27,9 +27,9 @@ namespace bcos
 namespace crypto
 {
 const int SECP256K1_SIGNATURE_LEN = 65;
-std::shared_ptr<bytes> secp256k1Sign(KeyPairInterface::Ptr _keyPair, const HashType& _hash);
+std::shared_ptr<bytes> secp256k1Sign(const KeyPairInterface& _keyPair, const HashType& _hash);
 bool secp256k1Verify(PublicPtr _pubKey, const HashType& _hash, bytesConstRef _signatureData);
-KeyPairInterface::Ptr secp256k1GenerateKeyPair();
+KeyPairInterface::UniquePtr secp256k1GenerateKeyPair();
 
 PublicPtr secp256k1Recover(const HashType& _hash, bytesConstRef _signatureData);
 std::pair<bool, bytes> secp256k1Recover(Hash::Ptr _hashImpl, bytesConstRef _in);
@@ -41,7 +41,7 @@ public:
     Secp256k1Crypto() = default;
     ~Secp256k1Crypto() override {}
     std::shared_ptr<bytes> sign(
-        KeyPairInterface::Ptr _keyPair, const HashType& _hash, bool) override
+        const KeyPairInterface& _keyPair, const HashType& _hash, bool) override
     {
         return secp256k1Sign(_keyPair, _hash);
     }
@@ -57,14 +57,14 @@ public:
     {
         return secp256k1Recover(_hash, _signatureData);
     }
-    KeyPairInterface::Ptr generateKeyPair() override { return secp256k1GenerateKeyPair(); }
+    KeyPairInterface::UniquePtr generateKeyPair() override { return secp256k1GenerateKeyPair(); }
 
     std::pair<bool, bytes> recoverAddress(Hash::Ptr _hashImpl, bytesConstRef _in) override
     {
         return secp256k1Recover(_hashImpl, _in);
     }
 
-    KeyPairInterface::Ptr createKeyPair(SecretPtr _secretKey) override;
+    KeyPairInterface::UniquePtr createKeyPair(SecretPtr _secretKey) override;
 };
 }  // namespace crypto
 }  // namespace bcos

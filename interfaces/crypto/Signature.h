@@ -23,6 +23,7 @@
 #include "KeyInterface.h"
 #include "KeyPairInterface.h"
 #include <memory>
+#include <mutex>
 namespace bcos
 {
 namespace crypto
@@ -31,14 +32,15 @@ class SignatureCrypto
 {
 public:
     using Ptr = std::shared_ptr<SignatureCrypto>;
+    using UniquePtr = std::unique_ptr<SignatureCrypto>;
     SignatureCrypto() = default;
     virtual ~SignatureCrypto() {}
 
     // sign returns a signature of a given hash
-    virtual std::shared_ptr<bytes> sign(
-        KeyPairInterface::Ptr _keyPair, const HashType& _hash, bool _signatureWithPub = false) = 0;
+    virtual std::shared_ptr<bytes> sign(const KeyPairInterface& _keyPair, const HashType& _hash,
+        bool _signatureWithPub = false) = 0;
 
-    // verify checks whether a signature is caculated from a given hash
+    // verify checks whether a signature is calculated from a given hash
     virtual bool verify(PublicPtr _pubKey, const HashType& _hash, bytesConstRef _signatureData) = 0;
     virtual bool verify(std::shared_ptr<const bytes> _pubKeyBytes, const HashType& _hash,
         bytesConstRef _signatureData) = 0;
@@ -47,12 +49,12 @@ public:
     virtual PublicPtr recover(const HashType& _hash, bytesConstRef _signatureData) = 0;
 
     // generateKeyPair generates keyPair
-    virtual KeyPairInterface::Ptr generateKeyPair() = 0;
+    virtual KeyPairInterface::UniquePtr generateKeyPair() = 0;
 
     // recoverAddress recovers address from a signature(for precompiled)
     virtual std::pair<bool, bytes> recoverAddress(Hash::Ptr _hashImpl, bytesConstRef _in) = 0;
 
-    virtual KeyPairInterface::Ptr createKeyPair(SecretPtr _secretKey) = 0;
+    virtual KeyPairInterface::UniquePtr createKeyPair(SecretPtr _secretKey) = 0;
 };
 }  // namespace crypto
 }  // namespace bcos

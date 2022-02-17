@@ -27,8 +27,8 @@ namespace crypto
 const int ED25519_SIGNATURE_LEN = 64;
 
 std::shared_ptr<bytes> ed25519Sign(
-    KeyPairInterface::Ptr _keyPair, const HashType& _messageHash, bool _signatureWithPub = false);
-KeyPairInterface::Ptr ed25519GenerateKeyPair();
+    const KeyPairInterface& _keyPair, const HashType& _messageHash, bool _signatureWithPub = false);
+KeyPairInterface::UniquePtr ed25519GenerateKeyPair();
 bool ed25519Verify(PublicPtr _pubKey, const HashType& _messageHash, bytesConstRef _signatureData);
 PublicPtr ed25519Recover(const HashType& _messageHash, bytesConstRef _signatureData);
 
@@ -40,7 +40,7 @@ public:
     using Ptr = std::shared_ptr<Ed25519Crypto>;
     Ed25519Crypto() = default;
     ~Ed25519Crypto() override {}
-    std::shared_ptr<bytes> sign(KeyPairInterface::Ptr _keyPair, const HashType& _messageHash,
+    std::shared_ptr<bytes> sign(const KeyPairInterface& _keyPair, const HashType& _messageHash,
         bool _signatureWithPub = false) override
     {
         return ed25519Sign(_keyPair, _messageHash, _signatureWithPub);
@@ -60,14 +60,14 @@ public:
         return ed25519Recover(_messageHash, _signatureData);
     }
 
-    KeyPairInterface::Ptr generateKeyPair() override { return ed25519GenerateKeyPair(); }
+    KeyPairInterface::UniquePtr generateKeyPair() override { return ed25519GenerateKeyPair(); }
 
     std::pair<bool, bytes> recoverAddress(Hash::Ptr _hashImpl, bytesConstRef _in) override
     {
         return ed25519Recover(_hashImpl, _in);
     }
 
-    KeyPairInterface::Ptr createKeyPair(SecretPtr _secretKey) override;
+    KeyPairInterface::UniquePtr createKeyPair(SecretPtr _secretKey) override;
 };
 }  // namespace crypto
 }  // namespace bcos

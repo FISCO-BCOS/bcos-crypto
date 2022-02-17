@@ -21,6 +21,7 @@
 #pragma once
 #include "FastSM2KeyPair.h"
 #include "signature/sm2/SM2KeyPairFactory.h"
+#include <memory>
 namespace bcos
 {
 namespace crypto
@@ -32,11 +33,14 @@ public:
     FastSM2KeyPairFactory() : SM2KeyPairFactory() {}
     ~FastSM2KeyPairFactory() override {}
 
-    KeyPairInterface::Ptr createKeyPair() override { return std::make_shared<FastSM2KeyPair>(); }
-
-    KeyPairInterface::Ptr createKeyPair(SecretPtr _secretKey) override
+    KeyPairInterface::UniquePtr createKeyPair() override
     {
-        return std::make_shared<FastSM2KeyPair>(_secretKey);
+        return std::make_unique<FastSM2KeyPair>();
+    }
+
+    KeyPairInterface::UniquePtr createKeyPair(SecretPtr _secretKey) override
+    {
+        return std::make_unique<FastSM2KeyPair>(_secretKey);
     }
 };
 }  // namespace crypto

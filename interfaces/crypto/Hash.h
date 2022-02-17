@@ -37,6 +37,7 @@ class Hash
 {
 public:
     using Ptr = std::shared_ptr<Hash>;
+    using UniquePtr = std::unique_ptr<Hash>;
     Hash() = default;
     virtual ~Hash() {}
     virtual HashType hash(bytesConstRef _data) = 0;

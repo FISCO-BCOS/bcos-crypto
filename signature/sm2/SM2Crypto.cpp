@@ -33,17 +33,17 @@ bool SM2Crypto::verify(
         std::make_shared<KeyImpl>(SM2_PUBLIC_KEY_LEN, _pubKeyBytes), _hash, _signatureData);
 }
 
-KeyPairInterface::Ptr SM2Crypto::createKeyPair(SecretPtr _secretKey)
+KeyPairInterface::UniquePtr SM2Crypto::createKeyPair(SecretPtr _secretKey)
 {
     return m_keyPairFactory->createKeyPair(_secretKey);
 }
 
 std::shared_ptr<bytes> SM2Crypto::sign(
-    KeyPairInterface::Ptr _keyPair, const HashType& _hash, bool _signatureWithPub)
+    const KeyPairInterface& _keyPair, const HashType& _hash, bool _signatureWithPub)
 {
     FixedBytes<SM2_SIGNATURE_LEN> signatureDataArray;
-    CInputBuffer rawPrivateKey{_keyPair->secretKey()->constData(), _keyPair->secretKey()->size()};
-    CInputBuffer rawPublicKey{_keyPair->publicKey()->constData(), _keyPair->publicKey()->size()};
+    CInputBuffer rawPrivateKey{_keyPair.secretKey()->constData(), _keyPair.secretKey()->size()};
+    CInputBuffer rawPublicKey{_keyPair.publicKey()->constData(), _keyPair.publicKey()->size()};
     CInputBuffer rawMsgHash{(const char*)_hash.data(), HashType::size};
     COutputBuffer sm2SignatureResult{(char*)signatureDataArray.data(), SM2_SIGNATURE_LEN};
     auto retCode = m_signer(&rawPrivateKey, &rawPublicKey, &rawMsgHash, &sm2SignatureResult);
@@ -57,8 +57,8 @@ std::shared_ptr<bytes> SM2Crypto::sign(
     // append the public key
     if (_signatureWithPub)
     {
-        signatureData->insert(signatureData->end(), _keyPair->publicKey()->mutableData(),
-            _keyPair->publicKey()->mutableData() + _keyPair->publicKey()->size());
+        signatureData->insert(signatureData->end(), _keyPair.publicKey()->mutableData(),
+            _keyPair.publicKey()->mutableData() + _keyPair.publicKey()->size());
     }
     return signatureData;
 }
@@ -121,7 +121,7 @@ std::pair<bool, bytes> SM2Crypto::recoverAddress(Hash::Ptr _hashImpl, bytesConst
     return {false, {}};
 }
 
-KeyPairInterface::Ptr SM2Crypto::generateKeyPair()
+KeyPairInterface::UniquePtr SM2Crypto::generateKeyPair()
 {
     return m_keyPairFactory->generateKeyPair();
 }

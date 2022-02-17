@@ -24,6 +24,7 @@
 #include "KeyFactory.h"
 #include "Signature.h"
 #include "SymmetricEncryption.h"
+#include <mutex>
 namespace bcos
 {
 namespace crypto
@@ -32,6 +33,8 @@ class CryptoSuite
 {
 public:
     using Ptr = std::shared_ptr<CryptoSuite>;
+    using UniquePtr = std::unique_ptr<CryptoSuite>;
+
     CryptoSuite(Hash::Ptr _hashImpl, SignatureCrypto::Ptr _signatureImpl,
         SymmetricEncryption::Ptr _symmetricEncryptionHandler)
       : m_hashImpl(_hashImpl),

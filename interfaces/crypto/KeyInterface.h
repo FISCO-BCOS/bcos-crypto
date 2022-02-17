@@ -20,6 +20,7 @@
  */
 #pragma once
 #include <bcos-utilities/Common.h>
+#include <memory>
 namespace bcos
 {
 namespace crypto
@@ -28,6 +29,7 @@ class KeyInterface
 {
 public:
     using Ptr = std::shared_ptr<KeyInterface>;
+    using UniquePtr = std::unique_ptr<KeyInterface>;
     KeyInterface() = default;
     virtual ~KeyInterface() {}
     virtual const bytes& data() const = 0;

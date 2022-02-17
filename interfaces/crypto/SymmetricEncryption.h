@@ -22,6 +22,7 @@
 #pragma once
 #include <bcos-utilities/Common.h>
 #include <memory>
+#include <mutex>
 
 namespace bcos
 {
@@ -31,6 +32,7 @@ class SymmetricEncryption
 {
 public:
     using Ptr = std::shared_ptr<SymmetricEncryption>;
+    using UniquePtr = std::unique_ptr<SymmetricEncryption>;
     SymmetricEncryption() = default;
     virtual ~SymmetricEncryption() {}
 

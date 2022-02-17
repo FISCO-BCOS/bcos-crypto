@@ -22,6 +22,7 @@
 #include "SM2KeyPair.h"
 #include "interfaces/crypto/KeyPairFactory.h"
 #include <wedpr-crypto/WedprCrypto.h>
+#include <memory>
 namespace bcos
 {
 namespace crypto
@@ -33,13 +34,13 @@ public:
     SM2KeyPairFactory() { m_keyPairGenerator = wedpr_sm2_gen_key_pair; }
     ~SM2KeyPairFactory() override {}
 
-    virtual KeyPairInterface::Ptr createKeyPair() { return std::make_shared<SM2KeyPair>(); }
-    KeyPairInterface::Ptr createKeyPair(SecretPtr _secretKey) override
+    virtual KeyPairInterface::UniquePtr createKeyPair() { return std::make_unique<SM2KeyPair>(); }
+    KeyPairInterface::UniquePtr createKeyPair(SecretPtr _secretKey) override
     {
-        return std::make_shared<SM2KeyPair>(_secretKey);
+        return std::make_unique<SM2KeyPair>(_secretKey);
     }
 
-    KeyPairInterface::Ptr generateKeyPair() override
+    KeyPairInterface::UniquePtr generateKeyPair() override
     {
         auto keyPair = createKeyPair();
         COutputBuffer publicKey{keyPair->publicKey()->mutableData(), keyPair->publicKey()->size()};

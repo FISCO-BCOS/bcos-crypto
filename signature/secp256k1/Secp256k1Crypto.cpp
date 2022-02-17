@@ -24,15 +24,16 @@
 #include "../codec/SignatureDataWithV.h"
 #include "Secp256k1KeyPair.h"
 #include <wedpr-crypto/WedprCrypto.h>
+#include <memory>
 
 using namespace bcos;
 using namespace bcos::crypto;
 
 std::shared_ptr<bytes> bcos::crypto::secp256k1Sign(
-    KeyPairInterface::Ptr _keyPair, const HashType& _hash)
+    const KeyPairInterface& _keyPair, const HashType& _hash)
 {
     FixedBytes<SECP256K1_SIGNATURE_LEN> signatureDataArray;
-    CInputBuffer privateKey{_keyPair->secretKey()->constData(), _keyPair->secretKey()->size()};
+    CInputBuffer privateKey{_keyPair.secretKey()->constData(), _keyPair.secretKey()->size()};
     CInputBuffer msgHash{(const char*)_hash.data(), HashType::size};
     COutputBuffer secp256k1SignatureResult{
         (char*)signatureDataArray.data(), SECP256K1_SIGNATURE_LEN};
@@ -61,9 +62,9 @@ bool bcos::crypto::secp256k1Verify(
     return false;
 }
 
-KeyPairInterface::Ptr bcos::crypto::secp256k1GenerateKeyPair()
+KeyPairInterface::UniquePtr bcos::crypto::secp256k1GenerateKeyPair()
 {
-    auto keyPair = std::make_shared<Secp256k1KeyPair>();
+    auto keyPair = std::make_unique<Secp256k1KeyPair>();
     COutputBuffer publicKey{keyPair->publicKey()->mutableData(), keyPair->publicKey()->size()};
     COutputBuffer privateKey{keyPair->secretKey()->mutableData(), keyPair->secretKey()->size()};
     auto retCode = wedpr_secp256k1_gen_key_pair(&publicKey, &privateKey);
@@ -129,7 +130,7 @@ bool Secp256k1Crypto::verify(
         std::make_shared<KeyImpl>(SECP256K1_PUBLIC_LEN, _pubKeyBytes), _hash, _signatureData);
 }
 
-KeyPairInterface::Ptr Secp256k1Crypto::createKeyPair(SecretPtr _secretKey)
+KeyPairInterface::UniquePtr Secp256k1Crypto::createKeyPair(SecretPtr _secretKey)
 {
-    return std::make_shared<Secp256k1KeyPair>(_secretKey);
+    return std::make_unique<Secp256k1KeyPair>(_secretKey);
 }

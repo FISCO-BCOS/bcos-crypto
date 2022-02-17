@@ -21,20 +21,30 @@
 #pragma once
 #include "Hash.h"
 #include "KeyInterface.h"
+#include <memory>
 namespace bcos
 {
 namespace crypto
 {
+enum class KeyPairType : int
+{
+    Secp256K1 = 1,
+    SM2 = 2,
+    Ed25519 = 3
+};
 class KeyPairInterface
 {
 public:
     using Ptr = std::shared_ptr<KeyPairInterface>;
+    using UniquePtr = std::unique_ptr<KeyPairInterface>;
+
     KeyPairInterface() = default;
     virtual ~KeyPairInterface() {}
 
     virtual SecretPtr secretKey() const = 0;
     virtual PublicPtr publicKey() const = 0;
     virtual Address address(Hash::Ptr _hashImpl) = 0;
+    virtual KeyPairType keyPairType() const = 0;
 };
 }  // namespace crypto
 }  // namespace bcos

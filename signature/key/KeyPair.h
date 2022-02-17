@@ -31,21 +31,25 @@ Address inline calculateAddress(Hash::Ptr _hashImpl, PublicPtr _publicKey)
 {
     return right160(_hashImpl->hash(_publicKey));
 }
+
 class KeyPair : public KeyPairInterface
 {
 public:
     using Ptr = std::shared_ptr<KeyPair>;
-    KeyPair(int _pubKeyLen, int _secretLen)
+    KeyPair(int _pubKeyLen, int _secretLen, KeyPairType _type)
       : m_publicKey(std::make_shared<KeyImpl>(_pubKeyLen)),
-        m_secretKey(std::make_shared<KeyImpl>(_secretLen))
+        m_secretKey(std::make_shared<KeyImpl>(_secretLen)),
+        m_type(_type)
     {}
 
-    KeyPair(Public const& _publicKey, Secret const& _secretKey)
+    KeyPair(Public const& _publicKey, Secret const& _secretKey, KeyPairType _type)
       : m_publicKey(std::make_shared<KeyImpl>(_publicKey.data())),
-        m_secretKey(std::make_shared<KeyImpl>(_secretKey.data()))
+        m_secretKey(std::make_shared<KeyImpl>(_secretKey.data())),
+        m_type(_type)
     {}
 
     ~KeyPair() override {}
+    KeyPairType keyPairType() const override { return m_type; }
     SecretPtr secretKey() const override { return m_secretKey; }
     PublicPtr publicKey() const override { return m_publicKey; }
 
@@ -57,6 +61,7 @@ public:
 protected:
     PublicPtr m_publicKey;
     SecretPtr m_secretKey;
+    KeyPairType m_type;
 };
 }  // namespace crypto
 }  // namespace bcos
