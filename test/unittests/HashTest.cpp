@@ -17,10 +17,10 @@
  * @file HashTest.h
  * @date 2021.03.04
  */
-#include "../../hash/Keccak256.h"
-#include "../../hash/SM3.h"
-#include "../../hash/Sha3.h"
-#include "interfaces/crypto/CryptoSuite.h"
+#include <bcos-crypto/hash/Keccak256.h>
+#include <bcos-crypto/hash/SM3.h>
+#include <bcos-crypto/hash/Sha3.h>
+#include <bcos-crypto/interfaces/crypto/CryptoSuite.h>
 #include <bcos-utilities/testutils/TestPromptFixture.h>
 #include <boost/test/unit_test.hpp>
 #include <string>

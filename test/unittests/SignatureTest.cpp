@@ -17,25 +17,25 @@
  * @file SignatureTest.h
  * @date 2021.03.06
  */
-#include "hash/Keccak256.h"
-#include "hash/SM3.h"
-#include "hash/Sha3.h"
-#include "signature/Exceptions.h"
-#include "signature/codec/SignatureDataWithPub.h"
-#include "signature/codec/SignatureDataWithV.h"
-#include "signature/ed25519/Ed25519Crypto.h"
-#include "signature/ed25519/Ed25519KeyPair.h"
-#include "signature/key/KeyFactoryImpl.h"
-#include "signature/secp256k1/Secp256k1Crypto.h"
-#include "signature/secp256k1/Secp256k1KeyPair.h"
-#include "signature/sm2.h"
-#include "signature/sm2/SM2Crypto.h"
-#include "signature/sm2/SM2KeyPair.h"
+#include <bcos-crypto/hash/Keccak256.h>
+#include <bcos-crypto/hash/SM3.h>
+#include <bcos-crypto/hash/Sha3.h>
+#include <bcos-crypto/signature/Exceptions.h>
+#include <bcos-crypto/signature/codec/SignatureDataWithPub.h>
+#include <bcos-crypto/signature/codec/SignatureDataWithV.h>
+#include <bcos-crypto/signature/ed25519/Ed25519Crypto.h>
+#include <bcos-crypto/signature/ed25519/Ed25519KeyPair.h>
+#include <bcos-crypto/signature/key/KeyFactoryImpl.h>
+#include <bcos-crypto/signature/secp256k1/Secp256k1Crypto.h>
+#include <bcos-crypto/signature/secp256k1/Secp256k1KeyPair.h>
+#include <bcos-crypto/signature/sm2.h>
+#include <bcos-crypto/signature/sm2/SM2Crypto.h>
+#include <bcos-crypto/signature/sm2/SM2KeyPair.h>
 #include <bcos-utilities/testutils/TestPromptFixture.h>
 #include <boost/test/unit_test.hpp>
 #include <string>
 #if SM2_OPTIMIZE
-#include "signature/fastsm2/FastSM2Crypto.h"
+#include <bcos-crypto/signature/fastsm2/FastSM2Crypto.h>
 #endif
 using namespace bcos;
 using namespace bcos::crypto;
