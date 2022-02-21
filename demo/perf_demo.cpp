@@ -18,15 +18,15 @@
  * @date 2021.04.07
  * @author yujiechen
  */
-#include "encrypt/AESCrypto.h"
-#include "encrypt/SM4Crypto.h"
-#include "hash/Keccak256.h"
-#include "hash/SM3.h"
-#include "hash/Sha3.h"
-#include "signature/ed25519/Ed25519Crypto.h"
-#include "signature/fastsm2/FastSM2Crypto.h"
-#include "signature/secp256k1/Secp256k1Crypto.h"
-#include "signature/sm2/SM2Crypto.h"
+#include <bcos-crypto/encrypt/AESCrypto.h>
+#include <bcos-crypto/encrypt/SM4Crypto.h>
+#include <bcos-crypto/hash/Keccak256.h>
+#include <bcos-crypto/hash/SM3.h>
+#include <bcos-crypto/hash/Sha3.h>
+#include <bcos-crypto/signature/ed25519/Ed25519Crypto.h>
+#include <bcos-crypto/signature/fastsm2/FastSM2Crypto.h>
+#include <bcos-crypto/signature/secp256k1/Secp256k1Crypto.h>
+#include <bcos-crypto/signature/sm2/SM2Crypto.h>
 #include <bcos-utilities/Common.h>
 
 using namespace bcos;
@@ -97,7 +97,7 @@ void signaturePerf(SignatureCrypto::Ptr _signatureImpl, HashType const& _msgHash
     auto startT = utcTime();
     for (size_t i = 0; i < _count; i++)
     {
-        signedData = _signatureImpl->sign(keyPair, _msgHash, false);
+        signedData = _signatureImpl->sign(*keyPair, _msgHash, false);
     }
     std::cout << "TPS of " << _signatureName << " sign:" << getTPS(utcTime(), startT, _count)
               << std::endl;
@@ -112,7 +112,7 @@ void signaturePerf(SignatureCrypto::Ptr _signatureImpl, HashType const& _msgHash
               << std::endl;
 
     // recover
-    signedData = _signatureImpl->sign(keyPair, _msgHash, true);
+    signedData = _signatureImpl->sign(*keyPair, _msgHash, true);
     startT = utcTime();
     for (size_t i = 0; i < _count; i++)
     {
@@ -125,7 +125,7 @@ void signaturePerf(SignatureCrypto::Ptr _signatureImpl, HashType const& _msgHash
 }
 
 void derivePublicKeyPerf(SignatureCrypto::Ptr _signatureImpl, std::string const& _signatureName,
-    KeyPairInterface::Ptr _keyPair, size_t _count)
+    const KeyPairInterface& _keyPair, size_t _count)
 {
     std::cout << std::endl;
     std::cout << "----------- " << _signatureName << " derivePublicKeyPerf test start -----------"
@@ -134,9 +134,9 @@ void derivePublicKeyPerf(SignatureCrypto::Ptr _signatureImpl, std::string const&
     KeyPairInterface::Ptr keyPair;
     for (size_t i = 0; i < _count; i++)
     {
-        keyPair = _signatureImpl->createKeyPair(_keyPair->secretKey());
-        assert(keyPair->secretKey()->data() == _keyPair->secretKey()->data());
-        assert(keyPair->publicKey()->data() == _keyPair->publicKey()->data());
+        keyPair = _signatureImpl->createKeyPair(_keyPair.secretKey());
+        assert(keyPair->secretKey()->data() == _keyPair.secretKey()->data());
+        assert(keyPair->publicKey()->data() == _keyPair.publicKey()->data());
     }
     std::cout << "TPS of " << _signatureName
               << " derivePublicKeyPerf:" << getTPS(utcTime(), startT, _count) << std::endl;
@@ -149,21 +149,21 @@ void derivePublicKeyPerf(size_t _count)
     SignatureCrypto::Ptr signatureImpl = nullptr;
     signatureImpl = std::make_shared<Secp256k1Crypto>();
     auto keyPair = signatureImpl->generateKeyPair();
-    derivePublicKeyPerf(signatureImpl, "secp256k1", keyPair, _count);
+    derivePublicKeyPerf(signatureImpl, "secp256k1", *keyPair, _count);
 
     signatureImpl = std::make_shared<SM2Crypto>();
     keyPair = signatureImpl->generateKeyPair();
-    derivePublicKeyPerf(signatureImpl, "SM2", keyPair, _count);
+    derivePublicKeyPerf(signatureImpl, "SM2", *keyPair, _count);
 
 #if SM2_OPTIMIZE
     signatureImpl = std::make_shared<FastSM2Crypto>();
     keyPair = signatureImpl->generateKeyPair();
-    derivePublicKeyPerf(signatureImpl, "FastSM2", keyPair, _count);
+    derivePublicKeyPerf(signatureImpl, "FastSM2", *keyPair, _count);
 #endif
 
     signatureImpl = std::make_shared<Ed25519Crypto>();
     keyPair = signatureImpl->generateKeyPair();
-    derivePublicKeyPerf(signatureImpl, "Ed25519Crypto", keyPair, _count);
+    derivePublicKeyPerf(signatureImpl, "Ed25519Crypto", *keyPair, _count);
 }
 void signaturePerf(size_t _count)
 {

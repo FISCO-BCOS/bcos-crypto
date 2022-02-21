@@ -48,6 +48,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # install dependencies
 include(InstallBcosUtilities)
+
 hunter_add_package(wedpr-crypto)
 find_package(wedpr-crypto CONFIG REQUIRED)
 

@@ -17,25 +17,25 @@
  * @file SignatureTest.h
  * @date 2021.03.06
  */
-#include "hash/Keccak256.h"
-#include "hash/SM3.h"
-#include "hash/Sha3.h"
-#include "signature/Exceptions.h"
-#include "signature/codec/SignatureDataWithPub.h"
-#include "signature/codec/SignatureDataWithV.h"
-#include "signature/ed25519/Ed25519Crypto.h"
-#include "signature/ed25519/Ed25519KeyPair.h"
-#include "signature/key/KeyFactoryImpl.h"
-#include "signature/secp256k1/Secp256k1Crypto.h"
-#include "signature/secp256k1/Secp256k1KeyPair.h"
-#include "signature/sm2.h"
-#include "signature/sm2/SM2Crypto.h"
-#include "signature/sm2/SM2KeyPair.h"
+#include <bcos-crypto/hash/Keccak256.h>
+#include <bcos-crypto/hash/SM3.h>
+#include <bcos-crypto/hash/Sha3.h>
+#include <bcos-crypto/signature/Exceptions.h>
+#include <bcos-crypto/signature/codec/SignatureDataWithPub.h>
+#include <bcos-crypto/signature/codec/SignatureDataWithV.h>
+#include <bcos-crypto/signature/ed25519/Ed25519Crypto.h>
+#include <bcos-crypto/signature/ed25519/Ed25519KeyPair.h>
+#include <bcos-crypto/signature/key/KeyFactoryImpl.h>
+#include <bcos-crypto/signature/secp256k1/Secp256k1Crypto.h>
+#include <bcos-crypto/signature/secp256k1/Secp256k1KeyPair.h>
+#include <bcos-crypto/signature/sm2.h>
+#include <bcos-crypto/signature/sm2/SM2Crypto.h>
+#include <bcos-crypto/signature/sm2/SM2KeyPair.h>
 #include <bcos-utilities/testutils/TestPromptFixture.h>
 #include <boost/test/unit_test.hpp>
 #include <string>
 #if SM2_OPTIMIZE
-#include "signature/fastsm2/FastSM2Crypto.h"
+#include <bcos-crypto/signature/fastsm2/FastSM2Crypto.h>
 #endif
 using namespace bcos;
 using namespace bcos::crypto;
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(testSecp256k1SignAndVerify)
     std::cout << "#### publicKey shortHex:" << keyPair->publicKey()->shortHex() << std::endl;
     /// normal check
     // sign
-    auto signData = secp256k1Sign(keyPair, hashData);
+    auto signData = secp256k1Sign(*keyPair, hashData);
     std::cout << "### signData:" << *toHexString(*signData) << std::endl;
     // verify
     bool result = secp256k1Verify(
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(testSecp256k1SignAndVerify)
     BOOST_CHECK(invalidPub->data() != keyPair->publicKey()->data());
 
     // check2: invalid sig
-    auto anotherSig(secp256k1Sign(keyPair, invalidHash));
+    auto anotherSig(secp256k1Sign(*keyPair, invalidHash));
     result = secp256k1Verify(
         keyPair->publicKey(), hashData, bytesConstRef(anotherSig->data(), anotherSig->size()));
     BOOST_CHECK(result == false);
@@ -244,7 +244,7 @@ inline void SM2SignAndVerifyTest(SM2Crypto::Ptr _smCrypto)
 
     keyPair = _smCrypto->generateKeyPair();
     // sign
-    auto sig = _smCrypto->sign(keyPair, hashData, true);
+    auto sig = _smCrypto->sign(*keyPair, hashData, true);
     // verify
     result =
         _smCrypto->verify(keyPair->publicKey(), hashData, bytesConstRef(sig->data(), sig->size()));
@@ -269,7 +269,7 @@ inline void SM2SignAndVerifyTest(SM2Crypto::Ptr _smCrypto)
         _smCrypto->recover(invalidHash, bytesConstRef(sig->data(), sig->size())), InvalidSignature);
 
     // invalid signature
-    auto anotherSig = _smCrypto->sign(keyPair, invalidHash, true);
+    auto anotherSig = _smCrypto->sign(*keyPair, invalidHash, true);
     result = _smCrypto->verify(
         keyPair->publicKey(), hashData, bytesConstRef(anotherSig->data(), anotherSig->size()));
     BOOST_CHECK(result == false);
@@ -327,7 +327,7 @@ BOOST_AUTO_TEST_CASE(testED25519SignAndVerify)
     auto keyPair = signatureCrypto->generateKeyPair();
     auto hashData = hashCrypto->hash(std::string("abcd"));
     // sign
-    auto sig = signatureCrypto->sign(keyPair, hashData, true);
+    auto sig = signatureCrypto->sign(*keyPair, hashData, true);
     // verify
     bool result = signatureCrypto->verify(
         keyPair->publicKey(), hashData, bytesConstRef(sig->data(), sig->size()));
@@ -353,7 +353,7 @@ BOOST_AUTO_TEST_CASE(testED25519SignAndVerify)
         InvalidSignature);
 
     // invalid signature
-    auto anotherSig = signatureCrypto->sign(keyPair, invalidHash, true);
+    auto anotherSig = signatureCrypto->sign(*keyPair, invalidHash, true);
     result = signatureCrypto->verify(
         keyPair->publicKey(), hashData, bytesConstRef(anotherSig->data(), anotherSig->size()));
     BOOST_CHECK(result == false);
