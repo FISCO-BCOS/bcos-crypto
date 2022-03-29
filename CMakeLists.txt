@@ -43,7 +43,7 @@ HunterGate(
     SHA1 "26ca1840eb26da410913469f2f278569c8d383ae"
     FILEPATH "${BCOS_CRYPTO_CMAKE_DIR}/config.cmake"
 )
-project(bcos-crypto VERSION "3.0.0")
+project(bcos-crypto VERSION "1.0.0")
 set(VERSION_SUFFIX "-rc1")
 
 # basic settings
