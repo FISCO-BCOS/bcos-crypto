@@ -16,6 +16,6 @@ hunter_config(
 )
 
 hunter_config(OpenSSL VERSION tassl_1.1.1b_v1.4-local
-    URL https://${URL_BASE}/FISCO-BCOS/TASSL-1.1.1b/archive/6a0fddd0eb33433c190c796e5b6d80db4db52810.tar.gz
-    SHA1 14f7590e09b54bb71926ad5853343f20893ee536
+    URL https://${URL_BASE}/FISCO-BCOS/TASSL-1.1.1b/archive/f9d60fa510e5fbe24413b4abdf1ea3a48f9ee6aa.tar.gz
+    SHA1 e56121278bf07587d58d154b4615f96575957d6f
 )
