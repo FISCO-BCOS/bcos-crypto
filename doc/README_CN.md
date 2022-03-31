@@ -1,4 +1,4 @@
-![](https://github.com/FISCO-BCOS/FISCO-BCOS/raw/master/docs/images/FISCO_BCOS_Logo.svg?sanitize=true)
+![](https://raw.githubusercontent.com/FISCO-BCOS/FISCO-BCOS/master/docs/FISCO_BCOS_Logo.svg?sanitize=true)
 
 [English](../README.md) / 中文
 
