@@ -65,8 +65,8 @@ std::vector<bcos::h256> hashPerf(
     std::cout << "input data size: " << (double)_inputData.size() / 1000.0
               << "KB, loops: " << _count << ", timeCost: " << utcTime() - startT << std::endl;
     std::cout << "TPS of " << _hashName << ": "
-              << getTPS(utcTime(), startT, _count) * (double)_inputData.size() / 1000.0 << " KB/s"
-              << std::endl;
+              << getTPS(utcTime(), startT, _count) * (double)_inputData.size() / (1024 * 1024)
+              << " MB/s" << std::endl;
     std::cout << "----------- " << _hashName << " perf end -----------" << std::endl;
     std::cout << std::endl;
 
@@ -90,8 +90,8 @@ std::vector<bcos::h256> hashingPerf(std::string const& _inputData, size_t _count
     std::cout << "input data size: " << (double)_inputData.size() / 1000.0
               << "KB, loops: " << _count << ", timeCost: " << utcTime() - startT << std::endl;
     std::cout << "TPS of " << hashName << ": "
-              << getTPS(utcTime(), startT, _count) * (double)_inputData.size() / 1000.0 << " KB/s"
-              << std::endl;
+              << getTPS(utcTime(), startT, _count) * (double)_inputData.size() / (1024 * 1024)
+              << " MB/s" << std::endl;
     std::cout << "----------- " << hashName << " perf end -----------" << std::endl;
     std::cout << std::endl;
 
