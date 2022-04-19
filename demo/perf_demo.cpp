@@ -121,17 +121,13 @@ void hashPerf(size_t _count)
 
     auto sha3New = hashingPerf(inputData, _count);
 
-    size_t limit = 50;
     for (size_t i = 0; i < _count; ++i)
     {
         if (sha3Old[i] != sha3New[i])
         {
             std::cout << "Wrong hash result! old: " << sha3Old[i] << " new: " << sha3New[i]
                       << std::endl;
-            if (limit-- == 0)
-            {
-                break;
-            }
+            break;
         }
     }
 }
