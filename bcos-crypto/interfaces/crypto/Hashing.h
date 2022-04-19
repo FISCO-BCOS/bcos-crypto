@@ -13,25 +13,24 @@ template <class Impl>
 class Hashing
 {
 public:
-    template <class POD>
-    std::enable_if_t<std::is_trivial_v<POD>> update(const POD& pod)
+    template <class Input>
+    auto& update(Input&& input)
     {
-        auto buffer = (const byte*)&pod;
-        auto length = sizeof(pod);
+        using RawType = typename std::remove_cv_t<typename std::remove_reference_t<Input>>;
+        if constexpr (std::is_trivial_v<RawType>)
+        {
+            update(gsl::span((const byte*)&input, sizeof(input)));
+        }
+        else
+        {
+            BOOST_CONCEPT_ASSERT((boost::RandomAccessRangeConcept<RawType>));
+            static_assert(std::is_trivial_v<typename boost::range_value<RawType>::type>,
+                "Range contains non trivial type is not allow!");
 
-        update(gsl::span(buffer, length));
-    }
-
-    template <class Range>
-    std::enable_if_t<std::is_class_v<Range>> update(const Range& range)
-    {
-        BOOST_CONCEPT_ASSERT((boost::RandomAccessRangeConcept<Range>));
-        static_assert(std::is_trivial_v<typename boost::range_value<Range>::type>, "");
-
-        auto buffer = (const byte*)&range[0];
-        auto length = sizeof(boost::range_value<Range>) * boost::size(range);
-
-        update(gsl::span(buffer, length));
+            update(gsl::span(
+                (const byte*)&input[0], sizeof(boost::range_value<Input>) * boost::size(input)));
+        }
+        return *this;
     }
 
     template <class Input>

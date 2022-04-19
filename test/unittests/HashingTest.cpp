@@ -13,9 +13,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * @brief test cases for keccak256/sm3
- * @file HashTest.h
- * @date 2021.03.04
+ * @brief test cases for hashing256
+ * @file HashingTest.h
+ * @date 2022.04.19
  */
 #include <bcos-crypto/hashing/SHA256Hashing.h>
 #include <bcos-crypto/interfaces/crypto/CryptoSuite.h>
@@ -43,9 +43,11 @@ BOOST_AUTO_TEST_CASE(testSHA256)
     hash3 << a << "abcdefg" << 100;
 
     auto h1 = hash1.final();
-    auto h3 = hash3.final();
+    auto h2 = SHA256Hashing{}.update(a).update("abcdefg").update(100).final();
+    auto h3 = hash3();
 
     BOOST_CHECK_EQUAL(h1, h3);
+    BOOST_CHECK_EQUAL(h1, h2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
