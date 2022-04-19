@@ -23,11 +23,13 @@
 #include <bcos-crypto/hash/Keccak256.h>
 #include <bcos-crypto/hash/SM3.h>
 #include <bcos-crypto/hash/Sha3.h>
+#include <bcos-crypto/hashing/SHA3Hashing.h>
 #include <bcos-crypto/signature/ed25519/Ed25519Crypto.h>
 #include <bcos-crypto/signature/fastsm2/FastSM2Crypto.h>
 #include <bcos-crypto/signature/secp256k1/Secp256k1Crypto.h>
 #include <bcos-crypto/signature/sm2/SM2Crypto.h>
 #include <bcos-utilities/Common.h>
+#include <boost/core/ignore_unused.hpp>
 
 using namespace bcos;
 using namespace bcos::crypto;
@@ -47,15 +49,17 @@ double getTPS(int64_t _endT, int64_t _startT, size_t _count)
     return (1000.0 * (double)_count) / (double)(_endT - _startT);
 }
 
-void hashPerf(
+std::vector<bcos::h256> hashPerf(
     Hash::Ptr _hash, std::string const& _hashName, std::string const& _inputData, size_t _count)
 {
+    std::vector<bcos::h256> result(_count);
+
     std::cout << std::endl;
     std::cout << "----------- " << _hashName << " perf start -----------" << std::endl;
     auto startT = utcTime();
     for (size_t i = 0; i < _count; i++)
     {
-        _hash->hash(bytesConstRef((byte const*)_inputData.c_str(), _inputData.size()));
+        result[i] = _hash->hash(bytesConstRef((byte const*)_inputData.c_str(), _inputData.size()));
     }
     std::cout << "input data size: " << (double)_inputData.size() / 1000.0
               << "KB, loops: " << _count << ", timeCost: " << utcTime() - startT << std::endl;
@@ -64,6 +68,33 @@ void hashPerf(
               << std::endl;
     std::cout << "----------- " << _hashName << " perf end -----------" << std::endl;
     std::cout << std::endl;
+
+    return result;
+}
+
+std::vector<bcos::h256> hashingPerf(std::string const& _inputData, size_t _count)
+{
+    std::vector<bcos::h256> result(_count);
+
+    std::string hashName = "SHA3 Hashing";
+    std::cout << std::endl;
+    std::cout << "----------- " << hashName << " perf start -----------" << std::endl;
+    auto startT = utcTime();
+    for (size_t i = 0; i < _count; i++)
+    {
+        SHA3Hashing sha3;
+        sha3.update(_inputData);
+        result[i] = sha3.final();
+    }
+    std::cout << "input data size: " << (double)_inputData.size() / 1000.0
+              << "KB, loops: " << _count << ", timeCost: " << utcTime() - startT << std::endl;
+    std::cout << "TPS of " << hashName << ": "
+              << getTPS(utcTime(), startT, _count) * (double)_inputData.size() / 1000.0 << " KB/s"
+              << std::endl;
+    std::cout << "----------- " << hashName << " perf end -----------" << std::endl;
+    std::cout << std::endl;
+
+    return result;
 }
 
 void hashPerf(size_t _count)
@@ -76,13 +107,25 @@ void hashPerf(size_t _count)
     }
     // sha3 perf
     Hash::Ptr hashImpl = std::make_shared<class Sha3>();
-    hashPerf(hashImpl, "SHA3", inputData, _count);
+    auto sha3Old = hashPerf(hashImpl, "SHA3", inputData, _count);
     // keccak256 perf
     hashImpl = std::make_shared<Keccak256>();
     hashPerf(hashImpl, "Keccak256", inputData, _count);
     // sm3 perf
     hashImpl = std::make_shared<SM3>();
     hashPerf(hashImpl, "SM3", inputData, _count);
+
+    auto sha3New = hashingPerf(inputData, _count);
+
+    for (size_t i = 0; i < _count; ++i)
+    {
+        if (sha3Old[i] != sha3New[i])
+        {
+            std::cout << "Wrong hash result! old: " << sha3Old[i] << " new: " << sha3New[i]
+                      << std::endl;
+            break;
+        }
+    }
 }
 
 void signaturePerf(SignatureCrypto::Ptr _signatureImpl, HashType const& _msgHash,
