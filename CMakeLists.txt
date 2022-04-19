@@ -31,12 +31,13 @@ list(APPEND CMAKE_MODULE_PATH ${BCOS_CRYPTO_CMAKE_DIR})
 #init hunter
 include(HunterGate)
 HunterGate(
-    URL "https://${URL_BASE}/FISCO-BCOS/hunter/archive/f1eaf0b9e1fc5e33b10fcc0166dbd107a34c1fbb.tar.gz"
-    SHA1 "b879745ced060797f4b27514abc9a1f7c512e487"
+    URL "https://${URL_BASE}/FISCO-BCOS/hunter/archive/2b5b25ecffaba74393740bf0b8758c4e8d9297cf.tar.gz"
+    SHA1 "5d8365a327be260cf24d2b125a71ee7069aca28f"
     FILEPATH "${BCOS_CRYPTO_CMAKE_DIR}/config.cmake"
 )
-project(bcos-crypto VERSION "3.0.0")
-set(VERSION_SUFFIX "-rc3")
+
+project(bcos-crypto VERSION "1.0.0")
+set(VERSION_SUFFIX "-rc2")
 
 # basic settings
 include(Options)
