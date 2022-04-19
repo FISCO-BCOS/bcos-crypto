@@ -84,7 +84,7 @@ std::vector<bcos::h256> hashingPerf(std::string const& _inputData, size_t _count
     for (size_t i = 0; i < _count; i++)
     {
         SHA256Hashing sha3;
-        sha3.update(_inputData);
+        sha3 << _inputData;
         result[i] = sha3.final();
     }
     std::cout << "input data size: " << (double)_inputData.size() / 1000.0

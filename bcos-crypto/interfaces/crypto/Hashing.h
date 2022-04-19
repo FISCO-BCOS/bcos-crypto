@@ -13,8 +13,8 @@ template <class Impl>
 class Hashing
 {
 public:
-    template <class POD, std::enable_if_t<std::is_trivial_v<POD>, void>>
-    void update(const POD& pod)
+    template <class POD>
+    std::enable_if_t<std::is_trivial_v<POD>> update(const POD& pod)
     {
         auto buffer = (const byte*)&pod;
         auto length = sizeof(pod);
@@ -23,16 +23,25 @@ public:
     }
 
     template <class Range>
-    void update(const Range& range)
+    std::enable_if_t<std::is_class_v<Range>> update(const Range& range)
     {
         BOOST_CONCEPT_ASSERT((boost::RandomAccessRangeConcept<Range>));
         static_assert(std::is_trivial_v<typename boost::range_value<Range>::type>, "");
 
-        auto buffer = (const byte*)range.data();
+        auto buffer = (const byte*)&range[0];
         auto length = sizeof(boost::range_value<Range>) * boost::size(range);
 
         update(gsl::span(buffer, length));
     }
+
+    template <class Input>
+    auto& operator<<(Input&& input)
+    {
+        update(std::forward<Input>(input));
+        return *this;
+    }
+
+    bcos::h256 operator()() { return final(); }
 
     void update(gsl::span<byte const> view) { impl().impl_update(view); }
 
