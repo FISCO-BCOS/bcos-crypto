@@ -24,7 +24,7 @@
 #include <bcos-crypto/hash/SM3.h>
 #include <bcos-crypto/hash/Sha256.h>
 #include <bcos-crypto/hash/Sha3.h>
-#include <bcos-crypto/hashing/SHA3Hashing.h>
+#include <bcos-crypto/hashing/SHA256Hashing.h>
 #include <bcos-crypto/signature/ed25519/Ed25519Crypto.h>
 #include <bcos-crypto/signature/fastsm2/FastSM2Crypto.h>
 #include <bcos-crypto/signature/secp256k1/Secp256k1Crypto.h>
@@ -83,7 +83,7 @@ std::vector<bcos::h256> hashingPerf(std::string const& _inputData, size_t _count
     auto startT = utcTime();
     for (size_t i = 0; i < _count; i++)
     {
-        SHA3Hashing sha3;
+        SHA256Hashing sha3;
         sha3.update(_inputData);
         result[i] = sha3.final();
     }

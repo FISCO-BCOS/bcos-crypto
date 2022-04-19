@@ -4,10 +4,10 @@
 
 namespace bcos::crypto
 {
-class SHA3Hashing : public Hashing<SHA3Hashing>
+class SHA256Hashing : public Hashing<SHA256Hashing>
 {
 public:
-    SHA3Hashing() { SHA256_Init(&m_context); }
+    SHA256Hashing() { SHA256_Init(&m_context); }
 
     void impl_update(gsl::span<byte const> view) { SHA256_Update(&m_context, view.data(), view.size()); }
 
