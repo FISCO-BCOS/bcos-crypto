@@ -22,6 +22,7 @@
 #include <bcos-crypto/encrypt/SM4Crypto.h>
 #include <bcos-crypto/hash/Keccak256.h>
 #include <bcos-crypto/hash/SM3.h>
+#include <bcos-crypto/hash/Sha256.h>
 #include <bcos-crypto/hash/Sha3.h>
 #include <bcos-crypto/hashing/SHA3Hashing.h>
 #include <bcos-crypto/signature/ed25519/Ed25519Crypto.h>
@@ -76,7 +77,7 @@ std::vector<bcos::h256> hashingPerf(std::string const& _inputData, size_t _count
 {
     std::vector<bcos::h256> result(_count);
 
-    std::string hashName = "SHA3 Hashing";
+    std::string hashName = "New SHA256 Hashing";
     std::cout << std::endl;
     std::cout << "----------- " << hashName << " perf start -----------" << std::endl;
     auto startT = utcTime();
@@ -107,7 +108,7 @@ void hashPerf(size_t _count)
     }
     // sha3 perf
     Hash::Ptr hashImpl = std::make_shared<class Sha3>();
-    auto sha3Old = hashPerf(hashImpl, "SHA3", inputData, _count);
+    hashPerf(hashImpl, "SHA3", inputData, _count);
     // keccak256 perf
     hashImpl = std::make_shared<Keccak256>();
     hashPerf(hashImpl, "Keccak256", inputData, _count);
@@ -115,15 +116,22 @@ void hashPerf(size_t _count)
     hashImpl = std::make_shared<SM3>();
     hashPerf(hashImpl, "SM3", inputData, _count);
 
+    hashImpl = std::make_shared<Sha256>();
+    auto sha3Old = hashPerf(hashImpl, "SHA256", inputData, _count);
+
     auto sha3New = hashingPerf(inputData, _count);
 
+    size_t limit = 50;
     for (size_t i = 0; i < _count; ++i)
     {
         if (sha3Old[i] != sha3New[i])
         {
             std::cout << "Wrong hash result! old: " << sha3Old[i] << " new: " << sha3New[i]
                       << std::endl;
-            break;
+            if (limit-- == 0)
+            {
+                break;
+            }
         }
     }
 }
