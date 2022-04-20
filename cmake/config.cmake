@@ -19,3 +19,12 @@ hunter_config(OpenSSL VERSION tassl_1.1.1b_v1.4-local
     URL https://${URL_BASE}/FISCO-BCOS/TASSL-1.1.1b/archive/f9d60fa510e5fbe24413b4abdf1ea3a48f9ee6aa.tar.gz
     SHA1 e56121278bf07587d58d154b4615f96575957d6f
 )
+
+hunter_config(
+    Microsoft.GSL VERSION "2.0.0-p0-local"
+    URL
+    "https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/FISCO-BCOS/deps/Microsoft.GSL/v2.0.0-p0.tar.gz
+    https://github.com/hunter-packages/Microsoft.GSL/archive/v2.0.0-p0.tar.gz"
+    SHA1
+    a94c9c1e41edf787a1c080b7cab8f2f4217dbc4b
+)

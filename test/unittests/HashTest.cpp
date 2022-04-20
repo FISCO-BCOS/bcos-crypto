@@ -100,6 +100,7 @@ BOOST_AUTO_TEST_CASE(testSha3)
     BOOST_REQUIRE_EQUAL(cryptoSuite->hash("hello"),
         h256("3338be694f50c5f338814986cdf0686453a888b84f424d792af4b9202398f392"));
 }
+
 BOOST_AUTO_TEST_SUITE_END()
 }  // namespace test
 }  // namespace bcos
