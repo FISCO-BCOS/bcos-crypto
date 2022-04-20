@@ -14,6 +14,7 @@ template <class Impl>
 class Hashing
 {
 public:
+    // Accept POD or RandomAccessRange(with POD)
     template <class Input>
     auto& update(Input&& input)
     {
