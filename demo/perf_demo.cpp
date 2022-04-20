@@ -25,6 +25,7 @@
 #include <bcos-crypto/hash/Sha256.h>
 #include <bcos-crypto/hash/Sha3.h>
 #include <bcos-crypto/hashing/SHA256Hashing.h>
+#include <bcos-crypto/hashing/SHA3Hashing.h>
 #include <bcos-crypto/hashing/SM3Hashing.h>
 #include <bcos-crypto/signature/ed25519/Ed25519Crypto.h>
 #include <bcos-crypto/signature/fastsm2/FastSM2Crypto.h>
@@ -127,6 +128,32 @@ std::vector<bcos::h256> sm3Perf(std::string const& _inputData, size_t _count)
     return result;
 }
 
+std::vector<bcos::h256> sha3Perf(std::string const& _inputData, size_t _count)
+{
+    std::vector<bcos::h256> result(_count);
+
+    std::string hashName = "New SHA3 Hashing";
+    std::cout << std::endl;
+    std::cout << "----------- " << hashName << " perf start -----------" << std::endl;
+    auto startT = utcTime();
+
+    SHA3Hashing sha3;
+    for (size_t i = 0; i < _count; i++)
+    {
+        sha3 << _inputData;
+        result[i] = sha3.final();
+    }
+    std::cout << "input data size: " << (double)_inputData.size() / 1000.0
+              << "KB, loops: " << _count << ", timeCost: " << utcTime() - startT << std::endl;
+    std::cout << "TPS of " << hashName << ": "
+              << getTPS(utcTime(), startT, _count) * (double)_inputData.size() / (1024 * 1024)
+              << " MB/s" << std::endl;
+    std::cout << "----------- " << hashName << " perf end -----------" << std::endl;
+    std::cout << std::endl;
+
+    return result;
+}
+
 void hashPerf(size_t _count)
 {
     std::string inputData = "abcdwer234q4@#2424wdf";
@@ -135,38 +162,51 @@ void hashPerf(size_t _count)
     {
         inputData += deltaData;
     }
-    // sha3 perf
-    Hash::Ptr hashImpl = std::make_shared<class Sha3>();
-    hashPerf(hashImpl, "SHA3", inputData, _count);
+
     // keccak256 perf
-    hashImpl = std::make_shared<Keccak256>();
+    Hash::Ptr hashImpl = std::make_shared<Keccak256>();
     hashPerf(hashImpl, "Keccak256", inputData, _count);
-    // sm3 perf
-    hashImpl = std::make_shared<SM3>();
-    auto sm3Old = hashPerf(hashImpl, "SM3", inputData, _count);
-    auto sm3New = sm3Perf(inputData, _count);
 
-    hashImpl = std::make_shared<Sha256>();
-    auto sha3Old = hashPerf(hashImpl, "SHA256", inputData, _count);
-
-    auto sha3New = hashingPerf(inputData, _count);
+    // sha3 perf
+    hashImpl = std::make_shared<class Sha3>();
+    auto sha3Old = hashPerf(hashImpl, "SHA3", inputData, _count);
+    auto sha3New = sha3Perf(inputData, _count);
 
     for (size_t i = 0; i < _count; ++i)
     {
         if (sha3Old[i] != sha3New[i])
         {
-            std::cout << "Wrong sha256 hash result! old: " << sha3Old[i] << " new: " << sha3New[i]
+            std::cout << "Wrong sha3 hash result! old: " << sha3Old[i] << " new: " << sha3New[i]
                       << std::endl;
             break;
         }
     }
 
+    // sm3 perf
+    hashImpl = std::make_shared<SM3>();
+    auto sm3Old = hashPerf(hashImpl, "SM3", inputData, _count);
+    auto sm3New = sm3Perf(inputData, _count);
+
     for (size_t i = 0; i < _count; ++i)
     {
-        if (sm3Old[i] != sha3New[i])
+        if (sm3Old[i] != sm3New[i])
         {
-            std::cout << "Wrong sm3 hash result! old: " << sha3Old[i] << " new: " << sha3New[i]
+            std::cout << "Wrong sm3 hash result! old: " << sm3Old[i] << " new: " << sm3New[i]
                       << std::endl;
+            break;
+        }
+    }
+
+    hashImpl = std::make_shared<Sha256>();
+    auto sha256Old = hashPerf(hashImpl, "SHA256", inputData, _count);
+    auto sha256New = hashingPerf(inputData, _count);
+
+    for (size_t i = 0; i < _count; ++i)
+    {
+        if (sha256Old[i] != sha256New[i])
+        {
+            std::cout << "Wrong sha256 hash result! old: " << sha256Old[i]
+                      << " new: " << sha256New[i] << std::endl;
             break;
         }
     }
