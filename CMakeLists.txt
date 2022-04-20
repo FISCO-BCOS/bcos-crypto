@@ -52,6 +52,8 @@ include(InstallBcosUtilities)
 
 hunter_add_package(wedpr-crypto)
 find_package(wedpr-crypto CONFIG REQUIRED)
+hunter_add_package(Microsoft.GSL)
+find_package(Microsoft.GSL CONFIG REQUIRED)
 
 # add source directory
 include(Sources)
