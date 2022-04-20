@@ -24,9 +24,7 @@
 #include <bcos-crypto/hash/SM3.h>
 #include <bcos-crypto/hash/Sha256.h>
 #include <bcos-crypto/hash/Sha3.h>
-#include <bcos-crypto/hashing/SHA256Hashing.h>
-#include <bcos-crypto/hashing/SHA3Hashing.h>
-#include <bcos-crypto/hashing/SM3Hashing.h>
+#include <bcos-crypto/hashing/OpenSSLHashing.h>
 #include <bcos-crypto/signature/ed25519/Ed25519Crypto.h>
 #include <bcos-crypto/signature/fastsm2/FastSM2Crypto.h>
 #include <bcos-crypto/signature/secp256k1/Secp256k1Crypto.h>
@@ -75,74 +73,23 @@ std::vector<bcos::h256> hashPerf(
     return result;
 }
 
+template <openssl::EVP_TYPE evpType>
 std::vector<bcos::h256> hashingPerf(std::string const& _inputData, size_t _count)
 {
     std::vector<bcos::h256> result(_count);
 
-    std::string hashName = "New SHA256 Hashing";
+    std::string hashName = "New Hashing Test: " + boost::lexical_cast<std::string>(evpType);
     std::cout << std::endl;
     std::cout << "----------- " << hashName << " perf start -----------" << std::endl;
     auto startT = utcTime();
 
-    SHA256Hashing sha256;
+    openssl::EVPHashing<evpType> hashing;
     for (size_t i = 0; i < _count; i++)
     {
-        sha256 << _inputData;
-        result[i] = sha256.final();
+        hashing << _inputData;
+        result[i] = hashing.final();
     }
 
-    std::cout << "input data size: " << (double)_inputData.size() / 1000.0
-              << "KB, loops: " << _count << ", timeCost: " << utcTime() - startT << std::endl;
-    std::cout << "TPS of " << hashName << ": "
-              << getTPS(utcTime(), startT, _count) * (double)_inputData.size() / (1024 * 1024)
-              << " MB/s" << std::endl;
-    std::cout << "----------- " << hashName << " perf end -----------" << std::endl;
-    std::cout << std::endl;
-
-    return result;
-}
-
-std::vector<bcos::h256> sm3Perf(std::string const& _inputData, size_t _count)
-{
-    std::vector<bcos::h256> result(_count);
-
-    std::string hashName = "New SM3 Hashing";
-    std::cout << std::endl;
-    std::cout << "----------- " << hashName << " perf start -----------" << std::endl;
-    auto startT = utcTime();
-
-    SM3Hashing sm3;
-    for (size_t i = 0; i < _count; i++)
-    {
-        sm3 << _inputData;
-        result[i] = sm3.final();
-    }
-    std::cout << "input data size: " << (double)_inputData.size() / 1000.0
-              << "KB, loops: " << _count << ", timeCost: " << utcTime() - startT << std::endl;
-    std::cout << "TPS of " << hashName << ": "
-              << getTPS(utcTime(), startT, _count) * (double)_inputData.size() / (1024 * 1024)
-              << " MB/s" << std::endl;
-    std::cout << "----------- " << hashName << " perf end -----------" << std::endl;
-    std::cout << std::endl;
-
-    return result;
-}
-
-std::vector<bcos::h256> sha3Perf(std::string const& _inputData, size_t _count)
-{
-    std::vector<bcos::h256> result(_count);
-
-    std::string hashName = "New SHA3 Hashing";
-    std::cout << std::endl;
-    std::cout << "----------- " << hashName << " perf start -----------" << std::endl;
-    auto startT = utcTime();
-
-    SHA3Hashing sha3;
-    for (size_t i = 0; i < _count; i++)
-    {
-        sha3 << _inputData;
-        result[i] = sha3.final();
-    }
     std::cout << "input data size: " << (double)_inputData.size() / 1000.0
               << "KB, loops: " << _count << ", timeCost: " << utcTime() - startT << std::endl;
     std::cout << "TPS of " << hashName << ": "
@@ -170,7 +117,7 @@ void hashPerf(size_t _count)
     // sha3 perf
     hashImpl = std::make_shared<class Sha3>();
     auto sha3Old = hashPerf(hashImpl, "SHA3", inputData, _count);
-    auto sha3New = sha3Perf(inputData, _count);
+    auto sha3New = hashingPerf<bcos::crypto::openssl::SHA3_256>(inputData, _count);
 
     for (size_t i = 0; i < _count; ++i)
     {
@@ -185,7 +132,7 @@ void hashPerf(size_t _count)
     // sm3 perf
     hashImpl = std::make_shared<SM3>();
     auto sm3Old = hashPerf(hashImpl, "SM3", inputData, _count);
-    auto sm3New = sm3Perf(inputData, _count);
+    auto sm3New = hashingPerf<openssl::SM3_256>(inputData, _count);
 
     for (size_t i = 0; i < _count; ++i)
     {
@@ -199,7 +146,7 @@ void hashPerf(size_t _count)
 
     hashImpl = std::make_shared<Sha256>();
     auto sha256Old = hashPerf(hashImpl, "SHA256", inputData, _count);
-    auto sha256New = hashingPerf(inputData, _count);
+    auto sha256New = hashingPerf<openssl::SHA2_256>(inputData, _count);
 
     for (size_t i = 0; i < _count; ++i)
     {

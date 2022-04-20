@@ -9,6 +9,7 @@ namespace bcos::crypto
 {
 
 // Hashing CRTP base
+// Non thread-safe!
 template <class Impl>
 class Hashing
 {
@@ -36,8 +37,7 @@ public:
     template <class Input>
     auto& operator<<(Input&& input)
     {
-        update(std::forward<Input>(input));
-        return *this;
+        return update(std::forward<Input>(input));
     }
 
     bcos::h256 operator()() { return final(); }

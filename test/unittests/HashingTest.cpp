@@ -17,7 +17,7 @@
  * @file HashingTest.h
  * @date 2022.04.19
  */
-#include <bcos-crypto/hashing/SHA256Hashing.h>
+#include <bcos-crypto/hashing/OpenSSLHashing.h>
 #include <bcos-crypto/interfaces/crypto/CryptoSuite.h>
 #include <bcos-utilities/testutils/TestPromptFixture.h>
 #include <boost/test/unit_test.hpp>
@@ -34,16 +34,16 @@ BOOST_AUTO_TEST_CASE(testSHA256)
 {
     std::string a = "arg";
 
-    SHA256Hashing hash1;
+    openssl::SHA2_256Hashing hash1;
     hash1.update(a);
     hash1.update("abcdefg");
     hash1.update(100);
 
-    SHA256Hashing hash3;
+    openssl::SHA2_256Hashing hash3;
     hash3 << a << "abcdefg" << 100;
 
     auto h1 = hash1.final();
-    auto h2 = SHA256Hashing{}.update(a).update("abcdefg").update(100).final();
+    auto h2 = openssl::SHA2_256Hashing{}.update(a).update("abcdefg").update(100).final();
     auto h3 = hash3();
 
     BOOST_CHECK_EQUAL(h1, h3);
