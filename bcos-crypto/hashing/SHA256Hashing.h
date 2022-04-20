@@ -9,12 +9,16 @@ class SHA256Hashing : public Hashing<SHA256Hashing>
 public:
     SHA256Hashing() { SHA256_Init(&m_context); }
 
-    void impl_update(gsl::span<byte const> view) { SHA256_Update(&m_context, view.data(), view.size()); }
+    void impl_update(gsl::span<byte const> view)
+    {
+        SHA256_Update(&m_context, view.data(), view.size());
+    }
 
     bcos::h256 impl_final()
     {
         bcos::h256 hash;
         SHA256_Final(hash.data(), &m_context);
+        SHA256_Init(&m_context);
 
         return hash;
     }
