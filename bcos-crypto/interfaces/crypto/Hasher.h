@@ -1,5 +1,6 @@
 #pragma once
 #include <bcos-utilities/FixedBytes.h>
+#include <boost/throw_exception.hpp>
 #include <iterator>
 #include <ranges>
 #include <span>
@@ -14,21 +15,24 @@ template <class Impl>
 class HasherBase
 {
 public:
-    // Accept POD or RandomAccessRange(with POD)
+    // Accept POD
     auto& update(auto&& input)
     {
-        using RawType = std::remove_cvref<decltype(input)>;
-        if constexpr (std::is_trivial_v<RawType>)
+        using Type = typename std::remove_cvref<decltype(input)>::type;
+        if constexpr (std::is_trivial_v<Type>)
         {
             impl().impl_update(std::span((const byte*)&input, sizeof(input)));
         }
-        else if constexpr (std::ranges::contiguous_range<RawType> &&
-                           std::is_trivial_v<std::ranges::range_value_t<RawType>>)
+        else if constexpr (std::ranges::contiguous_range<Type> &&
+                           std::is_trivial_v<std::ranges::range_value_t<Type>>)
         {
             impl().impl_update(std::span((const byte*)std::data(input),
-                sizeof(std::ranges::range_value_t<RawType>) * std::size(input)));
+                sizeof(std::ranges::range_value_t<Type>) * std::size(input)));
         }
-
+        else
+        {
+            static_assert(!sizeof(Type), "No match type! Input type must be POD or range of POD");
+        }
         return *this;
     }
 

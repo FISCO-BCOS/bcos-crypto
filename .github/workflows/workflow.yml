@@ -96,7 +96,7 @@ jobs:
         run: sudo apt install -y git curl build-essential cmake ccache
       - name: configure
         run: |
-          cmake . -DTESTS=ON -DDEMO=ON -DSM2_OPTIMIZE=ON
+          CC=gcc-10 CXX=g++-10 cmake . -DTESTS=ON -DDEMO=ON -DSM2_OPTIMIZE=ON
       - name: compile
         run: make -j2
       - name: run test
@@ -139,7 +139,7 @@ jobs:
       - name: configure
         run: |
           export CPATH=/Library/Developer/CommandLineTools/usr/include/c++/v1
-          cmake . -DTESTS=ON -DCOVERAGE=ON -DDEMO=ON -DSM2_OPTIMIZE=ON
+          CC=gcc-10 CXX=g++-10 cmake . -DTESTS=ON -DCOVERAGE=ON -DDEMO=ON -DSM2_OPTIMIZE=ON
       - name: compile
         run: make -j2
       - name: run test
@@ -188,7 +188,7 @@ jobs:
         run: |
           rustup override set stable
           cargo --version
-          source /opt/rh/devtoolset-7/enable
+          source /opt/rh/devtoolset-10/enable
           mkdir -p build && cd build
           cmake3 .. -DTESTS=ON -DSM2_OPTIMIZE=ON
           make -j2

@@ -47,21 +47,41 @@ BOOST_AUTO_TEST_CASE(testSHA256)
 
 BOOST_AUTO_TEST_CASE(testHasherType)
 {
-    std::string a = "str";
+    std::string a = "str123456789012345678901234567890";
     std::string_view view = a;
     bcos::h256 h(100);
+    std::span<byte const> hView(h.data(), h.size);
 
-    auto hash = openssl::OpenSSL_SHA3_256_Hasher{}.update(a).update(view).update(h).final();
+    auto hash = openssl::OpenSSL_SHA3_256_Hasher{}
+                    .update(100)
+                    .update(a)
+                    .update(view)
+                    .update(hView)
+                    .update("bbbc")
+                    .final();
 
     BOOST_CHECK_NE(hash, bcos::h256());
 
+    std::string a1 = "str123456789012345678901234567890";
+    view = a1;
+    char by[] = "bbbc";
+    int be = 100;
     auto hash2 = openssl::OpenSSL_SHA3_256_Hasher{}
-                     .update(a)
+                     .update(be)
+                     .update(a1)
                      .update(view)
                      .update(std::span((const byte*)h.data(), h.size))
+                     .update(by)
                      .final();
 
     BOOST_CHECK_EQUAL(hash, hash2);
+
+    std::vector<std::string> strList;
+    strList.emplace_back("hello world!");
+
+    std::vector<std::vector<std::string>> multiStrList;
+
+    // openssl::OpenSSL_SHA3_256_Hasher{}.update(multiStrList).final();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
