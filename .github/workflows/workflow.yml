@@ -45,13 +45,13 @@ jobs:
             hunter-clang-v2-notest-${{ runner.temp }}-
       - name: install macOS dependencies
         if: runner.os == 'macOS'
-        run: brew install ccache
+        run: brew install ccache llvm
       - name: install Ubuntu dependencies
         if: runner.os == 'Linux'
         run: sudo apt install -y git curl build-essential clang cmake ccache
       - name: configure
         if: runner.os == 'macOS'
-        run: export SDKROOT=$(xcrun --sdk macosx --show-sdk-path) && CC=/usr/bin/clang CXX=/usr/bin/clang++ cmake . -DTESTS=ON -DDEMO=ON -DSM2_OPTIMIZE=ON
+        run: CC=/opt/homebrew/opt/llvm/bin/clang CXX=/opt/homebrew/opt/llvm/bin/clang++ cmake . -DTESTS=ON -DDEMO=ON -DSM2_OPTIMIZE=ON
       - name: configure
         if: runner.os == 'Linux'
         run: CC=/usr/bin/clang CXX=/usr/bin/clang++ cmake . -DTESTS=ON -DDEMO=ON -DSM2_OPTIMIZE=ON
@@ -183,7 +183,7 @@ jobs:
       - name: install CentOS dependencies
         run: |
           yum install -y epel-release centos-release-scl
-          yum install -y git make gcc gcc-c++ glibc-static glibc-devel cmake3 ccache devtoolset-10 libzstd-devel zlib-devel flex bison python-devel python3-devel && source /opt/rh/devtoolset-7/enable
+          yum install -y git make gcc gcc-c++ glibc-static glibc-devel cmake3 ccache devtoolset-10 libzstd-devel zlib-devel flex bison python-devel python3-devel && source /opt/rh/devtoolset-10/enable
       - name: configure and compile
         run: |
           rustup override set stable

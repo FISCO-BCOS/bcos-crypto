@@ -51,8 +51,7 @@ public:
     {
         bcos::h256 hash;
 
-        unsigned int length = hash.size;
-        EVP_DigestFinal(m_mdCtx.get(), hash.data(), &length);
+        EVP_DigestFinal(m_mdCtx.get(), hash.data(), nullptr);
         EVP_DigestInit(m_mdCtx.get(), m_md);
 
         return hash;
