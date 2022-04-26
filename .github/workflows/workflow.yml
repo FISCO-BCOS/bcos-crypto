@@ -51,7 +51,7 @@ jobs:
         run: sudo apt install -y git curl build-essential clang cmake ccache
       - name: configure
         if: runner.os == 'macOS'
-        run: CC=/opt/homebrew/opt/llvm/bin/clang CXX=/opt/homebrew/opt/llvm/bin/clang++ cmake . -DTESTS=ON -DDEMO=ON -DSM2_OPTIMIZE=ON
+        run: CC=/usr/local/opt/llvm/bin/clang CXX=/usr/local/opt/llvm/bin/clang++ cmake . -DTESTS=ON -DDEMO=ON -DSM2_OPTIMIZE=ON
       - name: configure
         if: runner.os == 'Linux'
         run: CC=/usr/bin/clang CXX=/usr/bin/clang++ cmake . -DTESTS=ON -DDEMO=ON -DSM2_OPTIMIZE=ON
