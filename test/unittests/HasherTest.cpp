@@ -17,7 +17,7 @@
  * @file HashingTest.h
  * @date 2022.04.19
  */
-#include <bcos-crypto/hashing/OpenSSLHashing.h>
+#include <bcos-crypto/hasher/OpenSSLHasher.h>
 #include <bcos-crypto/interfaces/crypto/CryptoSuite.h>
 #include <bcos-utilities/testutils/TestPromptFixture.h>
 #include <boost/test/unit_test.hpp>
@@ -29,25 +29,39 @@ namespace bcos
 {
 namespace test
 {
-BOOST_FIXTURE_TEST_SUITE(HashingTest, TestPromptFixture)
+BOOST_FIXTURE_TEST_SUITE(HasherTest, TestPromptFixture)
 BOOST_AUTO_TEST_CASE(testSHA256)
 {
     std::string a = "arg";
 
-    openssl::SHA2_256Hashing hash1;
+    openssl::OpenSSL_SHA3_256_Hasher hash1;
     hash1.update(a);
     hash1.update("abcdefg");
     hash1.update(100);
 
-    openssl::SHA2_256Hashing hash3;
-    hash3 << a << "abcdefg" << 100;
-
     auto h1 = hash1.final();
-    auto h2 = openssl::SHA2_256Hashing{}.update(a).update("abcdefg").update(100).final();
-    auto h3 = hash3();
+    auto h2 = openssl::OpenSSL_SHA3_256_Hasher{}.update(a).update("abcdefg").update(100).final();
 
-    BOOST_CHECK_EQUAL(h1, h3);
     BOOST_CHECK_EQUAL(h1, h2);
+}
+
+BOOST_AUTO_TEST_CASE(testHasherType)
+{
+    std::string a = "str";
+    std::string_view view = a;
+    bcos::h256 h(100);
+
+    auto hash = openssl::OpenSSL_SHA3_256_Hasher{}.update(a).update(view).update(h).final();
+
+    BOOST_CHECK_NE(hash, bcos::h256());
+
+    auto hash2 = openssl::OpenSSL_SHA3_256_Hasher{}
+                     .update(a)
+                     .update(view)
+                     .update(std::span((const byte*)h.data(), h.size))
+                     .final();
+
+    BOOST_CHECK_EQUAL(hash, hash2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

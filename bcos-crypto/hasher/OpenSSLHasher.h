@@ -1,6 +1,6 @@
 #pragma one
 
-#include "../interfaces/crypto/Hashing.h"
+#include "../interfaces/crypto/Hasher.h"
 #include <openssl/evp.h>
 
 namespace bcos::crypto::openssl
@@ -14,10 +14,11 @@ enum EVP_TYPE
 };
 
 template <EVP_TYPE evpType>
-class EVPHashing : public Hashing<EVPHashing<evpType>>
+class OpenSSLHasher : public HasherBase<OpenSSLHasher<evpType>>
 {
 public:
-    EVPHashing() : Hashing<EVPHashing<evpType>>(), m_mdCtx(EVP_MD_CTX_new(), &EVP_MD_CTX_free)
+    OpenSSLHasher()
+      : HasherBase<OpenSSLHasher<evpType>>(), m_mdCtx(EVP_MD_CTX_new(), &EVP_MD_CTX_free)
     {
         switch (evpType)
         {
@@ -35,13 +36,13 @@ public:
         }
         EVP_DigestInit(m_mdCtx.get(), m_md);
     }
-    EVPHashing(const EVPHashing&) = delete;
-    EVPHashing(EVPHashing&&) = default;
-    EVPHashing& operator=(const EVPHashing&) = delete;
-    EVPHashing& operator=(EVPHashing&&) = default;
-    ~EVPHashing() = default;
+    OpenSSLHasher(const OpenSSLHasher&) = delete;
+    OpenSSLHasher(OpenSSLHasher&&) = default;
+    OpenSSLHasher& operator=(const OpenSSLHasher&) = delete;
+    OpenSSLHasher& operator=(OpenSSLHasher&&) = default;
+    ~OpenSSLHasher() = default;
 
-    void impl_update(gsl::span<byte const> view)
+    void impl_update(std::span<byte const> view)
     {
         EVP_DigestUpdate(m_mdCtx.get(), view.data(), view.size());
     }
@@ -62,8 +63,12 @@ private:
     const EVP_MD* m_md;
 };
 
-using SHA3_256Hashing = EVPHashing<SHA3_256>;
-using SHA2_256Hashing = EVPHashing<SHA2_256>;
-using SM3_256Hashing = EVPHashing<SM3_256>;
+using OpenSSL_SHA3_256_Hasher = OpenSSLHasher<SHA3_256>;
+using OpenSSL_SHA2_256_Hasher = OpenSSLHasher<SHA2_256>;
+using OPENSSL_SM3_Hasher = OpenSSLHasher<SM3_256>;
+
+static_assert(Hasher<OpenSSL_SHA3_256_Hasher>, "Assert OpenSSLHasher type");
+static_assert(Hasher<OpenSSL_SHA2_256_Hasher>, "Assert OpenSSLHasher type");
+static_assert(Hasher<OPENSSL_SM3_Hasher>, "Assert OpenSSLHasher type");
 
 }  // namespace bcos::crypto::openssl

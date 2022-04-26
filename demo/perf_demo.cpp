@@ -83,7 +83,7 @@ std::vector<bcos::h256> hashingPerf(std::string const& _inputData, size_t _count
     std::cout << "----------- " << hashName << " perf start -----------" << std::endl;
     auto startT = utcTime();
 
-    openssl::EVPHashing<evpType> hashing;
+    openssl::OpenSSLHasher<evpType> hashing;
     for (size_t i = 0; i < _count; i++)
     {
         hashing << _inputData;
