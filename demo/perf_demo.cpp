@@ -114,7 +114,13 @@ void hashPerf(size_t _count)
 
     // keccak256 perf
     Hash::Ptr hashImpl = std::make_shared<Keccak256>();
-    hashPerf(hashImpl, "Keccak256", inputData, _count);
+    auto keccak256Old = hashPerf(hashImpl, "Keccak256", inputData, _count);
+    auto keccak256New = hashingPerf<bcos::crypto::openssl::Keccak256>(inputData, _count);
+    if (keccak256Old[0] != keccak256New[0])
+    {
+        std::cout << "Wrong keccak256 hash result! old: " << keccak256Old[0]
+                  << " new: " << keccak256New[0] << std::endl;
+    }
 
     // sha3 perf
     hashImpl = std::make_shared<class Sha3>();
