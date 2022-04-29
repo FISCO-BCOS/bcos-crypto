@@ -20,15 +20,18 @@
 #include <bcos-crypto/hasher/OpenSSLHasher.h>
 #include <bcos-crypto/interfaces/crypto/CryptoSuite.h>
 #include <bcos-utilities/testutils/TestPromptFixture.h>
+#include <boost/algorithm/hex.hpp>
+#include <boost/core/ignore_unused.hpp>
 #include <boost/test/unit_test.hpp>
+#include <iterator>
 #include <string>
 
 using namespace bcos;
 using namespace crypto;
-namespace bcos
+
+namespace bcos::test
 {
-namespace test
-{
+
 BOOST_FIXTURE_TEST_SUITE(HasherTest, TestPromptFixture)
 BOOST_AUTO_TEST_CASE(testSHA256)
 {
@@ -60,7 +63,8 @@ BOOST_AUTO_TEST_CASE(testHasherType)
                     .update("bbbc")
                     .final();
 
-    BOOST_CHECK_NE(hash, bcos::h256());
+    decltype(hash) emptyHash;
+    BOOST_CHECK_NE(hash, emptyHash);
 
     std::string a1 = "str123456789012345678901234567890";
     view = a1;
@@ -85,5 +89,20 @@ BOOST_AUTO_TEST_CASE(testHasherType)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-}  // namespace test
-}  // namespace bcos
+}  // namespace bcos::test
+
+namespace std
+{
+
+template <size_t length>
+::std::ostream& operator<<(::std::ostream& stream, const std::array<std::byte, length>& hash)
+{
+    std::string str;
+    str.reserve(hash.size() * 2);
+    std::span<char> view{(char*)hash.data(), hash.size()};
+
+    boost::algorithm::hex_lower(view.begin(), view.end(), std::back_inserter(str));
+    stream << str;
+    return stream;
+}
+}  // namespace std

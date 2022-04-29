@@ -23,13 +23,20 @@
 #include <bcos-utilities/Log.h>
 
 #define CRYPTO_LOG(LEVEL) BCOS_LOG(LEVEL) << LOG_BADGE("CRYPTO")
-namespace bcos
-{
-namespace crypto
+namespace bcos::crypto
 {
 using HashType = h256;
 using HashList = std::vector<HashType>;
 using HashListPtr = std::shared_ptr<HashList>;
 
-}  // namespace crypto
-}  // namespace bcos
+template <class POD>
+concept HashPOD = std::is_trivial_v<std::remove_cvref_t<POD>>;
+
+template <class Range>
+concept HashRange = std::ranges::contiguous_range<Range> &&
+    std::is_trivial_v<std::remove_cvref_t<std::ranges::range_value_t<Range>>>;
+
+template <class Object>
+concept HashObject = HashPOD<Object> || HashRange<Object>;
+
+}  // namespace bcos::crypto

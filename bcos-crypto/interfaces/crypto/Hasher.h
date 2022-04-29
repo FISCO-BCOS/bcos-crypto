@@ -1,5 +1,5 @@
 #pragma once
-#include <bcos-utilities/FixedBytes.h>
+#include "CommonType.h"
 #include <boost/throw_exception.hpp>
 #include <iterator>
 #include <ranges>
@@ -15,31 +15,66 @@ template <class Impl>
 class HasherBase
 {
 public:
-    // Accept POD
-    auto& update(auto&& input)
+    auto& update(HashObject auto&& input)
     {
-        using Type = typename std::remove_cvref<decltype(input)>::type;
-        if constexpr (std::is_trivial_v<Type>)
-        {
-            impl().impl_update(std::span((const byte*)&input, sizeof(input)));
-        }
-        else if constexpr (std::ranges::contiguous_range<Type> &&
-                           std::is_trivial_v<std::ranges::range_value_t<Type>>)
-        {
-            impl().impl_update(std::span((const byte*)std::data(input),
-                sizeof(std::ranges::range_value_t<Type>) * std::size(input)));
-        }
-        else
-        {
-            static_assert(!sizeof(Type), "No match type! Input type must be POD or range of POD");
-        }
+        impl().impl_update(toView(std::forward<decltype(input)>(input)));
         return *this;
     }
+    void final(HashObject auto&& output)
+    {
+        impl().impl_final(toView(std::forward<decltype(output)>(output)));
+    }
 
-    bcos::h256 final() { return impl().impl_final(); }
+    template <HashObject Output>
+    auto final()
+    {
+        Output output;
+        final(output);
+
+        return output;
+    }
+
+    auto final()
+    {
+        std::array<std::byte, Impl::impl_hashSize()> output;
+        final(output);
+
+        return output;
+    }
 
 private:
     Impl& impl() { return *static_cast<Impl*>(this); }
+
+    auto toView(HashObject auto&& object)
+    {
+        using RawType = std::remove_cvref_t<decltype(object)>;
+        using RawTypeWithConst = std::remove_reference_t<decltype(object)>;
+
+        if constexpr (HashPOD<RawType>)
+        {
+            using ByteType =
+                std::conditional_t<std::is_const_v<RawTypeWithConst>, byte const, byte>;
+            std::span<ByteType> view{(ByteType*)&object, sizeof(object)};
+
+            return view;
+        }
+        else if constexpr (HashRange<RawType>)
+        {
+            using ValueType = std::remove_reference_t<std::ranges::range_value_t<RawType>>;
+            using ByteType = std::conditional_t<std::is_const_v<ValueType>, byte const, byte>;
+
+            std::span<ByteType> view{(ByteType*)object.data(),
+                sizeof(std::remove_cvref_t<std::ranges::range_value_t<RawType>>) *
+                    std::size(object)};
+
+            return view;
+        }
+        else
+        {
+            static_assert(!sizeof(object), "Unsupported type!");
+            return std::span<byte>{};
+        }
+    }
 };
 
 template <class Impl>

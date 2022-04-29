@@ -1,10 +1,14 @@
-#pragma one
+#pragma once
 
 #include "../interfaces/crypto/Hasher.h"
 #include <openssl/evp.h>
 
 namespace bcos::crypto::openssl
 {
+
+struct Exception : public std::exception, public boost::exception
+{
+};
 
 enum EVP_TYPE
 {
@@ -17,7 +21,7 @@ template <EVP_TYPE evpType>
 class OpenSSLHasher : public HasherBase<OpenSSLHasher<evpType>>
 {
 public:
-    OpenSSLHasher()
+    constexpr OpenSSLHasher()
       : HasherBase<OpenSSLHasher<evpType>>(), m_mdCtx(EVP_MD_CTX_new(), &EVP_MD_CTX_free)
     {
         switch (evpType)
@@ -47,19 +51,23 @@ public:
         EVP_DigestUpdate(m_mdCtx.get(), view.data(), view.size());
     }
 
-    bcos::h256 impl_final()
+    void impl_final(std::span<byte> view)
     {
-        bcos::h256 hash;
-
-        EVP_DigestFinal(m_mdCtx.get(), hash.data(), nullptr);
+        if (view.size() < HASH_SIZE)
+        {
+            BOOST_THROW_EXCEPTION(Error{});
+        }
+        EVP_DigestFinal(m_mdCtx.get(), view.data(), nullptr);
         EVP_DigestInit(m_mdCtx.get(), m_md);
-
-        return hash;
     }
+
+    constexpr static size_t impl_hashSize() { return HASH_SIZE; }
 
 private:
     std::unique_ptr<EVP_MD_CTX, std::function<void(EVP_MD_CTX*)>> m_mdCtx;
     const EVP_MD* m_md;
+
+    constexpr static size_t HASH_SIZE = 32;
 };
 
 using OpenSSL_SHA3_256_Hasher = OpenSSLHasher<SHA3_256>;
