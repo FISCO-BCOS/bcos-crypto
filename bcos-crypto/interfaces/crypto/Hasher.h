@@ -56,8 +56,6 @@ public:
     }
 
 private:
-    bool m_initd;
-
     constexpr Impl& impl() { return *static_cast<Impl*>(this); }
 
     constexpr auto toView(HashObject auto&& object)
