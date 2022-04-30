@@ -2,6 +2,7 @@
 
 #include "../interfaces/crypto/Hasher.h"
 #include <openssl/evp.h>
+#include <boost/throw_exception.hpp>
 
 namespace bcos::crypto::openssl
 {
@@ -23,31 +24,49 @@ class OpenSSLHasher : public HasherBase<OpenSSLHasher<evpType>>
 {
 public:
     constexpr OpenSSLHasher()
-      : HasherBase<OpenSSLHasher<evpType>>(), m_mdCtx(EVP_MD_CTX_new(), &EVP_MD_CTX_free)
+      : HasherBase<OpenSSLHasher<evpType>>(),
+        m_mdCtx(EVP_MD_CTX_new(), &EVP_MD_CTX_free),
+        m_init(false)
+    {}
+
+    OpenSSLHasher(const OpenSSLHasher&) = delete;
+    OpenSSLHasher(OpenSSLHasher&&) = default;
+    OpenSSLHasher& operator=(const OpenSSLHasher&) = delete;
+    OpenSSLHasher& operator=(OpenSSLHasher&&) = default;
+    ~OpenSSLHasher() = default;
+
+    void impl_update(std::span<std::byte const> view)
     {
-        switch (evpType)
+        if (!m_init)
         {
-        case SM3_256:
-            m_md = EVP_sm3();
-            break;
-        case SHA3_256:
-            m_md = EVP_sha3_256();
-            break;
-        case SHA2_256:
-            m_md = EVP_sha256();
-            break;
-        case Keccak256:
-            m_md = EVP_sha3_256();
-            break;
-        default:
-            break;
+            init();
+            m_init = true;
         }
+        EVP_DigestUpdate(m_mdCtx.get(), view.data(), view.size());
+    }
 
-        EVP_DigestInit(m_mdCtx.get(), m_md);
+    void impl_final(std::span<std::byte> view)
+    {
+        if (view.size() < HASH_SIZE)
+        {
+            BOOST_THROW_EXCEPTION(Exception{});
+        }
+        EVP_DigestFinal(m_mdCtx.get(), reinterpret_cast<unsigned char*>(view.data()), nullptr);
+        m_init = false;
+    }
 
+    constexpr static size_t impl_hashSize() { return HASH_SIZE; }
+
+
+private:
+    void init()
+    {
+        auto md = chooseMD();
+        EVP_DigestInit(m_mdCtx.get(), md);
+
+        // Keccak256 need special padding
         if constexpr (evpType == Keccak256)
         {
-            // change the pad of sha3_256
             struct KECCAK1600_CTX
             {
                 uint64_t A[5][5];
@@ -68,35 +87,33 @@ public:
             };
 
             auto keccak256 = reinterpret_cast<EVP_MD_CTX_Keccak256*>(m_mdCtx.get());
+            if (keccak256->md_data->pad != 0x06)  // The sha3 origin pad
+            {
+                BOOST_THROW_EXCEPTION(Exception{});
+            }
             keccak256->md_data->pad = 0x01;
         }
     }
-    OpenSSLHasher(const OpenSSLHasher&) = delete;
-    OpenSSLHasher(OpenSSLHasher&&) = default;
-    OpenSSLHasher& operator=(const OpenSSLHasher&) = delete;
-    OpenSSLHasher& operator=(OpenSSLHasher&&) = default;
-    ~OpenSSLHasher() = default;
 
-    void impl_update(std::span<byte const> view)
+    const EVP_MD* chooseMD()
     {
-        EVP_DigestUpdate(m_mdCtx.get(), view.data(), view.size());
-    }
-
-    void impl_final(std::span<byte> view)
-    {
-        if (view.size() < HASH_SIZE)
+        switch (evpType)
         {
-            BOOST_THROW_EXCEPTION(Exception{});
+        case SM3_256:
+            return EVP_sm3();
+        case SHA3_256:
+            return EVP_sha3_256();
+        case SHA2_256:
+            return EVP_sha256();
+        case Keccak256:
+            return EVP_sha3_256();
+        default:
+            return nullptr;
         }
-        EVP_DigestFinal(m_mdCtx.get(), view.data(), nullptr);
-        EVP_DigestInit(m_mdCtx.get(), m_md);
     }
 
-    constexpr static size_t impl_hashSize() { return HASH_SIZE; }
-
-private:
     std::unique_ptr<EVP_MD_CTX, std::function<void(EVP_MD_CTX*)>> m_mdCtx;
-    const EVP_MD* m_md;
+    bool m_init;
 
     constexpr static size_t HASH_SIZE = 32;
 };

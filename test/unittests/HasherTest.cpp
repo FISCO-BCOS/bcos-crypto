@@ -48,6 +48,20 @@ BOOST_AUTO_TEST_CASE(testSHA256)
     BOOST_CHECK_EQUAL(h1, h2);
 }
 
+BOOST_AUTO_TEST_CASE(calc)
+{
+    std::string str = "hash12345";
+    std::string str1 = "hash12345";
+
+    openssl::OPENSSL_Keccak256_Hasher hash1;
+    hash1.update(str1);
+
+    auto h1 = hash1.final();
+    auto h2 = openssl::OPENSSL_Keccak256_Hasher{}.calculate(str1);
+
+    BOOST_CHECK_EQUAL(h1, h2);
+}
+
 BOOST_AUTO_TEST_CASE(testHasherType)
 {
     std::string a = "str123456789012345678901234567890";

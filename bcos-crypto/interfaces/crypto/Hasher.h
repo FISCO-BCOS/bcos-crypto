@@ -15,6 +15,19 @@ template <class Impl>
 class HasherBase
 {
 public:
+    template <HashObject Output>
+    auto calculate(HashObject auto&& input)
+    {
+        update(input);
+        return final<Output>();
+    }
+
+    auto calculate(HashObject auto&& input)
+    {
+        update(input);
+        return final();
+    }
+
     auto& update(HashObject auto&& input)
     {
         impl().impl_update(toView(std::forward<decltype(input)>(input)));
@@ -43,9 +56,11 @@ public:
     }
 
 private:
-    Impl& impl() { return *static_cast<Impl*>(this); }
+    bool m_initd;
 
-    auto toView(HashObject auto&& object)
+    constexpr Impl& impl() { return *static_cast<Impl*>(this); }
+
+    constexpr auto toView(HashObject auto&& object)
     {
         using RawType = std::remove_cvref_t<decltype(object)>;
         using RawTypeWithConst = std::remove_reference_t<decltype(object)>;
@@ -53,7 +68,7 @@ private:
         if constexpr (HashPOD<RawType>)
         {
             using ByteType =
-                std::conditional_t<std::is_const_v<RawTypeWithConst>, byte const, byte>;
+                std::conditional_t<std::is_const_v<RawTypeWithConst>, std::byte const, std::byte>;
             std::span<ByteType> view{(ByteType*)&object, sizeof(object)};
 
             return view;
@@ -61,7 +76,8 @@ private:
         else if constexpr (HashRange<RawType>)
         {
             using ValueType = std::remove_reference_t<std::ranges::range_value_t<RawType>>;
-            using ByteType = std::conditional_t<std::is_const_v<ValueType>, byte const, byte>;
+            using ByteType =
+                std::conditional_t<std::is_const_v<ValueType>, std::byte const, std::byte>;
 
             std::span<ByteType> view{(ByteType*)object.data(),
                 sizeof(std::remove_cvref_t<std::ranges::range_value_t<RawType>>) *
