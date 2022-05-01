@@ -13,8 +13,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * @brief test cases for hashing256
- * @file HashingTest.h
+ * @brief test cases for hasher256
+ * @file HasherTest.h
  * @date 2022.04.19
  */
 #include <bcos-crypto/hasher/OpenSSLHasher.h>

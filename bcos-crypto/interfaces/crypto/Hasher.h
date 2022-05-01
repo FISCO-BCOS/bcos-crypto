@@ -15,6 +15,13 @@ template <class Impl>
 class HasherBase
 {
 public:
+    HasherBase() = default;
+    HasherBase(const HasherBase&) = default;
+    HasherBase(HasherBase&&) = default;
+    HasherBase& operator=(const HasherBase&) = default;
+    HasherBase& operator=(HasherBase&&) = default;
+    virtual ~HasherBase() = default;
+
     template <HashObject Output>
     auto calculate(HashObject auto&& input)
     {

@@ -33,25 +33,25 @@ public:
     OpenSSLHasher(OpenSSLHasher&&) = default;
     OpenSSLHasher& operator=(const OpenSSLHasher&) = delete;
     OpenSSLHasher& operator=(OpenSSLHasher&&) = default;
-    ~OpenSSLHasher() = default;
+    ~OpenSSLHasher() override = default;
 
-    void impl_update(std::span<std::byte const> view)
+    void impl_update(std::span<std::byte const> in)
     {
         if (!m_init)
         {
             init();
             m_init = true;
         }
-        EVP_DigestUpdate(m_mdCtx.get(), view.data(), view.size());
+        EVP_DigestUpdate(m_mdCtx.get(), in.data(), in.size());
     }
 
-    void impl_final(std::span<std::byte> view)
+    void impl_final(std::span<std::byte> out)
     {
-        if (view.size() < HASH_SIZE)
+        if (out.size() < HASH_SIZE)
         {
             BOOST_THROW_EXCEPTION(Exception{});
         }
-        EVP_DigestFinal(m_mdCtx.get(), reinterpret_cast<unsigned char*>(view.data()), nullptr);
+        EVP_DigestFinal(m_mdCtx.get(), reinterpret_cast<unsigned char*>(out.data()), nullptr);
         m_init = false;
     }
 
