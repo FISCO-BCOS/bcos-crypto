@@ -2,14 +2,12 @@
 
 #include "../interfaces/crypto/Hasher.h"
 #include <openssl/evp.h>
+#include <boost/exception/diagnostic_information.hpp>
 #include <boost/throw_exception.hpp>
+#include <stdexcept>
 
 namespace bcos::crypto::openssl
 {
-
-struct Exception : public std::exception, public boost::exception
-{
-};
 
 enum EVP_TYPE
 {
@@ -23,11 +21,16 @@ template <EVP_TYPE evpType>
 class OpenSSLHasher : public HasherBase<OpenSSLHasher<evpType>>
 {
 public:
-    constexpr OpenSSLHasher()
+    OpenSSLHasher()
       : HasherBase<OpenSSLHasher<evpType>>(),
         m_mdCtx(EVP_MD_CTX_new(), &EVP_MD_CTX_free),
         m_init(false)
-    {}
+    {
+        if (!m_mdCtx) [[unlikely]]
+        {
+            BOOST_THROW_EXCEPTION(std::runtime_error{"EVP_MD_CTX_new error!"});
+        }
+    }
 
     OpenSSLHasher(const OpenSSLHasher&) = delete;
     OpenSSLHasher(OpenSSLHasher&&) = default;
@@ -42,27 +45,37 @@ public:
             init();
             m_init = true;
         }
-        EVP_DigestUpdate(m_mdCtx.get(), in.data(), in.size());
+        if (!EVP_DigestUpdate(m_mdCtx.get(), in.data(), in.size())) [[unlikely]]
+        {
+            BOOST_THROW_EXCEPTION(std::runtime_error{"EVP_DigestUpdate error!"});
+        }
     }
 
     void impl_final(std::span<std::byte> out)
     {
-        if (out.size() < HASH_SIZE)
-        {
-            BOOST_THROW_EXCEPTION(Exception{});
-        }
-        EVP_DigestFinal(m_mdCtx.get(), reinterpret_cast<unsigned char*>(out.data()), nullptr);
         m_init = false;
+        if (out.size() < HASH_SIZE) [[unlikely]]
+        {
+            BOOST_THROW_EXCEPTION(std::invalid_argument{"Output size too short!"});
+        }
+        if (!EVP_DigestFinal(m_mdCtx.get(), reinterpret_cast<unsigned char*>(out.data()), nullptr))
+            [[unlikely]]
+        {
+            BOOST_THROW_EXCEPTION(std::runtime_error{"EVP_DigestFinal error!"});
+        }
     }
 
-    constexpr static size_t impl_hashSize() { return HASH_SIZE; }
+    constexpr static size_t impl_hashSize() noexcept { return HASH_SIZE; }
 
 
 private:
     void init()
     {
         auto md = chooseMD();
-        EVP_DigestInit(m_mdCtx.get(), md);
+        if (!EVP_DigestInit(m_mdCtx.get(), md)) [[unlikely]]
+        {
+            BOOST_THROW_EXCEPTION(std::runtime_error{"EVP_DigestInit error!"});
+        }
 
         // Keccak256 need special padding
         if constexpr (evpType == Keccak256)
@@ -87,9 +100,10 @@ private:
             };
 
             auto keccak256 = reinterpret_cast<EVP_MD_CTX_Keccak256*>(m_mdCtx.get());
-            if (keccak256->md_data->pad != 0x06)  // The sha3 origin pad
+            if (keccak256->md_data->pad != 0x06) [[unlikely]]  // The sha3 origin pad
             {
-                BOOST_THROW_EXCEPTION(Exception{});
+                BOOST_THROW_EXCEPTION(std::runtime_error{
+                    "OpenSSL KECCAK1600_CTX layout error! Maybe untested openssl version"});
             }
             keccak256->md_data->pad = 0x01;
         }

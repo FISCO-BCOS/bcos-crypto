@@ -10,7 +10,6 @@ namespace bcos::crypto
 {
 
 // Hashing CRTP base
-// Non thread-safe!
 template <class Impl>
 class HasherBase
 {
@@ -22,30 +21,30 @@ public:
     HasherBase& operator=(HasherBase&&) = default;
     virtual ~HasherBase() = default;
 
-    template <HashObject Output>
-    auto calculate(HashObject auto&& input)
+    template <TrivialObject Output>
+    auto calculate(TrivialObject auto&& input)
     {
         update(input);
         return final<Output>();
     }
 
-    auto calculate(HashObject auto&& input)
+    auto calculate(TrivialObject auto&& input)
     {
         update(input);
         return final();
     }
 
-    auto& update(HashObject auto&& input)
+    auto& update(TrivialObject auto&& input)
     {
         impl().impl_update(toView(std::forward<decltype(input)>(input)));
         return *this;
     }
-    void final(HashObject auto&& output)
+    void final(TrivialObject auto&& output)
     {
         impl().impl_final(toView(std::forward<decltype(output)>(output)));
     }
 
-    template <HashObject Output>
+    template <TrivialObject Output>
     auto final()
     {
         Output output;
@@ -65,26 +64,26 @@ public:
 private:
     constexpr Impl& impl() { return *static_cast<Impl*>(this); }
 
-    constexpr auto toView(HashObject auto&& object)
+    constexpr auto toView(TrivialObject auto&& object)
     {
         using RawType = std::remove_cvref_t<decltype(object)>;
-        using RawTypeWithConst = std::remove_reference_t<decltype(object)>;
 
-        if constexpr (HashPOD<RawType>)
+        if constexpr (TrivialValue<RawType>)
         {
+            using RawTypeWithConst = std::remove_reference_t<decltype(object)>;
             using ByteType =
                 std::conditional_t<std::is_const_v<RawTypeWithConst>, std::byte const, std::byte>;
             std::span<ByteType> view{(ByteType*)&object, sizeof(object)};
 
             return view;
         }
-        else if constexpr (HashRange<RawType>)
+        else if constexpr (TrivialRange<RawType>)
         {
             using ValueType = std::remove_reference_t<std::ranges::range_value_t<RawType>>;
             using ByteType =
                 std::conditional_t<std::is_const_v<ValueType>, std::byte const, std::byte>;
 
-            std::span<ByteType> view{(ByteType*)object.data(),
+            std::span<ByteType> view{(ByteType*)std::data(object),
                 sizeof(std::remove_cvref_t<std::ranges::range_value_t<RawType>>) *
                     std::size(object)};
 

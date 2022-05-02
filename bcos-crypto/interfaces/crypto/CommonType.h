@@ -29,14 +29,14 @@ using HashType = h256;
 using HashList = std::vector<HashType>;
 using HashListPtr = std::shared_ptr<HashList>;
 
-template <class POD>
-concept HashPOD = std::is_trivial_v<std::remove_cvref_t<POD>>;
+template <class Value>
+concept TrivialValue = std::is_trivial_v<std::remove_cvref_t<Value>>;
 
 template <class Range>
-concept HashRange = std::ranges::contiguous_range<Range> &&
+concept TrivialRange = std::ranges::contiguous_range<std::remove_cvref_t<Range>> &&
     std::is_trivial_v<std::remove_cvref_t<std::ranges::range_value_t<Range>>>;
 
 template <class Object>
-concept HashObject = HashPOD<Object> || HashRange<Object>;
+concept TrivialObject = TrivialValue<Object> || TrivialRange<Object>;
 
 }  // namespace bcos::crypto
