@@ -78,7 +78,7 @@ std::vector<bcos::h256> hashPerf(
     return result;
 }
 
-template <openssl::EVP_TYPE evpType>
+template <openssl::HasherType evpType>
 std::vector<bcos::h256> hashingPerf(std::string const& _inputData, size_t _count)
 {
     std::vector<bcos::h256> result(_count);
@@ -88,9 +88,9 @@ std::vector<bcos::h256> hashingPerf(std::string const& _inputData, size_t _count
     std::cout << "----------- " << hashName << " perf start -----------" << std::endl;
     auto startT = utcTime();
 
-    openssl::OpenSSLHasher<evpType> hasher;
     for (size_t i = 0; i < _count; i++)
     {
+        openssl::OpenSSLHasher<evpType> hasher;
         hasher.update(_inputData);
         std::span<std::byte> view{(std::byte*)result[i].data(), result[i].size};
 

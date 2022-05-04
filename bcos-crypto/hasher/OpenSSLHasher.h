@@ -9,7 +9,7 @@
 namespace bcos::crypto::openssl
 {
 
-enum EVP_TYPE
+enum HasherType
 {
     SM3_256,
     SHA3_256,
@@ -17,12 +17,12 @@ enum EVP_TYPE
     Keccak256,
 };
 
-template <EVP_TYPE evpType>
-class OpenSSLHasher : public HasherBase<OpenSSLHasher<evpType>>
+template <HasherType hasherType>
+class OpenSSLHasher : public HasherBase<OpenSSLHasher<hasherType>>
 {
 public:
     OpenSSLHasher()
-      : HasherBase<OpenSSLHasher<evpType>>(),
+      : HasherBase<OpenSSLHasher<hasherType>>(),
         m_mdCtx(EVP_MD_CTX_new(), &EVP_MD_CTX_free),
         m_init(false)
     {
@@ -72,13 +72,14 @@ private:
     void init()
     {
         auto md = chooseMD();
+
         if (!EVP_DigestInit(m_mdCtx.get(), md)) [[unlikely]]
         {
             BOOST_THROW_EXCEPTION(std::runtime_error{"EVP_DigestInit error!"});
         }
 
         // Keccak256 need special padding
-        if constexpr (evpType == Keccak256)
+        if constexpr (hasherType == Keccak256)
         {
             struct KECCAK1600_CTX
             {
@@ -109,9 +110,9 @@ private:
         }
     }
 
-    const EVP_MD* chooseMD()
+    constexpr const EVP_MD* chooseMD()
     {
-        switch (evpType)
+        switch (hasherType)
         {
         case SM3_256:
             return EVP_sm3();
