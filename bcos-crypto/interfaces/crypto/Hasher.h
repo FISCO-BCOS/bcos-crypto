@@ -9,7 +9,7 @@
 namespace bcos::crypto
 {
 
-// Hashing CRTP base
+// Hasher CRTP base
 template <class Impl>
 class HasherBase
 {

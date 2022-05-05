@@ -122,8 +122,6 @@ private:
             return EVP_sha256();
         case Keccak256:
             return EVP_sha3_256();
-        default:
-            return nullptr;
         }
     }
 
