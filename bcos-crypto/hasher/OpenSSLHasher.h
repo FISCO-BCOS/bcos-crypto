@@ -112,16 +112,21 @@ private:
 
     constexpr const EVP_MD* chooseMD()
     {
-        switch (hasherType)
+        if constexpr (hasherType == SM3_256)
         {
-        case SM3_256:
             return EVP_sm3();
-        case SHA3_256:
+        }
+        else if constexpr (hasherType == SHA3_256 || hasherType == Keccak256)
+        {
             return EVP_sha3_256();
-        case SHA2_256:
+        }
+        else if constexpr (hasherType == SHA2_256)
+        {
             return EVP_sha256();
-        case Keccak256:
-            return EVP_sha3_256();
+        }
+        else
+        {
+            static_assert(!sizeof(*this), "Unknown EVP Type!");
         }
     }
 

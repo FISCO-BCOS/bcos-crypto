@@ -31,6 +31,7 @@
 #include <bcos-crypto/signature/sm2/SM2Crypto.h>
 #include <bcos-utilities/Common.h>
 #include <boost/core/ignore_unused.hpp>
+#include <span>
 
 using namespace bcos;
 using namespace bcos::crypto;
@@ -92,7 +93,8 @@ std::vector<bcos::h256> hashingPerf(std::string const& _inputData, size_t _count
     {
         openssl::OpenSSLHasher<evpType> hasher;
         hasher.update(_inputData);
-        std::span<std::byte> view{(std::byte*)result[i].data(), result[i].size};
+        std::span<std::byte> view{
+            (std::byte*)result[i].data(), (std::span<std::byte>::size_type)result[i].size};
 
         hasher.final(view);
     }
