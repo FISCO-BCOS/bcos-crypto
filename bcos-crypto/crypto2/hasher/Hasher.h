@@ -1,5 +1,5 @@
 #pragma once
-#include "CommonType.h"
+#include "../Common.h"
 #include <boost/throw_exception.hpp>
 #include <iterator>
 #include <ranges>
@@ -92,7 +92,7 @@ private:
         else
         {
             static_assert(!sizeof(object), "Unsupported type!");
-            return std::span<byte>{};
+            return std::span<std::byte>{};
         }
     }
 };

@@ -17,7 +17,8 @@
  * @file HasherTest.h
  * @date 2022.04.19
  */
-#include <bcos-crypto/hasher/OpenSSLHasher.h>
+#include <bcos-crypto/crypto2/hasher/IPPCryptoHasher.h>
+#include <bcos-crypto/crypto2/hasher/OpenSSLHasher.h>
 #include <bcos-crypto/interfaces/crypto/CryptoSuite.h>
 #include <bcos-utilities/testutils/TestPromptFixture.h>
 #include <boost/algorithm/hex.hpp>
@@ -48,7 +49,15 @@ BOOST_AUTO_TEST_CASE(testSHA256)
     BOOST_CHECK_EQUAL(h1, h2);
 }
 
-BOOST_AUTO_TEST_CASE(calc)
+BOOST_AUTO_TEST_CASE(ippcryptoSM3)
+{
+    ippcrypto::IPPCryptoHasher<ippcrypto::SM3_256> hash1;
+
+    auto hash = hash1.calculate("hello world!");
+    boost::ignore_unused(hash);
+}
+
+BOOST_AUTO_TEST_CASE(opensslKeccak256)
 {
     std::string str = "hash12345";
     std::string str1 = "hash12345";
@@ -62,7 +71,7 @@ BOOST_AUTO_TEST_CASE(calc)
     BOOST_CHECK_EQUAL(h1, h2);
 }
 
-BOOST_AUTO_TEST_CASE(testHasherType)
+BOOST_AUTO_TEST_CASE(opensslSHA3)
 {
     std::string a = "str123456789012345678901234567890";
     std::string_view view = a;

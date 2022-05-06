@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../interfaces/crypto/Hasher.h"
+#include "Hasher.h"
+#include "ippcp.h"
 
 namespace bcos::crypto::ippcrypto
 {
@@ -17,8 +18,20 @@ template <HasherType hasherType>
 class IPPCryptoHasher : public bcos::crypto::HasherBase<IPPCryptoHasher<hasherType>>
 {
 public:
+    IPPCryptoHasher()
+    {
+        m_method = ippsHashMethod_SM3();
+    }
+
     void impl_update(std::span<std::byte const> in) {}
 
     void impl_final(std::span<std::byte> out) {}
+
+    constexpr static size_t impl_hashSize() noexcept { return HASH_SIZE; }
+
+private:
+    constexpr static size_t HASH_SIZE = 32;
+
+    const IppsHashMethod* m_method;
 };
 }  // namespace bcos::crypto::ippcrypto

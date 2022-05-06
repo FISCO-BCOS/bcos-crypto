@@ -37,7 +37,7 @@ HunterGate(
 )
 
 project(bcos-crypto VERSION "1.0.0")
-set(VERSION_SUFFIX "-rc2")
+set(VERSION_SUFFIX "")
 
 # basic settings
 include(Options)
@@ -64,7 +64,11 @@ add_library(${BCOS_CRYPTO_TARGET} ${SRC_LIST} ${HEADERS})
 target_link_libraries(${BCOS_CRYPTO_TARGET} PUBLIC ${DependLibraries})
 
 if(DEMO)
-add_subdirectory(demo)
+    add_subdirectory(demo)
+endif()
+
+if(ENABLE_IPPCRYPTO)
+    include(FindIPPCrypto)
 endif()
 
 if (TESTS)

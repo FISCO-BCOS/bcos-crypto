@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../interfaces/crypto/Hasher.h"
+#include "Hasher.h"
 #include <openssl/evp.h>
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/throw_exception.hpp>

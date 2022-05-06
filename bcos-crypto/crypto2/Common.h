@@ -15,18 +15,30 @@
  *
  * @brief common types for crypto
  * @file CommonType.h
- * @author: yujiechen
- * @date 2021-04-01
+ * @author: ancelmo
+ * @date 2022-05-06
  */
 #pragma once
-#include <bcos-utilities/FixedBytes.h>
-#include <bcos-utilities/Log.h>
 
-#define CRYPTO_LOG(LEVEL) BCOS_LOG(LEVEL) << LOG_BADGE("CRYPTO")
+#include <ranges>
+
 namespace bcos::crypto
 {
-using HashType = h256;
-using HashList = std::vector<HashType>;
-using HashListPtr = std::shared_ptr<HashList>;
+
+template <class Value>
+concept TrivialValue = std::is_trivial_v<std::remove_cvref_t<Value>>;
+
+#if (defined __clang__) && (__clang_major__ < 15)
+template <class Range>
+concept TrivialRange = std::ranges::random_access_range<std::remove_cvref_t<Range>> &&
+    std::is_trivial_v<std::remove_cvref_t<std::ranges::range_value_t<Range>>>;
+#else
+template <class Range>
+concept TrivialRange = std::ranges::contiguous_range<std::remove_cvref_t<Range>> &&
+    std::is_trivial_v<std::remove_cvref_t<std::ranges::range_value_t<Range>>>;
+#endif
+
+template <class Object>
+concept TrivialObject = TrivialValue<Object> || TrivialRange<Object>;
 
 }  // namespace bcos::crypto

@@ -68,6 +68,8 @@ macro(configure_project)
     # code coverage
     default_option(COVERAGE OFF)
 
+    default_option(ENABLE_IPPCRYPTO ON)
+
     #debug
     default_option(DEBUG OFF)
     if (DEBUG)
@@ -102,6 +104,8 @@ macro(print_config NAME)
     message("-- IPO                Enable IPO optimization      ${IPO}")
     message("-- SANITIZE           Enable sanitize              ${SANITIZE}")
     message("-- DEBUG              Enable debug                 ${DEBUG}")
+    message("-- SM2_OPTIMIZE       Enable SM2 optimize          ${SM2_OPTIMIZE}")
+    message("-- ENABLE_IPPCRYPTO   Enable IPPCrypto             ${ENABLE_IPPCRYPTO}")
     message("------------------------------------------------------------------------")
     message("")
 endmacro()
