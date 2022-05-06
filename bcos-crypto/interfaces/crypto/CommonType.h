@@ -32,9 +32,15 @@ using HashListPtr = std::shared_ptr<HashList>;
 template <class Value>
 concept TrivialValue = std::is_trivial_v<std::remove_cvref_t<Value>>;
 
+#if (defined __clang__) && (__clang_major__ < 15)
+template <class Range>
+concept TrivialRange = std::ranges::random_access_range<std::remove_cvref_t<Range>> &&
+    std::is_trivial_v<std::remove_cvref_t<std::ranges::range_value_t<Range>>>;
+#else
 template <class Range>
 concept TrivialRange = std::ranges::contiguous_range<std::remove_cvref_t<Range>> &&
     std::is_trivial_v<std::remove_cvref_t<std::ranges::range_value_t<Range>>>;
+#endif
 
 template <class Object>
 concept TrivialObject = TrivialValue<Object> || TrivialRange<Object>;
