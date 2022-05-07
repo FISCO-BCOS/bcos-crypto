@@ -106,7 +106,7 @@ std::vector<bcos::h256> hashingPerf(
     return result;
 }
 
-void startTest(std::string_view inputData, size_t _count)
+void stTest(std::string_view inputData, size_t _count)
 {
     // keccak256 perf
     auto hashImpl = std::make_shared<Keccak256>();
@@ -355,7 +355,7 @@ int main(int argc, char* argv[])
 
     if (HASH_CMD == cmd)
     {
-        startTest(data, count);
+        stTest(data, count);
     }
     else if (SIGN_CMD == cmd)
     {

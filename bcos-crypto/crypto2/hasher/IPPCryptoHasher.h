@@ -34,6 +34,14 @@ public:
         {
             hashMethod = ippsHashMethod_SM3();
         }
+        else if constexpr (hasherType == SHA2_256)
+        {
+            hashMethod = ippsHashMethod_SHA256_TT();
+        }
+        else
+        {
+            static_assert(!sizeof(*this), "Unknown Hasher Type!");
+        }
 
         m_hashState.reset(new std::byte[hashStateSize]);
         if (ippsHashInit_rmf(hashState(), hashMethod) != ippStsNoErr) [[unlikely]]
@@ -79,7 +87,9 @@ private:
 };
 
 using IPPCrypto_SM3_256_Hasher = IPPCryptoHasher<SM3_256>;
+using IPPCrypto_SHA2_256_Hasher = IPPCryptoHasher<SHA2_256>;
 
 static_assert(Hasher<IPPCrypto_SM3_256_Hasher>, "Assert Hasher type");
+static_assert(Hasher<IPPCrypto_SHA2_256_Hasher>, "Assert Hasher type");
 
 }  // namespace bcos::crypto::ippcrypto
