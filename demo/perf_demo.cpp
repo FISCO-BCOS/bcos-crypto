@@ -106,7 +106,7 @@ std::vector<bcos::h256> hashingPerf(
     return result;
 }
 
-void hashPerf(std::string_view inputData, size_t _count)
+void startTest(std::string_view inputData, size_t _count)
 {
     // keccak256 perf
     auto hashImpl = std::make_shared<Keccak256>();
@@ -144,7 +144,8 @@ void hashPerf(std::string_view inputData, size_t _count)
     openssl::OPENSSL_SM3_Hasher hasherSM3;
     auto sm3New = hashingPerf(hasherSM3, inputData, _count);
 
-    auto sm3New2 = hashingPerf(hasherSM3, inputData, _count);
+    ippcrypto::IPPCrypto_SM3_256_Hasher ippHasherSM3;
+    auto sm3New2 = hashingPerf(ippHasherSM3, inputData, _count);
 
     for (size_t i = 0; i < _count; ++i)
     {
@@ -354,7 +355,7 @@ int main(int argc, char* argv[])
 
     if (HASH_CMD == cmd)
     {
-        hashPerf(data, count);
+        startTest(data, count);
     }
     else if (SIGN_CMD == cmd)
     {
