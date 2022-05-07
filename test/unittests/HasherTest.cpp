@@ -51,10 +51,15 @@ BOOST_AUTO_TEST_CASE(testSHA256)
 
 BOOST_AUTO_TEST_CASE(ippcryptoSM3)
 {
-    ippcrypto::IPPCryptoHasher<ippcrypto::SM3_256> hash1;
+    ippcrypto::IPPCryptoHasher<ippcrypto::SM3_256> hasher1;
 
-    auto hash = hash1.calculate("hello world!");
-    boost::ignore_unused(hash);
+    auto hash = hasher1.calculate("hello world!");
+
+    ippcrypto::IPPCryptoHasher<ippcrypto::SM3_256> hasher2;
+    hasher2.update("hello world!");
+    auto hash2 = hasher2.final();
+
+    BOOST_CHECK_EQUAL(hash, hash2);
 }
 
 BOOST_AUTO_TEST_CASE(opensslKeccak256)
