@@ -17,7 +17,7 @@
  * @file HasherTest.h
  * @date 2022.04.19
  */
-#include <bcos-crypto/crypto2/hasher/OpenSSLHasher.h>
+#include <bcos-crypto/interfaces/crypto/hasher/OpenSSLHasher.h>
 #include <bcos-crypto/interfaces/crypto/CryptoSuite.h>
 #include <bcos-utilities/testutils/TestPromptFixture.h>
 #include <boost/algorithm/hex.hpp>

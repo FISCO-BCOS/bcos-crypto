@@ -69,6 +69,7 @@ endif()
 
 if(ENABLE_IPPCRYPTO)
     include(FindIPPCrypto)
+    add_definitions(-DENABLE_IPPCRYPTO)
 endif()
 
 if (TESTS)

@@ -1,5 +1,5 @@
-#include <bcos-crypto/crypto2/hasher/IPPCryptoHasher.h>
-#include <bcos-crypto/crypto2/hasher/OpenSSLHasher.h>
+#include <bcos-crypto/interfaces/crypto/hasher/IPPCryptoHasher.h>
+#include <bcos-crypto/interfaces/crypto/hasher/OpenSSLHasher.h>
 #include <boost/core/demangle.hpp>
 #include <boost/core/ignore_unused.hpp>
 #include <boost/lexical_cast.hpp>

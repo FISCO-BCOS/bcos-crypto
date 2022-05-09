@@ -1,3 +1,4 @@
+#ifdef ENABLE_IPPCRYPTO
 #pragma once
 
 #include "Hasher.h"
@@ -93,3 +94,5 @@ static_assert(Hasher<IPPCrypto_SM3_256_Hasher>, "Assert Hasher type");
 static_assert(Hasher<IPPCrypto_SHA2_256_Hasher>, "Assert Hasher type");
 
 }  // namespace bcos::crypto::ippcrypto
+
+#endif
