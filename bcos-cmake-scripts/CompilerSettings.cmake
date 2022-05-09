@@ -25,7 +25,6 @@ if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU") OR ("${CMAKE_CXX_COMPILER_ID}" MA
     endif()
     # set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "/usr/bin/time")
     # set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "/usr/bin/time")
-    # Use ISO C++17 standard language.
     set(CMAKE_CXX_STANDARD 20)
     set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
     set(CMAKE_CXX_VISIBILITY_PRESET hidden)
