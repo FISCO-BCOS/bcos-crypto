@@ -21,15 +21,10 @@ file(GLOB_RECURSE SOURCES "*.cpp" "*.h" "*.sol")
 set(TEST_BINARY_NAME test-bcos-crypto)
 
 find_package(OpenSSL)
-find_package(IPPCrypto REQUIRED MODULE)
-
-if (NOT IPPCRYPTO_FOUND)
-    message(FATAL_ERROR "No Intel IPP Cryptography library found on the system. To build bcos-crypto, please specify -DIPPCRYPTO_ROOT_DIR=<path> option, where <path> is the path to directory that contains include/ and lib/ folders of Intel IPP Cryptography product.")
-endif()
 
 add_executable(${TEST_BINARY_NAME} ${SOURCES})
 target_include_directories(${TEST_BINARY_NAME} PRIVATE .)
 find_package(Boost CONFIG REQUIRED unit_test_framework)
-target_include_directories(${TEST_BINARY_NAME} PUBLIC ${IPPCRYPTO_INCLUDE_DIRS})
-target_link_libraries(${TEST_BINARY_NAME} ${BCOS_CRYPTO_TARGET} Boost::unit_test_framework OpenSSL::SSL ${IPPCRYPTO_LIBRARIES})
+target_include_directories(${TEST_BINARY_NAME} PUBLIC)
+target_link_libraries(${TEST_BINARY_NAME} ${BCOS_CRYPTO_TARGET} Boost::unit_test_framework OpenSSL::SSL)
 add_test(NAME test-crypto WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND ${TEST_BINARY_NAME})

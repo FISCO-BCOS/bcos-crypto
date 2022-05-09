@@ -18,7 +18,6 @@
  * @date 2021.04.07
  * @author yujiechen
  */
-#include <bcos-crypto/crypto2/hasher/IPPCryptoHasher.h>
 #include <bcos-crypto/crypto2/hasher/OpenSSLHasher.h>
 #include <bcos-crypto/encrypt/AESCrypto.h>
 #include <bcos-crypto/encrypt/SM4Crypto.h>
@@ -144,12 +143,9 @@ void stTest(std::string_view inputData, size_t _count)
     openssl::OPENSSL_SM3_Hasher hasherSM3;
     auto sm3New = hashingPerf(hasherSM3, inputData, _count);
 
-    ippcrypto::IPPCrypto_SM3_256_Hasher ippHasherSM3;
-    auto sm3New2 = hashingPerf(ippHasherSM3, inputData, _count);
-
     for (size_t i = 0; i < _count; ++i)
     {
-        if (sm3Old[i] != sm3New[i] || sm3Old[i] != sm3New2[i])
+        if (sm3Old[i] != sm3New[i])
         {
             std::cout << "Wrong sm3 hash result! old: " << sm3Old[i] << " new: " << sm3New[i]
                       << std::endl;

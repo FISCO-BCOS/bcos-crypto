@@ -68,7 +68,7 @@ macro(configure_project)
     # code coverage
     default_option(COVERAGE OFF)
 
-    default_option(ENABLE_IPPCRYPTO ON)
+    default_option(ENABLE_IPPCRYPTO OFF)
 
     #debug
     default_option(DEBUG OFF)

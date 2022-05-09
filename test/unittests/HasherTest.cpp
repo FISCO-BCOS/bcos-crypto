@@ -17,7 +17,6 @@
  * @file HasherTest.h
  * @date 2022.04.19
  */
-#include <bcos-crypto/crypto2/hasher/IPPCryptoHasher.h>
 #include <bcos-crypto/crypto2/hasher/OpenSSLHasher.h>
 #include <bcos-crypto/interfaces/crypto/CryptoSuite.h>
 #include <bcos-utilities/testutils/TestPromptFixture.h>
@@ -47,19 +46,6 @@ BOOST_AUTO_TEST_CASE(testSHA256)
     auto h2 = openssl::OpenSSL_SHA3_256_Hasher{}.update(a).update("abcdefg").update(100).final();
 
     BOOST_CHECK_EQUAL(h1, h2);
-}
-
-BOOST_AUTO_TEST_CASE(ippcryptoSM3)
-{
-    ippcrypto::IPPCryptoHasher<ippcrypto::SM3_256> hasher1;
-
-    auto hash = hasher1.calculate("hello world!");
-
-    ippcrypto::IPPCryptoHasher<ippcrypto::SM3_256> hasher2;
-    hasher2.update("hello world!");
-    auto hash2 = hasher2.final();
-
-    BOOST_CHECK_EQUAL(hash, hash2);
 }
 
 BOOST_AUTO_TEST_CASE(opensslKeccak256)
