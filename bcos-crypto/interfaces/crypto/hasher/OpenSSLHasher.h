@@ -22,9 +22,7 @@ class OpenSSLHasher : public HasherBase<OpenSSLHasher<hasherType>>
 {
 public:
     OpenSSLHasher()
-      : HasherBase<OpenSSLHasher<hasherType>>(),
-        m_mdCtx(EVP_MD_CTX_new(), &EVP_MD_CTX_free),
-        m_init(false)
+      : HasherBase<OpenSSLHasher<hasherType>>(), m_mdCtx(EVP_MD_CTX_new()), m_init(false)
     {
         if (!m_mdCtx) [[unlikely]]
         {
@@ -130,7 +128,12 @@ private:
         }
     }
 
-    std::unique_ptr<EVP_MD_CTX, std::function<void(EVP_MD_CTX*)>> m_mdCtx;
+    struct Deleter
+    {
+        void operator()(EVP_MD_CTX* p) const { EVP_MD_CTX_free(p); }
+    };
+
+    std::unique_ptr<EVP_MD_CTX, Deleter> m_mdCtx;
     bool m_init;
 
     constexpr static size_t HASH_SIZE = 32;
