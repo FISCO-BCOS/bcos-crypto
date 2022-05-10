@@ -13,22 +13,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * @brief test cases for hashing256
- * @file HashingTest.h
+ * @brief test cases for hasher256
+ * @file HasherTest.h
  * @date 2022.04.19
  */
-#include <bcos-crypto/hasher/OpenSSLHasher.h>
+#include <bcos-crypto/interfaces/crypto/hasher/OpenSSLHasher.h>
 #include <bcos-crypto/interfaces/crypto/CryptoSuite.h>
 #include <bcos-utilities/testutils/TestPromptFixture.h>
+#include <boost/algorithm/hex.hpp>
+#include <boost/core/ignore_unused.hpp>
 #include <boost/test/unit_test.hpp>
+#include <iterator>
 #include <string>
 
 using namespace bcos;
 using namespace crypto;
-namespace bcos
+
+namespace bcos::test
 {
-namespace test
-{
+
 BOOST_FIXTURE_TEST_SUITE(HasherTest, TestPromptFixture)
 BOOST_AUTO_TEST_CASE(testSHA256)
 {
@@ -45,7 +48,21 @@ BOOST_AUTO_TEST_CASE(testSHA256)
     BOOST_CHECK_EQUAL(h1, h2);
 }
 
-BOOST_AUTO_TEST_CASE(testHasherType)
+BOOST_AUTO_TEST_CASE(opensslKeccak256)
+{
+    std::string str = "hash12345";
+    std::string str1 = "hash12345";
+
+    openssl::OPENSSL_Keccak256_Hasher hash1;
+    hash1.update(str1);
+
+    auto h1 = hash1.final();
+    auto h2 = openssl::OPENSSL_Keccak256_Hasher{}.calculate(str1);
+
+    BOOST_CHECK_EQUAL(h1, h2);
+}
+
+BOOST_AUTO_TEST_CASE(opensslSHA3)
 {
     std::string a = "str123456789012345678901234567890";
     std::string_view view = a;
@@ -60,7 +77,8 @@ BOOST_AUTO_TEST_CASE(testHasherType)
                     .update("bbbc")
                     .final();
 
-    BOOST_CHECK_NE(hash, bcos::h256());
+    decltype(hash) emptyHash;
+    BOOST_CHECK_NE(hash, emptyHash);
 
     std::string a1 = "str123456789012345678901234567890";
     view = a1;
@@ -85,5 +103,20 @@ BOOST_AUTO_TEST_CASE(testHasherType)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-}  // namespace test
-}  // namespace bcos
+}  // namespace bcos::test
+
+namespace std
+{
+
+template <size_t length>
+::std::ostream& operator<<(::std::ostream& stream, const std::array<std::byte, length>& hash)
+{
+    std::string str;
+    str.reserve(hash.size() * 2);
+    std::span<char> view{(char*)hash.data(), hash.size()};
+
+    boost::algorithm::hex_lower(view.begin(), view.end(), std::back_inserter(str));
+    stream << str;
+    return stream;
+}
+}  // namespace std
