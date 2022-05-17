@@ -48,6 +48,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # install dependencies
+include(ThirdDependencies)
 include(InstallBcosUtilities)
 
 hunter_add_package(wedpr-crypto)
@@ -57,7 +58,6 @@ find_package(Microsoft.GSL CONFIG REQUIRED)
 
 # add source directory
 include(Sources)
-option(DEMO "compile demo or not" OFF)
 
 set(BCOS_CRYPTO_TARGET bcos-crypto)
 add_library(${BCOS_CRYPTO_TARGET} ${SRC_LIST} ${HEADERS})
