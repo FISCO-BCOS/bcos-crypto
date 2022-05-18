@@ -47,14 +47,12 @@ include(CompilerSettings)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-# install dependencies
-include(ThirdDependencies)
-include(InstallBcosUtilities)
-
 hunter_add_package(wedpr-crypto)
 find_package(wedpr-crypto CONFIG REQUIRED)
 hunter_add_package(Microsoft.GSL)
 find_package(Microsoft.GSL CONFIG REQUIRED)
+
+include(InstallBcosUtilities)
 
 # add source directory
 include(Sources)
