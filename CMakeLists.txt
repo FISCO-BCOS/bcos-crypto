@@ -55,7 +55,7 @@ include(InstallDep)
 include(Sources)
 
 SET(Boost_USE_STATIC_LIBS ON)
-find_package(Boost 1.69.0 REQUIRED COMPONENTS log chrono system filesystem iostreams thread program_options)
+find_package(Boost 1.69.0 REQUIRED COMPONENTS log chrono system filesystem iostreams thread program_options unit_test_framework)
 
 set(BCOS_CRYPTO_TARGET bcos-crypto)
 add_library(${BCOS_CRYPTO_TARGET} ${SRC_LIST} ${HEADERS})
