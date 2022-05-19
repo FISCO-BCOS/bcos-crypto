@@ -132,14 +132,14 @@ jobs:
       - name: install CentOS dependencies
         run: |
           yum install -y epel-release centos-release-scl
-          yum install -y git make gcc gcc-c++ glibc-static glibc-devel cmake3 ccache devtoolset-10 boost169-static boost169-devel libzstd-devel zlib-devel flex bison python-devel python3-devel && source /opt/rh/devtoolset-10/enable
+          yum install -y git make gcc gcc-c++ glibc-static glibc-devel cmake3 ccache devtoolset-10 openssl11 openssl11-devel openssl11-static boost169-static boost169-devel libzstd-devel zlib-devel flex bison python-devel python3-devel && source /opt/rh/devtoolset-10/enable
       - name: configure and compile
         run: |
           rustup override set stable
           cargo --version
           source /opt/rh/devtoolset-10/enable
           mkdir -p build && cd build
-          cmake3 .. -DTESTS=ON -DHUNTER_ENABLED=OFF -DBOOST_INCLUDEDIR=/usr/include/boost169/ -DBOOST_LIBRARYDIR=/usr/lib64/boost169/
+          cmake3 .. -DTESTS=ON -DHUNTER_ENABLED=OFF -DBOOST_INCLUDEDIR=/usr/include/boost169/ -DBOOST_LIBRARYDIR=/usr/lib64/boost169/ -DOPENSSL_INCLUDE_DIR=/usr/include/openssl11/ -DOPENSSL_CRYPTO_LIBRARY=/usr/lib64/openssl11/
           make -j2
           CTEST_OUTPUT_ON_FAILURE=TRUE make test
   build_with_windows:
