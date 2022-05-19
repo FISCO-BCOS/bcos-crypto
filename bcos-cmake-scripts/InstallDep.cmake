@@ -7,6 +7,7 @@ if(HUNTER_ENABLED)
     find_package(bcos-utilities CONFIG REQUIRED)
 else()
     include(ExternalProject)
+    include(GNUInstallDirs)
 
     if(AUTO_INSTALL_DEPENDENCY)
         # install bcos-utilities
