@@ -24,6 +24,7 @@ else()
         IMPORTED_LOCATION ${BCOS_UTILITIES_INSTALL}/lib/libbcos-utilities.a)
     add_dependencies(bcos-utilities::bcos-utilities bcos-utilities)
 
+    # install wedpr-crypto
     set(WEDPR_CRYPTO_INSTALL ${CMAKE_CURRENT_BINARY_DIR}/wedpr-crypto-install)
     make_directory(${WEDPR_CRYPTO_INSTALL}/include)
 

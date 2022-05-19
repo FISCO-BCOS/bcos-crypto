@@ -47,7 +47,7 @@ include(CompilerSettings)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-include(InstallBcosUtilities)
+include(InstallDep)
 
 # add source directory
 include(Sources)
