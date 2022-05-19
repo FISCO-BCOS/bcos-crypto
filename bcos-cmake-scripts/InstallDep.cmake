@@ -15,7 +15,7 @@ else()
     ExternalProject_Add(bcos-utilities
         URL https://${URL_BASE}/FISCO-BCOS/bcos-utilities/archive/eaf6322d310f343663bb18b46e402ed328e2745b.tar.gz
         URL_HASH SHA1=409cdddc666eb6aea40ed8fb492c840b8614875b
-        CMAKE_ARGS -DHUNTER_ENABLED=OFF -DCMAKE_INSTALL_PREFIX=${BCOS_UTILITIES_INSTALL}
+        CMAKE_ARGS -DHUNTER_ENABLED=OFF -DCMAKE_INSTALL_PREFIX=${BCOS_UTILITIES_INSTALL} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
     )
 
     add_library(bcos-utilities::bcos-utilities STATIC IMPORTED)
