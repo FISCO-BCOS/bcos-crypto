@@ -12,11 +12,12 @@ else()
         # install bcos-utilities
         set(BCOS_UTILITIES_INSTALL ${CMAKE_CURRENT_BINARY_DIR}/bcos-utilities-install)
         make_directory(${BCOS_UTILITIES_INSTALL}/include)
-    
+
         ExternalProject_Add(bcos-utilities
             URL https://${URL_BASE}/FISCO-BCOS/bcos-utilities/archive/e3cc2f7176f495ceacbd5b3ee29c2de6f6c90b2e.tar.gz
             URL_HASH SHA1=793ff58a37d013f5efd4583f81eeff6345d5c4af
             CMAKE_ARGS -DHUNTER_ENABLED=OFF -DCMAKE_INSTALL_PREFIX=${BCOS_UTILITIES_INSTALL} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                $<BOOST_INCLUDEDIR:-DBOOST_INCLUDEDIR=${BOOST_INCLUDEDIR}> $<BOOST_LIBRARYDIR:-DBOOST_LIBRARYDIR=${BOOST_LIBRARYDIR}>
         )
 
         add_library(bcos-utilities::bcos-utilities STATIC IMPORTED)
