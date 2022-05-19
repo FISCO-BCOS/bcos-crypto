@@ -5,6 +5,7 @@ if(HUNTER_ENABLED)
 
     find_package(wedpr-crypto CONFIG REQUIRED)
     find_package(bcos-utilities CONFIG REQUIRED)
+    find_package(Boost CONFIG REQUIRED COMPONENTS log thread chrono iostreams filesystem unit_test_framework)
 else()
     include(ExternalProject)
     include(GNUInstallDirs)
