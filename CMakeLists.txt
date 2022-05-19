@@ -47,19 +47,17 @@ include(CompilerSettings)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-hunter_add_package(wedpr-crypto)
-find_package(wedpr-crypto CONFIG REQUIRED)
-hunter_add_package(Microsoft.GSL)
-find_package(Microsoft.GSL CONFIG REQUIRED)
-
 include(InstallBcosUtilities)
 
 # add source directory
 include(Sources)
 
+SET(Boost_USE_STATIC_LIBS ON)
+find_package(Boost CONFIG REQUIRED log chrono system filesystem iostreams thread program_options)
+
 set(BCOS_CRYPTO_TARGET bcos-crypto)
 add_library(${BCOS_CRYPTO_TARGET} ${SRC_LIST} ${HEADERS})
-target_link_libraries(${BCOS_CRYPTO_TARGET} PUBLIC ${DependLibraries})
+target_link_libraries(${BCOS_CRYPTO_TARGET} PUBLIC ${DependLibraries} Boost::log)
 
 if(DEMO)
     add_subdirectory(demo)
