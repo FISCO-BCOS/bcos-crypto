@@ -20,7 +20,7 @@ file(GLOB_RECURSE SOURCES "*.cpp" "*.h" "*.sol")
 # cmake settings
 set(TEST_BINARY_NAME test-bcos-crypto)
 
-find_package(OpenSSL)
+find_package(OpenSSL 1.1.1 REQUIRED)
 
 add_executable(${TEST_BINARY_NAME} ${SOURCES})
 target_include_directories(${TEST_BINARY_NAME} PRIVATE .)

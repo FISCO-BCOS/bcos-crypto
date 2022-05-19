@@ -1,4 +1,4 @@
-find_package(OpenSSL)
+find_package(OpenSSL 1.1.1 REQUIRED)
 
 add_executable(perf_demo perf_demo.cpp ${HEADERS})
 target_include_directories(perf_demo PUBLIC)
