@@ -16,8 +16,8 @@ else()
         make_directory(${BCOS_UTILITIES_INSTALL}/include)
 
         ExternalProject_Add(bcos-utilities
-            URL https://${URL_BASE}/FISCO-BCOS/bcos-utilities/archive/e3cc2f7176f495ceacbd5b3ee29c2de6f6c90b2e.tar.gz
-            URL_HASH SHA1=793ff58a37d013f5efd4583f81eeff6345d5c4af
+            URL https://${URL_BASE}/FISCO-BCOS/bcos-utilities/archive/78c461bfd3d70e1de346a6b1efdd0ce9d0d11ebe.tar.gz
+            URL_HASH SHA1=9f740a1e27133d839137abfae98acbf7dc902038
             CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} -DHUNTER_ENABLED=OFF -DCMAKE_INSTALL_PREFIX=${BCOS_UTILITIES_INSTALL} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         )
 
