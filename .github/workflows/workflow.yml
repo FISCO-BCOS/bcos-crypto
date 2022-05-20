@@ -135,8 +135,8 @@ jobs:
           yum install -y git make gcc gcc-c++ glibc-static glibc-devel cmake3 ccache devtoolset-10 openssl11 openssl11-devel openssl11-static boost169-static boost169-devel libzstd-devel zlib-devel flex bison python-devel python3-devel && source /opt/rh/devtoolset-10/enable
       - name: configure and compile
         run: |
-          cd /usr/include; ln -s boost169/openssl ./; ln -s openssl11/boost ./
-          cd /usr/lib64; ln -s boost169/* ./; ln -s openssl11/* ./
+          ln -s boost169/openssl /usr/include/; ln -s openssl11/boost /usr/include/
+          ln -s boost169/* /usr/lib64/; ln -s openssl11/* /usr/lib64/
           rustup override set stable
           cargo --version
           source /opt/rh/devtoolset-10/enable
