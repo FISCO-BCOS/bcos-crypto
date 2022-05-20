@@ -1,5 +1,6 @@
 find_package(OpenSSL 1.1.1 REQUIRED COMPONENTS Crypto)
 find_package(Boost 1.69.0 REQUIRED COMPONENTS log)
+find_package(ZLIB 1.2.7 REQUIRED)
 
 add_executable(perf_demo perf_demo.cpp ${HEADERS})
 target_include_directories(perf_demo PUBLIC)
@@ -13,5 +14,5 @@ if(ENABLE_IPPCRYPTO)
 
     add_executable(hasher_test hasher_test.cpp ${HEADERS})
     target_include_directories(hasher_test PUBLIC ${IPPCRYPTO_INCLUDE_DIRS})
-    target_link_libraries(hasher_test PUBLIC ${BCOS_CRYPTO_TARGET} Boost::thread OpenSSL::Crypto ${IPPCRYPTO_LIBRARIES})
+    target_link_libraries(hasher_test PUBLIC ${BCOS_CRYPTO_TARGET} Boost::thread OpenSSL::Crypto ${IPPCRYPTO_LIBRARIES} z)
 endif()
