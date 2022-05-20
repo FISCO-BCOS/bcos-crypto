@@ -1,5 +1,5 @@
 find_package(OpenSSL 1.1.1 REQUIRED COMPONENTS Crypto)
-find_package(Boost 1.69.0 REQUIRED COMPONENTS log)
+find_package(Boost 1.76.0 REQUIRED COMPONENTS log)
 find_package(ZLIB 1.2.7 REQUIRED)
 
 add_executable(perf_demo perf_demo.cpp ${HEADERS})

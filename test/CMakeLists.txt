@@ -21,7 +21,7 @@ file(GLOB_RECURSE SOURCES "*.cpp" "*.h" "*.sol")
 set(TEST_BINARY_NAME test-bcos-crypto)
 
 find_package(OpenSSL 1.1.1 REQUIRED COMPONENTS Crypto)
-find_package(Boost 1.69.0 REQUIRED COMPONENTS log unit_test_framework)
+find_package(Boost 1.76.0 REQUIRED COMPONENTS log unit_test_framework)
 find_package(ZLIB 1.2.7 REQUIRED)
 
 add_executable(${TEST_BINARY_NAME} ${SOURCES})
