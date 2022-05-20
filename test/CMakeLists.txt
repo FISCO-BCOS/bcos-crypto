@@ -21,10 +21,10 @@ file(GLOB_RECURSE SOURCES "*.cpp" "*.h" "*.sol")
 set(TEST_BINARY_NAME test-bcos-crypto)
 
 find_package(OpenSSL 1.1.1 REQUIRED COMPONENTS Crypto)
-find_package(Boost 1.69.0 REQUIRED COMPONENTS unit_test_framework)
+find_package(Boost 1.69.0 REQUIRED COMPONENTS log unit_test_framework)
 
 add_executable(${TEST_BINARY_NAME} ${SOURCES})
 target_include_directories(${TEST_BINARY_NAME} PRIVATE .)
 target_include_directories(${TEST_BINARY_NAME} PUBLIC)
-target_link_libraries(${TEST_BINARY_NAME} Boost::unit_test_framework ${BCOS_CRYPTO_TARGET} OpenSSL::Crypto)
+target_link_libraries(${TEST_BINARY_NAME} Boost::log Boost::unit_test_framework ${BCOS_CRYPTO_TARGET} OpenSSL::Crypto)
 add_test(NAME test-crypto WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND ${TEST_BINARY_NAME})

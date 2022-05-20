@@ -1,8 +1,9 @@
 find_package(OpenSSL 1.1.1 REQUIRED COMPONENTS Crypto)
+find_package(Boost 1.69.0 REQUIRED COMPONENTS log)
 
 add_executable(perf_demo perf_demo.cpp ${HEADERS})
 target_include_directories(perf_demo PUBLIC)
-target_link_libraries(perf_demo PUBLIC ${BCOS_CRYPTO_TARGET} OpenSSL::Crypto)
+target_link_libraries(perf_demo PUBLIC ${BCOS_CRYPTO_TARGET} Boost::log OpenSSL::Crypto)
 
 if(ENABLE_IPPCRYPTO)
     find_package(IPPCrypto REQUIRED MODULE)
