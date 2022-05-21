@@ -57,7 +57,8 @@ include(Sources)
 
 set(BCOS_CRYPTO_TARGET bcos-crypto)
 add_library(${BCOS_CRYPTO_TARGET} ${SRC_LIST} ${HEADERS})
-target_link_libraries(${BCOS_CRYPTO_TARGET} PUBLIC ${DependLibraries})
+include_directories(${Boost_INCLUDE_DIRS})
+target_link_libraries(${BCOS_CRYPTO_TARGET} PUBLIC ${DependLibraries} Boost::log)
 
 if(DEMO)
     add_subdirectory(demo)

@@ -5,10 +5,11 @@ if(HUNTER_ENABLED)
 
     find_package(wedpr-crypto CONFIG REQUIRED)
     find_package(bcos-utilities CONFIG REQUIRED)
-    find_package(Boost CONFIG REQUIRED COMPONENTS log thread chrono iostreams filesystem unit_test_framework)
+    find_package(Boost CONFIG REQUIRED COMPONENTS log thread chrono unit_test_framework)
 else()
     include(ExternalProject)
     include(GNUInstallDirs)
+    find_package(Boost REQUIRED COMPONENTS log thread chrono unit_test_framework)
 
     if(AUTO_INSTALL_DEPENDENCY)
         # install bcos-utilities
@@ -16,8 +17,8 @@ else()
         make_directory(${BCOS_UTILITIES_INSTALL}/include)
 
         ExternalProject_Add(bcos-utilities
-            URL https://${URL_BASE}/FISCO-BCOS/bcos-utilities/archive/78c461bfd3d70e1de346a6b1efdd0ce9d0d11ebe.tar.gz
-            URL_HASH SHA1=9f740a1e27133d839137abfae98acbf7dc902038
+            URL https://${URL_BASE}/FISCO-BCOS/bcos-utilities/archive/d92ecb39d82a85ec991513e53c53ee273f4729d0.tar.gz
+            URL_HASH SHA1=664163d9b597b04fef3a118b625e8a5e1479aa3b
             CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} -DHUNTER_ENABLED=OFF -DCMAKE_INSTALL_PREFIX=${BCOS_UTILITIES_INSTALL} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         )
 

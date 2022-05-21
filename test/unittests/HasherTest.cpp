@@ -53,11 +53,11 @@ BOOST_AUTO_TEST_CASE(opensslKeccak256)
     std::string str = "hash12345";
     std::string str1 = "hash12345";
 
-    openssl::OPENSSL_Keccak256_Hasher hash1;
+    openssl::OpenSSL_SHA3_256_Hasher hash1;
     hash1.update(str1);
 
     auto h1 = hash1.final();
-    auto h2 = openssl::OPENSSL_Keccak256_Hasher{}.calculate(str1);
+    auto h2 = openssl::OpenSSL_SHA3_256_Hasher{}.calculate(str1);
 
     BOOST_CHECK_EQUAL(h1, h2);
 }

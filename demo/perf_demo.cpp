@@ -108,16 +108,16 @@ std::vector<bcos::h256> hashingPerf(
 void stTest(std::string_view inputData, size_t _count)
 {
     // keccak256 perf
-    auto hashImpl = std::make_shared<Keccak256>();
-    auto keccak256Old = hashPerf(hashImpl, "Keccak256", inputData, _count);
+    // auto hashImpl = std::make_shared<Keccak256>();
+    // auto keccak256Old = hashPerf(hashImpl, "Keccak256", inputData, _count);
 
-    openssl::OPENSSL_Keccak256_Hasher hasherKeccak256;
-    auto keccak256New = hashingPerf(hasherKeccak256, inputData, _count);
-    if (keccak256Old[0] != keccak256New[0])
-    {
-        std::cout << "Wrong keccak256 hash result! old: " << keccak256Old[0]
-                  << " new: " << keccak256New[0] << std::endl;
-    }
+    // openssl::OPENSSL_Keccak256_Hasher hasherKeccak256;
+    // auto keccak256New = hashingPerf(hasherKeccak256, inputData, _count);
+    // if (keccak256Old[0] != keccak256New[0])
+    // {
+    //     std::cout << "Wrong keccak256 hash result! old: " << keccak256Old[0]
+    //               << " new: " << keccak256New[0] << std::endl;
+    // }
 
     // sha3 perf
     auto hashImpl2 = std::make_shared<class Sha3>();
