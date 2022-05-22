@@ -23,13 +23,13 @@ else()
         )
 
         add_library(bcos-utilities::bcos-utilities MODULE IMPORTED)
-        target_include_directories(bcos-utilities::bcos-utilities INTERFACE ${BCOS_UTILITIES_INSTALL}/include)
+        target_include_directories(bcos-utilities::bcos-utilities INTERFACE "${BCOS_UTILITIES_INSTALL}/include")
         set_property(TARGET bcos-utilities::bcos-utilities PROPERTY
-            IMPORTED_LOCATION ${BCOS_UTILITIES_INSTALL}/${CMAKE_INSTALL_LIBDIR}/libbcos-utilities.a)
+            IMPORTED_LOCATION "${BCOS_UTILITIES_INSTALL}/${CMAKE_INSTALL_LIBDIR}/libbcos-utilities${CMAKE_STATIC_LIBRARY_SUFFIX}")
         add_dependencies(bcos-utilities::bcos-utilities bcos-utilities)
 
         # install wedpr-crypto
-        set(WEDPR_CRYPTO_INSTALL ${CMAKE_CURRENT_BINARY_DIR}/wedpr-crypto-install)
+        set(WEDPR_CRYPTO_INSTALL "${CMAKE_CURRENT_BINARY_DIR}/wedpr-crypto-install")
         make_directory(${WEDPR_CRYPTO_INSTALL}/include)
 
         ExternalProject_Add(wedpr-crypto
@@ -37,13 +37,14 @@ else()
             URL_HASH SHA1=dcbb69c96085ada1d107380b3771fd8e177ad207
             CONFIGURE_COMMAND ""
             BUILD_COMMAND cargo +nightly-2021-06-17 build --release --features "wedpr_f_hash_keccak256 wedpr_f_signature_secp256k1 wedpr_f_signature_sm2 wedpr_f_hash_sm3 wedpr_f_vrf_curve25519 wedpr_f_crypto_block_cipher_aes wedpr_f_crypto_block_cipher_sm4 wedpr_f_hash_ripemd160 wedpr_f_hash_sha2 wedpr_f_hash_sha3 wedpr_f_hash_blake2b wedpr_f_signature_ed25519" --no-default-features --manifest-path ${CMAKE_CURRENT_BINARY_DIR}/wedpr-crypto-prefix/src/wedpr-crypto/ffi/ffi_c/ffi_c_crypto_binary/Cargo.toml
-            INSTALL_COMMAND cp -r ${CMAKE_CURRENT_BINARY_DIR}/wedpr-crypto-prefix/src/wedpr-crypto/third_party/include ${WEDPR_CRYPTO_INSTALL}/include/wedpr-crypto
+            INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_BINARY_DIR}/wedpr-crypto-prefix/src/wedpr-crypto/third_party/include" "${WEDPR_CRYPTO_INSTALL}/include/wedpr-crypto"
+            # INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_BINARY_DIR}/wedpr-crypto-prefix/src/wedpr-crypto/third_party/include" "${WEDPR_CRYPTO_INSTALL}/include/wedpr-crypto"
         )
 
         add_library(wedpr-crypto::crypto STATIC IMPORTED)
-        target_include_directories(wedpr-crypto::crypto INTERFACE ${WEDPR_CRYPTO_INSTALL}/include/)
+        target_include_directories(wedpr-crypto::crypto INTERFACE "${WEDPR_CRYPTO_INSTALL}/include/")
         set_property(TARGET wedpr-crypto::crypto PROPERTY
-            IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/wedpr-crypto-prefix/src/wedpr-crypto/target/release/libffi_c_crypto_binary.a)
+            IMPORTED_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/wedpr-crypto-prefix/src/wedpr-crypto/target/release/libffi_c_crypto_binary${CMAKE_STATIC_LIBRARY_SUFFIX}")
         add_dependencies(wedpr-crypto::crypto wedpr-crypto)
     endif()
 endif()
