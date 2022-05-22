@@ -4,7 +4,7 @@ find_package(ZLIB REQUIRED)
 
 add_executable(perf_demo perf_demo.cpp ${HEADERS})
 target_include_directories(perf_demo PUBLIC)
-target_link_libraries(perf_demo PUBLIC ${BCOS_CRYPTO_TARGET} Boost::log OpenSSL::Crypto z)
+target_link_libraries(perf_demo PUBLIC ${BCOS_CRYPTO_TARGET} Boost::log OpenSSL::Crypto ZLIB::ZLIB)
 
 if(ENABLE_IPPCRYPTO)
     find_package(IPPCrypto REQUIRED MODULE)
