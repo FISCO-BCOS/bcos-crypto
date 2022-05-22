@@ -1,4 +1,4 @@
-name: bcos-crypto GitHub Actions
+name: FISCO-BCOS GitHub Actions
 on:
   push:
     paths-ignore:
@@ -12,166 +12,39 @@ on:
       - "README.md"
   release:
     types: [published, created, edited]
-env:
-  CCACHE_DIR: ${{ github.workspace }}/ccache
-
 jobs:
-  build_with_clang:
-    name: build_with_clang
+  build_with_vcpkg:
+    name: build_with_vcpkg
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest]
+        os: [ubuntu-20.04,windows-2019,macos-latest]
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 5
-      - name: install rust language
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly-2021-06-17
-          override: true
-      - uses: actions/cache@v2
-        id: cache
-        with:
-          path: |
-            /home/runner/.hunter
-            /Users/runner/.hunter/
-            ccache
-          key: hunter-clang-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
-          restore-keys: |
-            hunter-clang-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
-            hunter-clang-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-
-            hunter-clang-v2-notest-${{ runner.temp }}-
-      - name: install macOS dependencies
-        if: runner.os == 'macOS'
-        run: brew install ccache llvm zlib; 
-      - name: install Ubuntu dependencies
-        if: runner.os == 'Linux'
-        run: sudo apt install -y git curl build-essential clang cmake ccache libboost1.71-all-dev
-      - name: configure
-        if: runner.os == 'macOS'
-        run: CC=/usr/local/opt/llvm/bin/clang CXX=/usr/local/opt/llvm/bin/clang++ cmake . -DTESTS=ON -DDEMO=ON -DSM2_OPTIMIZE=ON
-      - name: configure
-        if: runner.os == 'Linux'
-        run: CC=/usr/bin/clang CXX=/usr/bin/clang++ cmake . -DTESTS=ON -DDEMO=ON -DSM2_OPTIMIZE=ON
-      - name: compile
-        run: make -j2
-      - name: run test
-        run: CTEST_OUTPUT_ON_FAILURE=TRUE make test
-  build_with_gcc:
-    name: build_with_gcc
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-20.04]
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 5
-      - uses: actions/cache@v2
-        id: cache
-        with:
-          path: /home/runner/.hunter
-          key: hunter-ubuntu20-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
-          restore-keys: |
-            hunter-ubuntu20-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
-            hunter-ubuntu20-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-
-            hunter-ubuntu20-v2-notest-${{ runner.temp }}-
-      - uses: actions/cache@v2
-        id: ccache
-        with:
-          path: ccache
-          key: ccache-ubuntu20-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
-          restore-keys: |
-            ccache-ubuntu20-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
-            ccache-ubuntu20-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-
-            ccache-ubuntu20-v2-notest-${{ runner.temp }}-
-      - name: install rust language
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly-2021-06-17
-          override: true
-      - name: install Ubuntu dependencies
-        run: sudo apt install -y git curl build-essential cmake ccache libboost1.71-all-dev
-      - name: configure
-        run: |
-          CC=gcc-10 CXX=g++-10 cmake . -DTESTS=ON -DDEMO=ON -DHUNTER_ENABLED=OFF
-      - name: compile
-        run: make -j2
-      - name: run test
-        run: CTEST_OUTPUT_ON_FAILURE=TRUE make test
-  build_with_centos:
-    name: build_with_centos
-    runs-on: ubuntu-latest
-    container:
-      image: docker.io/centos:7
-      volumes:
-        - /github/home/.hunter:/github/home/.hunter
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 5
-      - name: install rust language
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly-2021-06-17
-          override: true
-      - uses: actions/cache@v2
-        id: cache
-        with:
-          path: |
-            /home/runner/.hunter
-            /github/home/.hunter
-            ccache
-          key: hunter-centos-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
-          restore-keys: |
-            hunter-centos-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
-            hunter-centos-v2-notest-${{ runner.temp }}-${{ github.base_ref }}-
-            hunter-centos-v2-notest-${{ runner.temp }}-
-      - name: install CentOS dependencies
-        run: |
-          yum install -y epel-release centos-release-scl
-          yum install -y git make gcc gcc-c++ glibc-static glibc-devel cmake3 ccache devtoolset-10 openssl11 openssl11-devel openssl11-static boost169-static boost169-devel libzstd-devel zlib-devel flex bison python-devel python3-devel && source /opt/rh/devtoolset-10/enable
-      - name: configure and compile
-        run: |
-          cd /usr/include; ln -s boost169/openssl ./; ln -s openssl11/boost ./; cd -
-          cd /usr/lib64; ln -s boost169/* ./; ln -s openssl11/* ./; cd -
-          rustup override set stable
-          cargo --version
-          source /opt/rh/devtoolset-10/enable
-          mkdir -p build && cd build
-          cmake3 .. -DTESTS=ON -DDEMO=ON -DHUNTER_ENABLED=OFF
-          make -j2
-          CTEST_OUTPUT_ON_FAILURE=TRUE make test
-  build_with_windows:
-    name: build_with_windows
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-2019]
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 5
-      - uses: actions/cache@v2
-        id: cache
-        with:
-          path: |
-            /home/runner/.hunter
-            /github/home/.hunter
-            /Users/runner/.hunter
-            C:/.hunter/
-            ccache
-          key: hunter-msvc-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
-          restore-keys: |
-            hunter-msvc-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-${{ hashFiles('.github/workflows/workflow.yml') }}
-            hunter-msvc-v1-notest-${{ runner.temp }}-${{ github.base_ref }}-
-            hunter-msvc-v1-notest-${{ runner.temp }}-
-      - name: Add MSbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
-      - name: configure
+      - uses: friendlyanon/setup-vcpkg@v1
+        with: { committish: 7e3dcf74e37034eea358934a90a11d618520e139 }
+      - name: Prepare windows msbuild
         if: runner.os == 'Windows'
-        run: mkdir -p build && cd build && cmake -G "Visual Studio 16 2019" -A x64 .. -DTESTS=ON -DDEMO=ON -DSM2_OPTIMIZE=ON -DHUNTER_CONFIGURATION_TYPES=Release -DHUNTER_STATUS_DEBUG=ON
-      - name: compile
-        run: cd build && MSBuild bcos-crypto.sln /p:Configuration=Release /p:Platform=x64
+        uses: microsoft/setup-msbuild@v1.1
+      - name: Prepare linux build tool
+        if: runner.os == 'Linux'
+        run: |
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
+      - name: Configure for macOS
+        if: runner.os == 'macOS'
+        run:
+          mkdir -p build && cd build && CC="$(brew --prefix llvm)/bin/clang" CXX="$(brew --prefix llvm)/bin/clang++" cmake -DCMAKE_BUILD_TYPE=Release -DTESTS=ON -DHUNTER_ENABLED=OFF -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake ../
+      - name: Configure for linux and windows
+        if: runner.os != 'macOS'
+        run:
+          mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DTESTS=ON -DHUNTER_ENABLED=OFF -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake ../
+      - name: Compile
+        run: 
+          cd build && cmake --build . --parallel
+      - name: Test
+        if: runner.os != 'Windows'
+        run:
+          cd build && CTEST_OUTPUT_ON_FAILURE=TRUE ctest
