@@ -25,7 +25,7 @@ else()
         add_library(bcos-utilities::bcos-utilities MODULE IMPORTED)
         target_include_directories(bcos-utilities::bcos-utilities INTERFACE "${BCOS_UTILITIES_INSTALL}/include")
         set_property(TARGET bcos-utilities::bcos-utilities PROPERTY
-            IMPORTED_LOCATION "${BCOS_UTILITIES_INSTALL}/${CMAKE_INSTALL_LIBDIR}/libbcos-utilities${CMAKE_STATIC_LIBRARY_SUFFIX}")
+            IMPORTED_LOCATION "${BCOS_UTILITIES_INSTALL}/${CMAKE_INSTALL_LIBDIR}/${CMAKE_STATIC_LIBRARY_PREFIX}bcos-utilities${CMAKE_STATIC_LIBRARY_SUFFIX}")
         add_dependencies(bcos-utilities::bcos-utilities bcos-utilities)
 
         # install wedpr-crypto
