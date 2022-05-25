@@ -11,13 +11,15 @@ include_directories(bcos-crypto/signature/ed25519)
 aux_source_directory(bcos-crypto/encrypt SRC_LIST)
 include_directories(bcos-crypto/encrypt)
 
+find_package(BCOSUtilities REQUIRED MODULE)
+find_package(WeDPRCrypto REQUIRED MODULE)
 
-set(DependLibraries bcos-utilities::bcos-utilities wedpr-crypto::crypto)
+set(DependLibraries BCOSUtilities::BCOSUtilities WeDPRCrypto::WeDPRCrypto)
 
 if (WIN32)
-set(DependLibraries ${DependLibraries} Ws2_32 Wldap32 Crypt32 userenv)
+    set(DependLibraries ${DependLibraries} Ws2_32 Wldap32 Crypt32 userenv)
 else()
-set(DependLibraries ${DependLibraries} pthread dl)
+    set(DependLibraries ${DependLibraries} pthread dl)
 endif()
 
 set(ExcludePattern "bcos-crypto/signature/fastsm2*")
