@@ -13,12 +13,12 @@ on:
   release:
     types: [published, created, edited]
 jobs:
-  build_with_vcpkg:
-    name: build_with_vcpkg
+  build:
+    name: build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04,windows-2019,macos-latest]
+        os: [ubuntu-20.04,windows-2019,macos-11]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -27,24 +27,25 @@ jobs:
         with:
           toolchain: nightly-2021-06-17
           override: true
-      - uses: friendlyanon/setup-vcpkg@v1
-        with: { committish: 7e3dcf74e37034eea358934a90a11d618520e139 }
       - name: Prepare windows msbuild
         if: runner.os == 'Windows'
         uses: microsoft/setup-msbuild@v1.1
-      - name: Prepare linux build tool
+      - name: Prepare linux gcc-10
         if: runner.os == 'Linux'
         run: |
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
-      - name: Configure for macOS
+      - name: Prepare vcpkg
+        uses: friendlyanon/setup-vcpkg@v1
+        with: { committish: 7e3dcf74e37034eea358934a90a11d618520e139 }
+      - name: Configure for macos
         if: runner.os == 'macOS'
         run:
-          mkdir -p build && cd build && CC="$(brew --prefix llvm)/bin/clang" CXX="$(brew --prefix llvm)/bin/clang++" cmake -DCMAKE_BUILD_TYPE=Release -DTESTS=ON -DHUNTER_ENABLED=OFF -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake ../
+          mkdir -p build && cd build && CC="$(brew --prefix llvm)/bin/clang" CXX="$(brew --prefix llvm)/bin/clang++" cmake -DCMAKE_BUILD_TYPE=Release -DTESTS=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake ../
       - name: Configure for linux and windows
         if: runner.os != 'macOS'
         run:
-          mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DTESTS=ON -DHUNTER_ENABLED=OFF -DCMAKE_TOOLCHAIN_FILE="${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake" ../
+          mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DTESTS=ON -DDEMO=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake ../
       - name: Compile
         run: 
           cd build && cmake --build . --parallel
@@ -52,3 +53,37 @@ jobs:
         if: runner.os != 'Windows'
         run:
           cd build && CTEST_OUTPUT_ON_FAILURE=TRUE ctest
+  build_centos:
+    name: build_centos
+    runs-on: ubuntu-20.04
+    container: docker.io/centos:7
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 5
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2021-06-17
+          override: true
+      - name: Prepare centos tools
+        run: |
+          yum install yum install -y epel-release centos-release-scl
+          yum install -y devtoolset-10  rh-perl530-perl cmake3
+          yum install -y https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm
+          yum install -y git
+      - name: Prepare vcpkg
+        uses: friendlyanon/setup-vcpkg@v1
+        with: { committish: 7e3dcf74e37034eea358934a90a11d618520e139 }
+      - name: Configure
+        run: |
+          . /opt/rh/devtoolset-10/enable
+          . /opt/rh/rh-perl530/enable
+          mkdir -p build
+          cd build
+          cmake3 -DCMAKE_BUILD_TYPE=Release -DTESTS=ON DEMO=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake ../
+      - name: Compile
+        run: 
+          cd build && cmake3 --build . --parallel
+      - name: Test
+        run:
+          cd build && CTEST_OUTPUT_ON_FAILURE=TRUE make test
