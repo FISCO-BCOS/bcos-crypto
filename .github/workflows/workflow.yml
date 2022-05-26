@@ -83,7 +83,7 @@ jobs:
           cmake3 -DCMAKE_BUILD_TYPE=Release -DTESTS=ON DEMO=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake ../
       - name: Compile
         run: 
-          cd build && cmake3 --build . --parallel
+          cd build && cmake3 --build . --parallel || cat /__w/bcos-crypto/bcos-crypto/build/bcos-utilities-prefix/src/bcos-utilities-build/vcpkg-manifest-install.log
       - name: Test
         run:
           cd build && CTEST_OUTPUT_ON_FAILURE=TRUE make test
