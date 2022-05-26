@@ -1,0 +1,13 @@
+{
+    "name": "bcos-crypto",
+    "version-string": "1.0-dev",
+    "homepage": "https://ftp.gnome.org/pub/GNOME/sources/pango/",
+    "description": "Text and font handling library.",
+    "dependencies": [
+        "boost-test",
+        "boost-log",
+        "boost-multiprecision",
+        "openssl",
+        "zlib"
+    ]
+}

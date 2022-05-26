@@ -28,13 +28,6 @@ set(BCOS_CMAKE_SCRIPTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bcos-cmake-scripts)
 set(BCOS_CRYPTO_CMAKE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake" CACHE PATH "The cmake path for the library")
 list(APPEND CMAKE_MODULE_PATH ${BCOS_CMAKE_SCRIPTS_DIR})
 list(APPEND CMAKE_MODULE_PATH ${BCOS_CRYPTO_CMAKE_DIR})
-#init hunter
-include(HunterGate)
-HunterGate(
-    URL "https://${URL_BASE}/FISCO-BCOS/hunter/archive/2b5b25ecffaba74393740bf0b8758c4e8d9297cf.tar.gz"
-    SHA1 "5d8365a327be260cf24d2b125a71ee7069aca28f"
-    FILEPATH "${BCOS_CRYPTO_CMAKE_DIR}/config.cmake"
-)
 
 project(bcos-crypto VERSION "1.0.0")
 set(VERSION_SUFFIX "")
@@ -47,20 +40,14 @@ include(CompilerSettings)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-# install dependencies
-include(InstallBcosUtilities)
-
-hunter_add_package(wedpr-crypto)
-find_package(wedpr-crypto CONFIG REQUIRED)
-hunter_add_package(Microsoft.GSL)
-find_package(Microsoft.GSL CONFIG REQUIRED)
+# SET(Boost_USE_STATIC_LIBS ON)
 
 # add source directory
 include(Sources)
-option(DEMO "compile demo or not" OFF)
 
 set(BCOS_CRYPTO_TARGET bcos-crypto)
 add_library(${BCOS_CRYPTO_TARGET} ${SRC_LIST} ${HEADERS})
+include_directories(${Boost_INCLUDE_DIRS})
 target_link_libraries(${BCOS_CRYPTO_TARGET} PUBLIC ${DependLibraries})
 
 if(DEMO)
