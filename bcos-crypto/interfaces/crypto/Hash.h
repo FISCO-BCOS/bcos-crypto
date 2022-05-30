@@ -67,6 +67,13 @@ public:
 
     inline HashImplType getHashImplType() const { return m_type; }
 
+    // init a hashContext
+    virtual void* init() = 0;
+    // update the hashContext
+    virtual void* update(void* _hashContext, bytesConstRef _data) = 0;
+    // final the hashContext
+    virtual HashType final(void* _hashContext) = 0;
+
 private:
     HashType m_emptyHash = HashType();
     HashImplType m_type = Keccak256Hash;

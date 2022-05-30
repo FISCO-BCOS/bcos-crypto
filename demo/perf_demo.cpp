@@ -155,11 +155,9 @@ void derivePublicKeyPerf(size_t _count)
     keyPair = signatureImpl->generateKeyPair();
     derivePublicKeyPerf(signatureImpl, "SM2", *keyPair, _count);
 
-#if SM2_OPTIMIZE
     signatureImpl = std::make_shared<FastSM2Crypto>();
     keyPair = signatureImpl->generateKeyPair();
     derivePublicKeyPerf(signatureImpl, "FastSM2", *keyPair, _count);
-#endif
 
     signatureImpl = std::make_shared<Ed25519Crypto>();
     keyPair = signatureImpl->generateKeyPair();
@@ -177,11 +175,9 @@ void signaturePerf(size_t _count)
     signatureImpl = std::make_shared<SM2Crypto>();
     signaturePerf(signatureImpl, msgHash, "SM2", _count);
 
-#if SM2_OPTIMIZE
     // fastsm2 perf
     signatureImpl = std::make_shared<FastSM2Crypto>();
     signaturePerf(signatureImpl, msgHash, "FastSM2", _count);
-#endif
 
     // ed25519 perf
     signatureImpl = std::make_shared<Ed25519Crypto>();

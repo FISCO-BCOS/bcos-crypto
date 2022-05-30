@@ -19,6 +19,7 @@
  * @author yujiechen
  */
 #pragma once
+#include "OpenSSLHasher.h"
 #include <bcos-crypto/interfaces/crypto/Hash.h>
 #include <wedpr-crypto/WedprCrypto.h>
 
@@ -30,9 +31,21 @@ class Keccak256 : public Hash
 {
 public:
     using Ptr = std::shared_ptr<Keccak256>;
-    Keccak256() { setHashImplType(HashImplType::Keccak256Hash); }
-    virtual ~Keccak256() {}
+    Keccak256() : m_hasher(std::make_shared<OPENSSL_Keccak256_Hasher>())
+    {
+        setHashImplType(HashImplType::Keccak256Hash);
+    }
+    ~Keccak256() override {}
     HashType hash(bytesConstRef _data) override;
+    // init a hashContext
+    void* init() override;
+    // update the hashContext
+    void* update(void* _hashContext, bytesConstRef _data) override;
+    // final the hashContext
+    HashType final(void* _hashContext) override;
+
+private:
+    std::shared_ptr<OPENSSL_Keccak256_Hasher> m_hasher;
 };
 HashType keccak256Hash(bytesConstRef _data);
 }  // namespace crypto
