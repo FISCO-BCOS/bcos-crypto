@@ -51,10 +51,10 @@ jobs:
         run: sudo apt install -y git curl build-essential clang cmake ccache
       - name: configure
         if: runner.os == 'macOS'
-        run: export SDKROOT=$(xcrun --sdk macosx --show-sdk-path) && CC=/usr/bin/clang CXX=/usr/bin/clang++ cmake . -DTESTS=ON -DDEMO=ON -DSM2_OPTIMIZE=ON
+        run: export SDKROOT=$(xcrun --sdk macosx --show-sdk-path) && CC=/usr/bin/clang CXX=/usr/bin/clang++ cmake . -DTESTS=ON -DDEMO=ON
       - name: configure
         if: runner.os == 'Linux'
-        run: CC=/usr/bin/clang CXX=/usr/bin/clang++ cmake . -DTESTS=ON -DDEMO=ON -DSM2_OPTIMIZE=ON
+        run: CC=/usr/bin/clang CXX=/usr/bin/clang++ cmake . -DTESTS=ON -DDEMO=ON
       - name: compile
         run: make -j2
       - name: run test
@@ -96,7 +96,7 @@ jobs:
         run: sudo apt install -y git curl build-essential cmake ccache
       - name: configure
         run: |
-          cmake . -DTESTS=ON -DDEMO=ON -DSM2_OPTIMIZE=ON
+          cmake . -DTESTS=ON -DDEMO=ON
       - name: compile
         run: make -j2
       - name: run test
@@ -139,7 +139,7 @@ jobs:
       - name: configure
         run: |
           export CPATH=/Library/Developer/CommandLineTools/usr/include/c++/v1
-          cmake . -DTESTS=ON -DCOVERAGE=ON -DDEMO=ON -DSM2_OPTIMIZE=ON
+          cmake . -DTESTS=ON -DCOVERAGE=ON -DDEMO=ON
       - name: compile
         run: make -j2
       - name: run test
@@ -190,7 +190,7 @@ jobs:
           cargo --version
           source /opt/rh/devtoolset-7/enable
           mkdir -p build && cd build
-          cmake3 .. -DTESTS=ON -DSM2_OPTIMIZE=ON
+          cmake3 .. -DTESTS=ON
           make -j2
           CTEST_OUTPUT_ON_FAILURE=TRUE make test
   build_with_windows:
@@ -221,6 +221,6 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1
       - name: configure
         if: runner.os == 'Windows'
-        run: mkdir -p build && cd build && cmake -G "Visual Studio 16 2019" -A x64 .. -DTESTS=ON -DDEMO=ON -DSM2_OPTIMIZE=ON -DHUNTER_CONFIGURATION_TYPES=Release -DHUNTER_STATUS_DEBUG=ON
+        run: mkdir -p build && cd build && cmake -G "Visual Studio 16 2019" -A x64 .. -DTESTS=ON -DDEMO=ON -DHUNTER_CONFIGURATION_TYPES=Release -DHUNTER_STATUS_DEBUG=ON
       - name: compile
         run: cd build && MSBuild bcos-crypto.sln /p:Configuration=Release /p:Platform=x64

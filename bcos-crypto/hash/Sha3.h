@@ -19,6 +19,7 @@
  * @author yujiechen
  */
 #pragma once
+#include "OpenSSLHasher.h"
 #include <bcos-crypto/interfaces/crypto/Hash.h>
 #include <wedpr-crypto/WedprCrypto.h>
 #include <wedpr-crypto/WedprUtilities.h>
@@ -29,21 +30,31 @@ namespace crypto
 {
 HashType inline sha3Hash(bytesConstRef _data)
 {
-    HashType hashData;
-    CInputBuffer hashInput{(const char*)_data.data(), _data.size()};
-    COutputBuffer hashResult{(char*)hashData.data(), HashType::size};
-    wedpr_sha3_hash(&hashInput, &hashResult);
-    // Note: Due to the return value optimize of the C++ compiler, there will be no additional copy
-    // overhead
-    return hashData;
+    OpenSSL_SHA3_256_Hasher hasher;
+    return hasher.calculate(_data);
 }
 class Sha3 : public Hash
 {
 public:
     using Ptr = std::shared_ptr<Sha3>;
-    Sha3() { setHashImplType(HashImplType::Sha3); }
+    Sha3() : m_hasher(std::make_shared<OpenSSL_SHA3_256_Hasher>())
+    {
+        setHashImplType(HashImplType::Sha3);
+    }
     virtual ~Sha3() {}
-    HashType hash(bytesConstRef _data) override { return sha3Hash(_data); }
+    HashType hash(bytesConstRef _data) override { return m_hasher->calculate(_data); }
+    // init a hashContext
+    void* init() override { return m_hasher->init(); }
+    // update the hashContext
+    void* update(void* _hashContext, bytesConstRef _data) override
+    {
+        return m_hasher->update(_hashContext, _data);
+    }
+    // final the hashContext
+    HashType final(void* _hashContext) override { return m_hasher->final(_hashContext); }
+
+private:
+    std::shared_ptr<OpenSSL_SHA3_256_Hasher> m_hasher;
 };
 }  // namespace crypto
 }  // namespace bcos
