@@ -37,7 +37,7 @@ HunterGate(
 )
 
 project(bcos-crypto VERSION "1.0.0")
-set(VERSION_SUFFIX "-rc2")
+set(VERSION_SUFFIX "-rc3")
 
 # basic settings
 include(Options)
