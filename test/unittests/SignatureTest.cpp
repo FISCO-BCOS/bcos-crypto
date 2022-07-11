@@ -25,6 +25,7 @@
 #include <bcos-crypto/signature/codec/SignatureDataWithV.h>
 #include <bcos-crypto/signature/ed25519/Ed25519Crypto.h>
 #include <bcos-crypto/signature/ed25519/Ed25519KeyPair.h>
+#include <bcos-crypto/signature/fastsm2/FastSM2Crypto.h>
 #include <bcos-crypto/signature/key/KeyFactoryImpl.h>
 #include <bcos-crypto/signature/secp256k1/Secp256k1Crypto.h>
 #include <bcos-crypto/signature/secp256k1/Secp256k1KeyPair.h>
@@ -34,9 +35,6 @@
 #include <bcos-utilities/testutils/TestPromptFixture.h>
 #include <boost/test/unit_test.hpp>
 #include <string>
-#if SM2_OPTIMIZE
-#include <bcos-crypto/signature/fastsm2/FastSM2Crypto.h>
-#endif
 using namespace bcos;
 using namespace bcos::crypto;
 
@@ -312,11 +310,10 @@ BOOST_AUTO_TEST_CASE(testSM2SignAndVerify)
     std::cout << "### testSM2SignAndVerify: SM2Crypto" << std::endl;
     auto signatureCrypto = std::make_shared<SM2Crypto>();
     SM2SignAndVerifyTest(signatureCrypto);
-#if SM2_OPTIMIZE
+
     std::cout << "### testSM2SignAndVerify: FastSM2Crypto" << std::endl;
     auto fastCrypto = std::make_shared<FastSM2Crypto>();
     SM2SignAndVerifyTest(fastCrypto);
-#endif
 }
 
 
