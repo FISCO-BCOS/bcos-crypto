@@ -25,23 +25,22 @@ namespace bcos
 {
 namespace crypto
 {
-HashType inline sha3Hash(bytesConstRef _data)
+HashType inline sha256Hash(bytesConstRef _data)
 {
-    hasher::openssl::OpenSSL_SHA3_256_Hasher hasher;
+    hasher::openssl::OpenSSL_SHA2_256_Hasher hasher;
     hasher.update(_data);
 
     HashType out;
     hasher.final(out);
     return out;
 }
-
-class Sha3 : public Hash
+class Sha256 : public Hash
 {
 public:
-    using Ptr = std::shared_ptr<Sha3>;
-    Sha3() { setHashImplType(HashImplType::Sha3); }
-    virtual ~Sha3() {}
-    HashType hash(bytesConstRef _data) override { return sha3Hash(_data); }
+    using Ptr = std::shared_ptr<Sha256>;
+    Sha256() { setHashImplType(HashImplType::Sha3); }
+    virtual ~Sha256() {}
+    HashType hash(bytesConstRef _data) override { return sha256Hash(_data); }
     bcos::crypto::hasher::AnyHasher hasher() override
     {
         return bcos::crypto::hasher::AnyHasher{

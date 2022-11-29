@@ -19,7 +19,6 @@
  * @author yujiechen
  */
 #pragma once
-#include "OpenSSLHasher.h"
 #include <bcos-crypto/interfaces/crypto/Hash.h>
 #include <wedpr-crypto/WedprCrypto.h>
 
@@ -29,31 +28,25 @@ namespace crypto
 {
 HashType inline sm3Hash(bytesConstRef _data)
 {
-    OPENSSL_SM3_Hasher hasher;
-    return hasher.calculate(_data);
+    hasher::openssl::OpenSSL_SM3_Hasher hasher;
+    hasher.update(_data);
+
+    HashType out;
+    hasher.final(out);
+    return out;
 }
 class SM3 : public Hash
 {
 public:
     using Ptr = std::shared_ptr<SM3>;
-    SM3() : m_hasher(std::make_shared<OPENSSL_SM3_Hasher>())
-    {
-        setHashImplType(HashImplType::Sm3Hash);
-    }
+    SM3() { setHashImplType(HashImplType::Sm3Hash); }
     virtual ~SM3() {}
-    HashType hash(bytesConstRef _data) override { return m_hasher->calculate(_data); }
-    // init a hashContext
-    void* init() override { return m_hasher->init(); }
-    // update the hashContext
-    void* update(void* _hashContext, bytesConstRef _data) override
-    {
-        return m_hasher->update(_hashContext, _data);
-    }
-    // final the hashContext
-    HashType final(void* _hashContext) override { return m_hasher->final(_hashContext); }
+    HashType hash(bytesConstRef _data) override { return sm3Hash(_data); }
 
-private:
-    std::shared_ptr<OPENSSL_SM3_Hasher> m_hasher;
+    bcos::crypto::hasher::AnyHasher hasher() override
+    {
+        return bcos::crypto::hasher::AnyHasher{bcos::crypto::hasher::openssl::OpenSSL_SM3_Hasher{}};
+    };
 };
 }  // namespace crypto
 }  // namespace bcos

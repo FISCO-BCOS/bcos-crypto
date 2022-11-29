@@ -13,41 +13,40 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * @brief implementation for fast-sm2 keyPairFactory
- * @file FastSM2KeyPairFactory.h
- * @date 2022.01.17
- * @author yujiechen
+ * @brief implementation for hsm sm2 keyPairFactory algorithm
+ * @file HsmSM2KeyPairFactory.h
+ * @date 2022.11.04
+ * @author lucasli
  */
 #pragma once
-#include <bcos-crypto/signature/fastsm2/FastSM2KeyPair.h>
-#include <bcos-crypto/signature/fastsm2/FastSM2KeyPairFactory.h>
-#include <bcos-crypto/signature/sm2/SM2KeyPairFactory.h>
+#include <bcos-crypto/interfaces/crypto/KeyPairFactory.h>
+#include <bcos-crypto/signature/hsmSM2/HsmSM2KeyPair.h>
 #include <memory>
-
-#ifdef WITH_SM2_OPTIMIZE
-
 namespace bcos
 {
 namespace crypto
 {
-class FastSM2KeyPairFactory : public SM2KeyPairFactory
+class HsmSM2KeyPairFactory : public KeyPairFactory
 {
 public:
-    using Ptr = std::shared_ptr<FastSM2KeyPairFactory>;
-    FastSM2KeyPairFactory() : SM2KeyPairFactory() {}
-    ~FastSM2KeyPairFactory() override {}
+    using Ptr = std::shared_ptr<HsmSM2KeyPairFactory>;
+    HsmSM2KeyPairFactory() = default;
+    ~HsmSM2KeyPairFactory() override {}
 
-    KeyPairInterface::UniquePtr createKeyPair() override
+    KeyPairInterface::UniquePtr createKeyPair(unsigned int _keyIndex, std::string _password)
     {
-        return std::make_unique<FastSM2KeyPair>();
+        return std::make_unique<HsmSM2KeyPair>(_keyIndex, _password);
     }
 
     KeyPairInterface::UniquePtr createKeyPair(SecretPtr _secretKey) override
     {
-        return std::make_unique<FastSM2KeyPair>(_secretKey);
+        return std::make_unique<HsmSM2KeyPair>(_secretKey);
+    }
+
+    KeyPairInterface::UniquePtr generateKeyPair() override
+    {
+        return std::make_unique<HsmSM2KeyPair>();
     }
 };
 }  // namespace crypto
 }  // namespace bcos
-
-#endif
