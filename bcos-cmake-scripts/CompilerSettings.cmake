@@ -25,9 +25,9 @@ if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU") OR ("${CMAKE_CXX_COMPILER_ID}" MA
     endif()
     # set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "/usr/bin/time")
     # set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "/usr/bin/time")
-    # Use ISO C++17 standard language.
-    set(CMAKE_CXX_STANDARD 17)
-    set(CMAKE_CXX_FLAGS "-std=c++17 -pthread -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -fexceptions")
+    # Use ISO C++20 standard language.
+    set(CMAKE_CXX_STANDARD 20)
+    set(CMAKE_CXX_FLAGS "-std=c++20 -pthread -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -fexceptions")
     set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
     set(CMAKE_CXX_VISIBILITY_PRESET hidden)
     # Enables all the warnings about constructions that some users consider questionable,
@@ -140,7 +140,7 @@ if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU") OR ("${CMAKE_CXX_COMPILER_ID}" MA
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
     
     # Only support visual studio 2017 and visual studio 2019
-    set(MSVC_MIN_VERSION "1914") # VS2017 15.7, for full-ish C++17 support
+    set(MSVC_MIN_VERSION "1914") # VS2017 15.7, for full-ish C++20 support
     
     message(STATUS "Compile On Windows, MSVC_TOOLSET_VERSION: ${MSVC_TOOLSET_VERSION}")
 
@@ -152,7 +152,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
         message(FATAL_ERROR "Unsupported Visual Studio, supported list: [2017, 2019]. Current MSVC_TOOLSET_VERSION: ${MSVC_TOOLSET_VERSION}")
     endif()
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20")
 else ()
     message(WARNING "Your compiler is not tested, if you run into any issues, we'd welcome any patches.")
 endif ()

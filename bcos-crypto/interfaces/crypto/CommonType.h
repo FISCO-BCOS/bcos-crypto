@@ -23,13 +23,10 @@
 #include <bcos-utilities/Log.h>
 
 #define CRYPTO_LOG(LEVEL) BCOS_LOG(LEVEL) << LOG_BADGE("CRYPTO")
-namespace bcos
-{
-namespace crypto
+namespace bcos::crypto
 {
 using HashType = h256;
 using HashList = std::vector<HashType>;
 using HashListPtr = std::shared_ptr<HashList>;
 
-}  // namespace crypto
-}  // namespace bcos
+}  // namespace bcos::crypto

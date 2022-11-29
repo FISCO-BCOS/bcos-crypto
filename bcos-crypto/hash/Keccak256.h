@@ -19,34 +19,34 @@
  * @author yujiechen
  */
 #pragma once
-#include "OpenSSLHasher.h"
+
 #include <bcos-crypto/interfaces/crypto/Hash.h>
 #include <wedpr-crypto/WedprCrypto.h>
 
-namespace bcos
+namespace bcos::crypto
 {
-namespace crypto
+
+inline HashType keccak256Hash(bytesConstRef _data)
 {
+    bcos::crypto::hasher::openssl::OpenSSL_Keccak256_Hasher hasher;
+    hasher.update(_data);
+
+    HashType out;
+    hasher.final(out);
+    return out;
+}
+
 class Keccak256 : public Hash
 {
 public:
     using Ptr = std::shared_ptr<Keccak256>;
-    Keccak256() : m_hasher(std::make_shared<OPENSSL_Keccak256_Hasher>())
-    {
-        setHashImplType(HashImplType::Keccak256Hash);
-    }
+    Keccak256() { setHashImplType(HashImplType::Keccak256Hash); }
     ~Keccak256() override {}
-    HashType hash(bytesConstRef _data) override;
-    // init a hashContext
-    void* init() override;
-    // update the hashContext
-    void* update(void* _hashContext, bytesConstRef _data) override;
-    // final the hashContext
-    HashType final(void* _hashContext) override;
-
-private:
-    std::shared_ptr<OPENSSL_Keccak256_Hasher> m_hasher;
+    HashType hash(bytesConstRef _data) override { return keccak256Hash(_data); }
+    bcos::crypto::hasher::AnyHasher hasher() override
+    {
+        return bcos::crypto::hasher::AnyHasher{
+            bcos::crypto::hasher::openssl::OpenSSL_Keccak256_Hasher{}};
+    }
 };
-HashType keccak256Hash(bytesConstRef _data);
-}  // namespace crypto
-}  // namespace bcos
+}  // namespace bcos::crypto

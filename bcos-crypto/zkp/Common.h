@@ -13,40 +13,29 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * @brief Hash algorithm of sha3
- * @file Sha3.h
- * @date 2021.04.01
+ * @brief define the exceptions for zkp of bcos-crypto
+ * @file Common.h
+ * @date 2022.07.18
  * @author yujiechen
  */
 #pragma once
-#include <bcos-crypto/interfaces/crypto/Hash.h>
+#include "Exceptions.h"
+#include <bcos-utilities/Common.h>
+#include <wedpr-crypto/WedprUtilities.h>
 
 namespace bcos
 {
 namespace crypto
 {
-HashType inline sha3Hash(bytesConstRef _data)
+inline CInputBuffer bytesToInputBuffer(bytes const& data, size_t _length)
 {
-    hasher::openssl::OpenSSL_SHA3_256_Hasher hasher;
-    hasher.update(_data);
-
-    HashType out;
-    hasher.final(out);
-    return out;
-}
-
-class Sha3 : public Hash
-{
-public:
-    using Ptr = std::shared_ptr<Sha3>;
-    Sha3() { setHashImplType(HashImplType::Sha3); }
-    virtual ~Sha3() {}
-    HashType hash(bytesConstRef _data) override { return sha3Hash(_data); }
-    bcos::crypto::hasher::AnyHasher hasher() override
+    if (data.size() < _length)
     {
-        return bcos::crypto::hasher::AnyHasher{
-            bcos::crypto::hasher::openssl::OpenSSL_SHA3_256_Hasher{}};
-    };
-};
+        BOOST_THROW_EXCEPTION(
+            InvalidInputInput() << errinfo_comment(
+                "InvalidInputInput: the data size must be at least " + std::to_string(_length)));
+    }
+    return CInputBuffer{(const char*)data.data(), _length};
+}
 }  // namespace crypto
 }  // namespace bcos

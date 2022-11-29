@@ -19,6 +19,7 @@
  * @date 2021-03-03
  */
 #pragma once
+#include "../../hasher/AnyHasher.h"
 #include <bcos-crypto/interfaces/crypto/CommonType.h>
 #include <bcos-crypto/interfaces/crypto/KeyInterface.h>
 #include <bcos-utilities/FixedBytes.h>
@@ -67,12 +68,7 @@ public:
 
     inline HashImplType getHashImplType() const { return m_type; }
 
-    // init a hashContext
-    virtual void* init() = 0;
-    // update the hashContext
-    virtual void* update(void* _hashContext, bytesConstRef _data) = 0;
-    // final the hashContext
-    virtual HashType final(void* _hashContext) = 0;
+    virtual bcos::crypto::hasher::AnyHasher hasher() = 0;
 
 private:
     HashType m_emptyHash = HashType();

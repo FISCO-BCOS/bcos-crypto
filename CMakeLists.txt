@@ -53,6 +53,9 @@ include(InstallBcosUtilities)
 hunter_add_package(wedpr-crypto)
 find_package(wedpr-crypto CONFIG REQUIRED)
 
+hunter_add_package(range-v3)
+find_package(range-v3 CONFIG REQUIRED)
+
 # add source directory
 include(Sources)
 option(DEMO "compile demo or not" OFF)
@@ -69,6 +72,10 @@ if (TESTS)
     enable_testing()
     set(CTEST_OUTPUT_ON_FAILURE TRUE)
     add_subdirectory(test)
+endif()
+
+if(USE_HSM_SDF)
+    include(ProjectSDF)
 endif()
 
 include(InstallConfig)

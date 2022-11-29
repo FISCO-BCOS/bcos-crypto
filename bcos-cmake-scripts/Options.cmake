@@ -74,6 +74,15 @@ macro(configure_project)
         add_definitions(-DFISCO_DEBUG)
     endif()
 
+    # hardware crypto SDF
+    default_option(USE_HSM_SDF OFF)
+    if(USE_HSM_SDF)
+        if(NOT "${CMAKE_HOST_SYSTEM_NAME}" MATCHES "Linux")
+            message(FATAL "${CMAKE_HOST_SYSTEM_NAME} ${ARCHITECTURE} does not support by hardware secure module")
+        endif()
+        add_compile_definitions(WITH_HSM)
+    endif()
+
     # Suffix like "-rc1" e.t.c. to append to versions wherever needed.
     if (NOT DEFINED VERSION_SUFFIX)
         set(VERSION_SUFFIX "")
@@ -91,6 +100,7 @@ macro(print_config NAME)
     message("-- CMAKE_BUILD_TYPE   Build type                   ${CMAKE_BUILD_TYPE}")
     message("-- TARGET_PLATFORM    Target platform              ${CMAKE_SYSTEM_NAME} ${ARCHITECTURE}")
     message("-- BUILD_STATIC       Build static                 ${BUILD_STATIC}")
+    message("-- USE_HSM_SDF        Build SDF HSM                ${USE_HSM_SDF}")
     message("-- COVERAGE           Build code coverage          ${COVERAGE}")
     message("-- TESTS              Build tests                  ${TESTS}")
     message("-- NATIVE             Build native binary          ${NATIVE}")

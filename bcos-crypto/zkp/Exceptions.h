@@ -13,40 +13,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *
- * @brief Hash algorithm of sha3
- * @file Sha3.h
- * @date 2021.04.01
+ * @brief define the exceptions for zkp of bcos-crypto
+ * @file Execptions.h
+ * @date 2022.07.18
  * @author yujiechen
  */
 #pragma once
-#include <bcos-crypto/interfaces/crypto/Hash.h>
+#include <bcos-utilities/Exceptions.h>
 
 namespace bcos
 {
 namespace crypto
 {
-HashType inline sha3Hash(bytesConstRef _data)
-{
-    hasher::openssl::OpenSSL_SHA3_256_Hasher hasher;
-    hasher.update(_data);
-
-    HashType out;
-    hasher.final(out);
-    return out;
-}
-
-class Sha3 : public Hash
-{
-public:
-    using Ptr = std::shared_ptr<Sha3>;
-    Sha3() { setHashImplType(HashImplType::Sha3); }
-    virtual ~Sha3() {}
-    HashType hash(bytesConstRef _data) override { return sha3Hash(_data); }
-    bcos::crypto::hasher::AnyHasher hasher() override
-    {
-        return bcos::crypto::hasher::AnyHasher{
-            bcos::crypto::hasher::openssl::OpenSSL_SHA3_256_Hasher{}};
-    };
-};
+DERIVE_BCOS_EXCEPTION(ZkpExcetpion);
+DERIVE_BCOS_EXCEPTION(InvalidInputInput);
 }  // namespace crypto
 }  // namespace bcos
