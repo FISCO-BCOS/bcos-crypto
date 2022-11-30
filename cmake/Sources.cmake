@@ -9,7 +9,7 @@ else()
 set(DependLibraries ${DependLibraries} pthread dl)
 endif()
 
-if (NOT USE_HSM_SDF)
+if (NOT WITH_HSM_SDF)
     list(REMOVE_ITEM SRC_LIST ${HSM_SRCS})
 else ()
     list(APPEND DependLibraries SDF gmt0018)
