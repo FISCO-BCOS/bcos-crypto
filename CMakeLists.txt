@@ -74,7 +74,7 @@ if (TESTS)
     add_subdirectory(test)
 endif()
 
-if(USE_HSM_SDF)
+if(WITH_HSM_SDF)
     include(ProjectSDF)
 endif()
 
