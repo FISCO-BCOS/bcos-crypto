@@ -25,3 +25,8 @@ hunter_config(wedpr-crypto VERSION 1.0.0
     URL https://${URL_BASE}/WeBankBlockchain/WeDPR-Lab-Crypto/archive/caeea48d7fa6c879fef52063cf107873744629b2.tar.gz
     SHA1 03e76f0759a0da0f55cad5d49af510657bb6f343
 )
+
+hunter_config(range-v3 VERSION 1.0.0
+    URL https://${URL_BASE}/ericniebler/range-v3/archive/a81477931a8aa2ad025c6bda0609f38e09e4d7ec.tar.gz
+    SHA1 2d84b639bfd42bb1cbe2fd88f85ff0d1cca25952
+)
