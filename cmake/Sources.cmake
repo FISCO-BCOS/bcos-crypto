@@ -9,11 +9,7 @@ else()
 set(DependLibraries ${DependLibraries} pthread dl)
 endif()
 
-if (NOT WITH_HSM_SDF)
-    list(REMOVE_ITEM SRC_LIST ${HSM_SRCS})
-else ()
-    list(APPEND DependLibraries SDF gmt0018)
-endif ()
+list(APPEND DependLibraries SDF)
 
 set(ExcludePattern "bcos-crypto/signature/fastsm2*")
 hunter_add_package(OpenSSL)

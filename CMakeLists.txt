@@ -74,9 +74,8 @@ if (TESTS)
     add_subdirectory(test)
 endif()
 
-if(WITH_HSM_SDF)
-    include(ProjectSDF)
-endif()
+# hardware crypto SDF
+include(ProjectSDF)
 
 include(InstallConfig)
 # install crypto target
