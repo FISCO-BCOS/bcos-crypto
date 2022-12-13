@@ -18,8 +18,8 @@
  * @date 2022.10.07
  * @author lucasli
  */
-#include "CryptoProvider.h"
-#include "sdf/SDFCryptoProvider.h"
+#include "hsm-crypto/hsm/CryptoProvider.h"
+#include "hsm-crypto/hsm/SDFCryptoProvider.h"
 #include <bcos-crypto/signature/Exceptions.h>
 #include <bcos-crypto/signature/codec/SignatureDataWithPub.h>
 #include <bcos-crypto/signature/hsmSM2/HsmSM2Crypto.h>
@@ -28,7 +28,6 @@
 using namespace bcos;
 using namespace bcos::crypto;
 using namespace hsm;
-using namespace hsm::sdf;
 
 #define SDR_OK 0x0
 #define SDR_BASE 0x01000000
