@@ -27,7 +27,6 @@
 #include <openssl/obj_mac.h>
 #include <openssl/sm2.h>
 
-#ifdef WITH_SM2_OPTIMIZE
 using namespace bcos;
 using namespace bcos::crypto;
 
@@ -303,5 +302,3 @@ done:
     }
     return ret;
 }
-
-#endif
