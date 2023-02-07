@@ -6,7 +6,7 @@ set(SDF_LIB_NAME "libsdf-crypto.a")
 ExternalProject_Add(libsdf
     PREFIX ${CMAKE_SOURCE_DIR}/deps
     GIT_REPOSITORY https://${URL_BASE}/WeBankBlockchain/hsm-crypto.git
-    GIT_TAG        0ec6b68c262fcdc49520bafb9544790625dfa7f5
+    GIT_TAG        4061ec90c9e840a11660dffd04e3e4590799becc
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
     BUILD_IN_SOURCE true
     LOG_CONFIGURE 1

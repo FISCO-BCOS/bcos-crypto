@@ -93,20 +93,25 @@ jobs:
           toolchain: nightly-2021-06-17
           override: true
       - name: install Ubuntu dependencies
-        run: sudo apt install -y git curl build-essential cmake ccache
+        run: |  
+          sudo apt update
+          sudo apt install -y git curl build-essential cmake ccache
       - name: configure
         run: |
+          export GCC='gcc-10'
+          export CXX='g++-10'
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           cmake . -DTESTS=ON -DDEMO=ON
       - name: compile
         run: make -j2
       - name: run test
         run: CTEST_OUTPUT_ON_FAILURE=TRUE make test
-  ubuntu18_04_build_with_gcc:
-    name: ubuntu18_04_build_with_gcc
+  ubuntu22_04_build_with_gcc:
+    name: ubuntu22_04_build_with_gcc
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04]
+        os: [ubuntu-22.04]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -135,9 +140,14 @@ jobs:
           toolchain: nightly-2021-06-17
           override: true
       - name: install Ubuntu dependencies
-        run: sudo apt-get install -y git curl build-essential cmake ccache lcov libzstd-dev
+        run: | 
+          sudo apt-get update
+          sudo apt-get install -y git curl build-essential cmake ccache lcov libzstd-dev python3-dev
       - name: configure
         run: |
+          export GCC='gcc-10'
+          export CXX='g++-10'
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           export CPATH=/Library/Developer/CommandLineTools/usr/include/c++/v1
           cmake . -DTESTS=ON -DCOVERAGE=ON -DDEMO=ON
       - name: compile
@@ -183,12 +193,17 @@ jobs:
       - name: install CentOS dependencies
         run: |
           yum install -y epel-release centos-release-scl
-          yum install -y git make gcc gcc-c++ glibc-static glibc-devel cmake3 ccache devtoolset-7 libzstd-devel zlib-devel flex bison python-devel python3-devel && source /opt/rh/devtoolset-7/enable
+          yum install -y git make gcc gcc-c++ glibc-static glibc-devel cmake3 ccache devtoolset-11 llvm-toolset-7.0 rh-perl530-perl libzstd-devel zlib-devel flex bison python-devel python3-devel
       - name: configure and compile
         run: |
           rustup override set stable
           cargo --version
-          source /opt/rh/devtoolset-7/enable
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          . /opt/rh/devtoolset-11/enable
+          . /opt/rh/rh-perl530/enable
+          export LIBCLANG_PATH=/opt/rh/llvm-toolset-7.0/root/lib64/
+          . /opt/rh/llvm-toolset-7.0/enable
+          alias cmake='cmake3'
           mkdir -p build && cd build
           cmake3 .. -DTESTS=ON
           make -j2
