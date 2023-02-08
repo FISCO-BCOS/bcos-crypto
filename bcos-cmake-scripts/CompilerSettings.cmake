@@ -90,8 +90,8 @@ if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU") OR ("${CMAKE_CXX_COMPILER_ID}" MA
 
     # Additional GCC-specific compiler settings.
     if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-        # Check that we've got GCC 7.0 or newer.
-        set(GCC_MIN_VERSION "7.0")
+        # Check that we've got GCC 10.0 or newer.
+        set(GCC_MIN_VERSION "10.0")
         execute_process(
             COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
         if (NOT (GCC_VERSION VERSION_GREATER ${GCC_MIN_VERSION} OR GCC_VERSION VERSION_EQUAL ${GCC_MIN_VERSION}))
