@@ -53,8 +53,10 @@ include(InstallBcosUtilities)
 hunter_add_package(wedpr-crypto)
 find_package(wedpr-crypto CONFIG REQUIRED)
 
-hunter_add_package(range-v3)
-find_package(range-v3 CONFIG REQUIRED)
+if (NOT MSVC)
+    hunter_add_package(range-v3)
+    find_package(range-v3 CONFIG REQUIRED)
+endif()
 
 # add source directory
 include(Sources)

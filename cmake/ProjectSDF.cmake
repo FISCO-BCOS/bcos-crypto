@@ -1,17 +1,21 @@
 include(ExternalProject)
 include(GNUInstallDirs)
 
-set(SDF_LIB_NAME "libsdf-crypto.a")
+if (WIN32)
+    set(SDF_LIB_NAME "sdf-crypto.lib")
+else()
+    set(SDF_LIB_NAME "libsdf-crypto.a")
+endif (WIN32)
 
 ExternalProject_Add(libsdf
     PREFIX ${CMAKE_SOURCE_DIR}/deps
     GIT_REPOSITORY https://${URL_BASE}/WeBankBlockchain/hsm-crypto.git
-    GIT_TAG        0693c45167a932266f8a1c11f3ef83d982e8334d
+    GIT_TAG        654f2253e890dc6c868ba759201cfad4c7cf928d
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
     BUILD_IN_SOURCE true
-    LOG_CONFIGURE 1
-    LOG_BUILD 1
-    LOG_INSTALL 1
+    LOG_CONFIGURE 0
+    LOG_BUILD 0
+    LOG_INSTALL 0
 )
 
 ExternalProject_Get_Property(libsdf INSTALL_DIR)

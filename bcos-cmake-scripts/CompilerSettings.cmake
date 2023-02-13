@@ -138,21 +138,31 @@ if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU") OR ("${CMAKE_CXX_COMPILER_ID}" MA
         endif()
     endif ()
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
-    
+
     # Only support visual studio 2017 and visual studio 2019
     set(MSVC_MIN_VERSION "1914") # VS2017 15.7, for full-ish C++20 support
-    
+
     message(STATUS "Compile On Windows, MSVC_TOOLSET_VERSION: ${MSVC_TOOLSET_VERSION}")
 
     if (MSVC_TOOLSET_VERSION EQUAL 141)
         message(STATUS "Compile On Visual Studio 2017")
     elseif(MSVC_TOOLSET_VERSION EQUAL 142)
         message(STATUS "Compile On Visual Studio 2019")
+    elseif(MSVC_TOOLSET_VERSION EQUAL 143)
+        message(STATUS "Compile On Visual Studio 2019")
     else()
         message(FATAL_ERROR "Unsupported Visual Studio, supported list: [2017, 2019]. Current MSVC_TOOLSET_VERSION: ${MSVC_TOOLSET_VERSION}")
     endif()
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20")
+    add_definitions(-DUSE_STD_RANGES)
+    add_compile_options(/std:c++latest)
+    add_compile_options(-bigobj)
+
+    set(CMAKE_CXX_FLAGS_DEBUG "/MTd /DEBUG")
+    set(CMAKE_CXX_FLAGS_MINSIZEREL "/MT /Os")
+    set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/MT /DEBUG")
+    link_libraries(ws2_32 Crypt32 userenv)
 else ()
     message(WARNING "Your compiler is not tested, if you run into any issues, we'd welcome any patches.")
 endif ()
